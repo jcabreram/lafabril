@@ -9,23 +9,24 @@ class Users_Model extends CI_Model
 	
 	public function login($username, $password)
 	{
-		$username = $this->security->xss_clean($username);
-		$password = $this->security->xss_clean($password);
-
-		$this->db->where('username', $username);
-		$this->db->where('password', $password);
-
-		$query = $this->db->get('users');
-
-		if ($query->num_rows == 1) {
+		$sql = "SELECT id, nombre, departamento, activo FROM usuarios WHERE username = '$username' AND password = '$password'";
+		$query = $this->db->query($sql);
+		
+		if($query->num_rows() == 1) {
 			$row = $query->row();
-			$data = array(
-				'user_id' => $row->id,
-				'username' => $row->username,
-				'nombre' => $row->nombre,
-				'departamento' => $row->departamento
-			);
 
+			// Load session library
+			$this->load->library('session');
+
+			// Prepare data for saving
+			$data = array(
+				'id' => $row->id,
+				'nombre' => $row->nombre,
+				'departamento' => $row->departamento,
+				'activo' => $row->activo
+ 			);
+
+			// Save session data
 			$this->session->set_userdata($data);
 
 			return true;

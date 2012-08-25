@@ -7,21 +7,20 @@ class Login extends CI_Controller
 		// Page title
 		$data['title'] = 'Identificación';
 
-		// We load form validation library
-		$this->load->library('form_validation');
+		// If form was submitted
+		if ($_POST) {
+			// Load users model
+			$this->load->model('users_model');
 
-		// Set validation rules
-		$this->form_validation->set_rules('username', 'usuario', 'trim|required|xss_clean');
-		$this->form_validation->set_rules('password', 'contraseña', 'trim|required|sha1');
-
-		// We run form validation
-		if ($this->form_validation->run() == true) { // If validation succeeded
-			if (false) { // If login succeeded
+			// If login was correct
+			if ($this->users_model->login($_POST['username'], $_POST['password'])) {
+				// Load url helper
 				$this->load->helper('url');
-				redirect();
+				redirect('home');
 			}
 		}
-		
+
+		// Display views
 		$this->load->view('login/index.php', $data);
 	}
 	
