@@ -73,17 +73,19 @@
 			
 			<div id="login-content">
 				
-				<form action="index.html">
+				<form action="/login" method="post">
 				
+					<?php if ($_POST) : ?>
 					<div class="notification information png_bg">
 						<div>
-							Usuario y/o contraseña incorrecto(s).
+							Usuario y/o contraseña incorrectos.
 						</div>
 					</div>
+					<?php endif; ?>
 					
 					<p>
 						<label>Usuario</label>
-						<input name="username" class="text-input" type="text" value="<?php echo set_value('username'); ?>" />
+						<input name="username" class="text-input" type="text" />
 					</p>
 					<div class="clear"></div>
 					<p>
