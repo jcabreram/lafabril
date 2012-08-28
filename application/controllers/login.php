@@ -2,6 +2,15 @@
 
 class Login extends CI_Controller
 {
+	public function __construct()
+	{
+		parent::__construct();
+		
+		$this->load->helper('url');
+		$this->load->library('session');
+		$this->load->helper('html');
+	}
+	
 	public function index()
 	{
 		// Page title
