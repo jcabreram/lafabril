@@ -1,6 +1,6 @@
 <?php
 
-class Home extends CI_Controller
+class Usuario extends CI_Controller
 {
 	public function __construct()
 	{
@@ -10,14 +10,16 @@ class Home extends CI_Controller
 		$this->load->library('session');
 	}
 	
-	public function index()
+	public function agregar()
 	{
 		$data['username'] = $this->session->userdata('nombre');
-		$data['title'] = "La Fabril - Pantalla Principal";
+		$data['title'] = "La Fabril - Agregar usuario";
 			
 		// Display views
 		$this->load->view('header.php', $data);
-		$this->load->view('index.php', $data);
+		$this->load->view('usuarios/agregar_usuario.php', $data);
 		$this->load->view('footer.php', $data);
+
+		
 	}
 }

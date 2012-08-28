@@ -68,7 +68,7 @@
 			
 				<h1>La Fabril</h1>
 				<!-- Logo (221px width) -->
-				<img id="logo" src="/resources/images/logo.png" alt="La Fabril" />
+				<img src="<?php echo site_url('resources/images/banner.png'); ?>" />
 			</div> <!-- End #login-top -->
 			
 			<div id="login-content">
