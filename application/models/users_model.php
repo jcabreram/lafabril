@@ -9,6 +9,8 @@ class Users_Model extends CI_Model
 	
 	public function login($username, $password)
 	{
+		// FALTA FILTRAR LOS DATOS
+
 		$sql = "SELECT id, nombre, departamento, activo FROM usuarios WHERE username = '$username' AND password = '$password'";
 		$query = $this->db->query($sql);
 		
