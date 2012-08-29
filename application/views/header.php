@@ -7,7 +7,7 @@
 		
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		
-		<title><?php echo $title; ?></title>
+		<title>La Fabril - <?php echo $title; ?></title>
 		
 		<!--                       CSS                       -->
 	  
@@ -68,19 +68,19 @@
 			<h1 id="sidebar-title"><a href="/">La Fabril</a></h1>
 		  
 			<!-- Logo (221px wide) -->
-			<a href="#"><center><img id="logo" src="<?php echo base_url();?>resources/images/logo.png" alt="Simpla Admin logo" /></center></a>
+			<a href="<?php echo site_url(); ?>"><center><img id="logo" src="<?php echo base_url();?>resources/images/logo.png" alt="Simpla Admin logo" /></center></a>
 		  
 			<!-- Sidebar Profile links -->
 			<div id="profile-links">
-				Bienvenido, <a href="#" title="Edit your profile"><?php echo $username; ?></a>.<br />
+				Bienvenido, <a href="#" title="Edit your profile"><?php echo $user['nombre']; ?></a>.<br />
 				<br />
-				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="#" title="Cerrar Sesión">Salir</a>
+				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="<?php echo site_url('usuarios/salir'); ?>" title="Cerrar Sesión">Salir</a>
 			</div>        
 			
 			<ul id="main-nav">  <!-- Accordion Menu -->
 				
 				<li>
-					<a href="/" class="nav-top-item no-submenu current"> <!-- Add the class "no-submenu" to menu items with no sub menu -->
+					<a href="<?php echo site_url(); ?>" class="nav-top-item no-submenu<?php if (controller_name() == 'inicio') { echo ' current'; } ?>"> <!-- Add the class "no-submenu" to menu items with no sub menu -->
 						Inicio
 					</a>       
 				</li>
@@ -105,11 +105,11 @@
 				</li>
 				
 				<li>
-					<a href="#" class="nav-top-item">
+					<a href="#" class="nav-top-item<?php if (controller_name() == 'usuarios') { echo ' current'; } ?>">
 						Usuarios
 					</a>
 					<ul>
-						<li><a href="<?php echo base_url();?>usuario/agregar">Agregar Usuario</a></li>
+						<li><a href="<?php echo site_url('usuarios/registrar'); ?>"<?php if (method_name() == 'usuarios/registrar') { echo ' class="current"'; } ?>>Registrar Usuario</a></li>
 						<li><a href="#">Administrar Usuarios</a></li>
 					</ul>
 				</li>
