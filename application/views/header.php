@@ -68,11 +68,11 @@
 			<h1 id="sidebar-title"><a href="/">La Fabril</a></h1>
 		  
 			<!-- Logo (221px wide) -->
-			<a href="<?php echo site_url(); ?>"><center><img id="logo" src="<?php echo base_url();?>resources/images/logo.png" alt="Simpla Admin logo" /></center></a>
+			<a href="<?php echo site_url(); ?>"><center><img id="logo" src="<?php echo base_url();?>resources/images/logo.png" alt="Logo de La Fabril" /></center></a>
 		  
 			<!-- Sidebar Profile links -->
 			<div id="profile-links">
-				Bienvenido, <a href="#" title="Edit your profile"><?php echo $user['nombre']; ?></a>.<br />
+				Bienvenido, <a href="#" title="Edita tu perfil"><?php echo $user['nombre']; ?></a>.<br />
 				<br />
 				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="<?php echo site_url('usuarios/salir'); ?>" title="Cerrar Sesión">Salir</a>
 			</div>        
