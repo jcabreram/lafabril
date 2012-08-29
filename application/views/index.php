@@ -1,5 +1,5 @@
 <!-- Page Head -->
-			<h2>Bienvenido <?php echo $username; ?></h2>
+			<h2>Bienvenido <?php echo $user['nombre']; ?></h2>
 			<p id="page-intro">¿Qué te gustaría hacer?</p>
 			
 			<ul class="shortcut-buttons-set">
