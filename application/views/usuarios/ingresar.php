@@ -7,7 +7,7 @@
 		
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		
-		<title><?php echo $title; ?></title>
+		<title>La Fabril - <?php echo $title; ?></title>
 		
 		<!--                       CSS                       -->
 	  
@@ -73,12 +73,12 @@
 			
 			<div id="login-content">
 				
-				<form action="/login" method="post">
+				<form action="<?php echo site_url('usuarios/ingresar'); ?>" method="post">
 				
 					<?php if ($_POST) : ?>
 					<div class="notification information png_bg">
 						<div>
-							Usuario y/o contraseña incorrectos.
+							Usuario y/o contraseña incorrectos.	
 						</div>
 					</div>
 					<?php endif; ?>
