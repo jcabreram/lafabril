@@ -11,7 +11,7 @@ class Users extends CI_Model
 	public function login($username, $password)
 	{
 		$username = $this->db->escape($username);
-		$password = $this->db->escape(sha1($password));
+		$password = $this->db->escape($password);
 
 		$sql = "SELECT id, nombre, departamento, activo FROM usuarios WHERE username = $username AND password = $password";
 		$query = $this->db->query($sql);
@@ -40,11 +40,16 @@ class Users extends CI_Model
 
 	public function signUp($username, $password, $fullName, $department, $status)
 	{
+		$username = $this->db->escape($username);
+		$password = $this->db->escape($password);
+		$fullName = $this->db->escape($fullName);
+		$department = $this->db->escape($department);
+		$status = $this->db->escape($status);
 		
 
-		$sql = "INSERT INTO usuarios (id, username, password, nombre, departamento, fecha_alta, activo)
+		$sql = "INSERT INTO usuarios (id, username, password, nombre, departamento, activo)
 				VALUES (NULL, $username, $password, $fullName, $department, $status)";
-
-		exit(var_dump($sql));
+		
+		return $this->db->query($sql);
 	}
 }

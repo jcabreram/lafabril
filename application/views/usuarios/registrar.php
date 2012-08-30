@@ -48,7 +48,7 @@
 										<option value="">Escoge una opción</option>
 										<option value="ventas" <?php echo set_select('department', 'ventas'); ?>>Ventas</option>
 										<option value="cuentasxcobrar" <?php echo set_select('department', 'cuentasxcobrar'); ?>>Cuentas por Cobrar</option>
-										<option value="administracion" <?php echo set_select('department', 'administracion'); ?>>Administración</option>
+										<option value="admin" <?php echo set_select('department', 'admin'); ?>>Administración</option>
 									</select> 
 									<?php echo form_error('department'); ?>
 								</p>
