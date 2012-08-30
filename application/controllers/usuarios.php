@@ -22,7 +22,7 @@ class Usuarios extends CI_Controller
 		// If form was submitted
 		if ($_POST) {
 			// If login was correct
-			if ($this->users->login($_POST['username'], $_POST['password'])) {
+			if ($this->users->login($_POST['username'], sha1($_POST['password']))) {
 				redirect();
 			}
 		}
@@ -88,8 +88,7 @@ class Usuarios extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			exit(var_dump($_POST));
-			//$this->users->signUp($_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status']);
+			$this->users->signUp($_POST['username'], sha1($_POST['password']), $_POST['fullName'], $_POST['department'], intval($_POST['status']));
 		}
 
 		$data['title'] = "Registrar Usuario";
