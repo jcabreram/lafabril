@@ -1,6 +1,6 @@
 <?php
 
-class Users_Model extends CI_Model
+class Users extends CI_Model
 {
 	public function __construct()
 	{
@@ -36,5 +36,15 @@ class Users_Model extends CI_Model
 		}
 
 		return false;
+	}
+
+	public function signUp($username, $password, $fullName, $department, $status)
+	{
+		
+
+		$sql = "INSERT INTO usuarios (id, username, password, nombre, departamento, fecha_alta, activo)
+				VALUES (NULL, $username, $password, $fullName, $department, $status)";
+
+		exit(var_dump($sql));
 	}
 }

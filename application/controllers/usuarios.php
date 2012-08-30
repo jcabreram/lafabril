@@ -6,7 +6,7 @@ class Usuarios extends CI_Controller
 	{
 		parent::__construct();
 
-		$this->load->helper('html');
+		$this->load->model('users');
 	}
 
 	public function ingresar()
@@ -21,11 +21,8 @@ class Usuarios extends CI_Controller
 
 		// If form was submitted
 		if ($_POST) {
-			// Load users model
-			$this->load->model('users_model');
-
 			// If login was correct
-			if ($this->users_model->login($_POST['username'], $_POST['password'])) {
+			if ($this->users->login($_POST['username'], $_POST['password'])) {
 				redirect();
 			}
 		}
@@ -47,12 +44,60 @@ class Usuarios extends CI_Controller
 			redirect('/usuarios/ingresar');
 		}
 
+		// Load form validation library
+		$this->load->library('form_validation');
+
+		// Setting error delimiters
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		// Define validation rules
+		$config = array(
+			array(
+				'field' => 'fullName', 
+				'label' => 'Nombre Completo', 
+				'rules' => 'trim|required|max_length[255]'
+			),
+			array(
+				'field' => 'username', 
+				'label' => 'Nombre de Usuario', 
+				'rules' => 'trim|required|max_length[25]|is_unique[usuarios.username]'
+			),
+			array(
+				'field' => 'password', 
+				'label' => 'Contraseña', 
+				'rules' => 'required|min_length[5]|max_length[20]'
+			),
+			array(
+				'field' => 'repassword', 
+				'label' => 'Repetir Contraseña', 
+				'rules' => 'required|matches[password]'
+			),
+			array(
+				'field' => 'department', 
+				'label' => 'Departamento',
+				'rules' => 'required'
+			),
+			array(
+				'field' => 'status', 
+				'label' => 'Estatus', 
+				'rules' => 'required'
+			),
+		);
+
+		$this->form_validation->set_rules($config);
+
+		// If validation was successful
+		if ($this->form_validation->run()) {
+			exit(var_dump($_POST));
+			//$this->users->signUp($_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status']);
+		}
+
 		$data['title'] = "Registrar Usuario";
 		$data['user'] = $this->session->userdata('user');
 			
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('usuarios/registrar', $data);
-		$this->load->view('footer', $data);		
+		$this->load->view('footer', $data);
 	}
 }
