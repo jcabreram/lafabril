@@ -99,4 +99,50 @@ class Usuarios extends CI_Controller
 		$this->load->view('usuarios/registrar', $data);
 		$this->load->view('footer', $data);
 	}
+	
+	public function administrar()
+	{
+		// Is user not logged in?
+		if (!$this->session->userdata('user')) {
+			redirect('/usuarios/ingresar');
+		}
+		
+		$data['title'] = "Administrar Usuarios";
+		$data['user'] = $this->session->userdata('user');
+		
+		// Get the array with the users in the database
+		$data['users'] = $this->users->get_users();
+			
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('usuarios/administrar', $data);
+		$this->load->view('footer', $data);
+
+	}
+	
+	public function modificar($id)
+	{
+		// Is user not logged in?
+		if (!$this->session->userdata('user')) {
+			redirect('/usuarios/ingresar');
+		}
+		
+		$data['title'] = "Modificar Usuario";
+		$data['user'] = $this->session->userdata('user');
+		
+		// Get the array with the users in the database
+		$data['users_item'] = $this->users->get_users($id);
+		
+		if (empty($data['users_item']))
+		{
+			show_404();
+		}
+			
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('usuarios/modificar', $data);
+		$this->load->view('footer', $data);
+
+	}
+	
 }

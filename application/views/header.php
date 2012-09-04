@@ -110,7 +110,7 @@
 					</a>
 					<ul>
 						<li><a href="<?php echo site_url('usuarios/registrar'); ?>"<?php if (method_name() == 'usuarios/registrar') { echo ' class="current"'; } ?>>Registrar Usuario</a></li>
-						<li><a href="#">Administrar Usuarios</a></li>
+						<li><a href="<?php echo site_url('usuarios/administrar'); ?>"<?php if (method_name() == 'usuarios/administrar') { echo ' class="current"'; } ?>>Administrar Usuarios</a></li>
 					</ul>
 				</li>
 				

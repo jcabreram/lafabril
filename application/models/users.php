@@ -52,4 +52,16 @@ class Users extends CI_Model
 		
 		return $this->db->query($sql);
 	}
+	
+	public function get_users($id = FALSE)
+	{
+		if ($id === FALSE)
+		{
+			$query = $this->db->get('usuarios');
+			return $query->result_array();
+		}
+		
+		$query = $this->db->get_where('usuarios', array('id' => $id));
+		return $query->row_array();
+	}
 }
