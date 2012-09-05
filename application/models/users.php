@@ -53,6 +53,37 @@ class Users extends CI_Model
 		return $this->db->query($sql);
 	}
 	
+	public function update($id, $username, $password, $fullName, $department, $status)
+	{
+		$username = $this->db->escape($username);
+		$password = $this->db->escape($password);
+		$fullName = $this->db->escape($fullName);
+		$department = $this->db->escape($department);
+		$status = $this->db->escape($status);
+				
+		if ($password == '\''. sha1('') . '\'') {
+			$sql = "UPDATE usuarios
+				SET username=$username, nombre=$fullName, departamento=$department, activo=$status
+				WHERE id=$id";
+				
+		} else {
+			$sql = "UPDATE usuarios
+				SET username=$username, password=$password, nombre=$fullName, departamento=$department, activo=$status
+				WHERE id=$id";
+		}
+		
+		return $this->db->query($sql);
+	}
+	
+	public function deactivate($id)
+	{
+		$sql = "UPDATE usuarios
+				SET activo='0'
+				WHERE id=$id";
+				
+		return $this->db->query($sql);
+	}
+	
 	public function get_users($id = FALSE)
 	{
 		if ($id === FALSE)
@@ -64,4 +95,5 @@ class Users extends CI_Model
 		$query = $this->db->get_where('usuarios', array('id' => $id));
 		return $query->row_array();
 	}
+	
 }
