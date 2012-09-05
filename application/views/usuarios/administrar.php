@@ -7,7 +7,7 @@
 				
 				<div class="content-box-header">
 					
-					<h3>Administrar</h3>
+					<h3>Administrar usuarios</h3>
 					
 					<div class="clear"></div>
 					
@@ -16,13 +16,17 @@
 				<div class="content-box-content">
 			   
 					<div class="tab-content default-tab" id="tab1"> <!-- This is the target div. id must match the href of this div's tab -->
-					
-						<div class="notification attention png_bg">
-							<a href="#" class="close"><img src="<?php echo base_url();?>resources/images/icons/cross_grey_small.png" title="Close this notification" alt="close" /></a>
-							<div>
-								Aviso.
-							</div>
-						</div>
+					<?php 
+						if ($this->session->flashdata('mensaje')) {
+							echo '<div class="notification attention png_bg">
+							<a href="#" class="close"><img src="'.base_url().'resources/images/icons/cross_grey_small.png" title="Cerrar notificación" alt="cerrar" /></a>
+							<div>'.
+								$this->session->flashdata('mensaje')
+							.'</div>
+						</div>';
+						}
+					?>
+						
 						
 						<table>
 							
@@ -72,15 +76,15 @@
 										<td><?php echo $users_item['nombre'] ?></td>
 										<td><?php echo $users_item['departamento'] ?></td>
 										<td><?php if ($users_item['activo'] == 1) {
-											echo '<img src="'.base_url().'resources/images/icons/tick_circle.png" alt="Edit" />';
+											echo '<img src="'.base_url().'resources/images/icons/tick_circle.png" alt="Activo" />';
 											} else {
-												echo '<img src="'.base_url().'resources/images/icons/cross_circle.png" alt="Edit" />';
+												echo '<img src="'.base_url().'resources/images/icons/cross_circle.png" alt="Inactivo" />';
 											}	
 								?></td>
 										<td>
 											<!-- Icons -->
-											 <a href="#" title="Edit"><img src="<?php echo base_url();?>resources/images/icons/pencil.png" alt="Edit" /></a>
-											 <a href="#" title="Delete"><img src="<?php echo base_url();?>resources/images/icons/cross.png" alt="Delete" /></a> 
+											 <a href="<?php echo base_url();?>usuarios/modificar/<?php echo $users_item['id'] ?>" title="Editar"><img src="<?php echo base_url();?>resources/images/icons/pencil.png" alt="Editar" /></a>
+											 <a href="<?php echo base_url();?>usuarios/desactivar/<?php echo $users_item['id'] ?>" title="Desactivar"><img src="<?php echo base_url();?>resources/images/icons/cross.png" alt="Desactivar" /></a> 
 										</td>
 									</tr>
 								<?php endforeach ?>
