@@ -22,7 +22,7 @@ class Usuarios extends CI_Controller
 		// If form was submitted
 		if ($_POST) {
 			// If login was correct
-			if ($this->users->login($_POST['username'], sha1($_POST['password']))) {
+			if ($this->users->login($_POST['username'], $_POST['password'])) {
 				redirect();
 			}
 		}
@@ -41,7 +41,7 @@ class Usuarios extends CI_Controller
 	{
 		// Is user not logged in?
 		if (!$this->session->userdata('user')) {
-			redirect('/usuarios/ingresar');
+			redirect('usuarios/ingresar');
 		}
 
 		// Load form validation library
@@ -88,10 +88,9 @@ class Usuarios extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->users->signUp($_POST['username'], sha1($_POST['password']), $_POST['fullName'], $_POST['department'], intval($_POST['status'])))
-			{
-				$this->session->set_flashdata('mensaje', 'El usuario "'.$_POST['username'].'" se ha registrado exitosamente.');
-				redirect('/usuarios/administrar');
+			if($this->users->signUp($_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
+				$this->session->set_flashdata('mensaje', 'El usuario "'.$_POST['username'].'" se ha registrado exitósamente.');
+				redirect('usuarios');
 			};
 		}
 
@@ -103,32 +102,32 @@ class Usuarios extends CI_Controller
 		$this->load->view('usuarios/registrar', $data);
 		$this->load->view('footer', $data);
 	}
-	
-	public function administrar()
+
+	public function index()
 	{
 		// Is user not logged in?
 		if (!$this->session->userdata('user')) {
-			redirect('/usuarios/ingresar');
+			redirect('usuarios/ingresar');
 		}
 		
-		$data['title'] = "Administrar Usuarios";
+		$data['title'] = "Usuarios";
 		$data['user'] = $this->session->userdata('user');
 		
 		// Get the array with the users in the database
-		$data['users'] = $this->users->get_users();
+		$data['usersData'] = $this->users->getUsers();
 			
 		// Display views
 		$this->load->view('header', $data);
-		$this->load->view('usuarios/administrar', $data);
+		$this->load->view('usuarios/index', $data);
 		$this->load->view('footer', $data);
 
 	}
 	
-	public function modificar($id)
+	public function editar($id)
 	{
 		// Is user not logged in?
 		if (!$this->session->userdata('user')) {
-			redirect('/usuarios/ingresar');
+			redirect('usuarios/ingresar');
 		}
 		
 		// Load form validation library
@@ -183,8 +182,8 @@ class Usuarios extends CI_Controller
 		if ($this->form_validation->run()) {
 			if($this->users->update($id, $_POST['username'], sha1($_POST['password']), $_POST['fullName'], $_POST['department'], intval($_POST['status'])))
 			{
-				$this->session->set_flashdata('mensaje', 'El usuario "'.$_POST['username'].'" se ha modificado exitosamente.');
-				redirect('/usuarios/administrar/');
+				$this->session->set_flashdata('mensaje', "El usuario {$_POST['username']} ha sido modificado.");
+				redirect('usuarios/administrar');
 			};
 		}
 		
@@ -210,14 +209,27 @@ class Usuarios extends CI_Controller
 	{
 		// Is user not logged in?
 		if (!$this->session->userdata('user')) {
-			redirect('/usuarios/ingresar');
+			redirect('usuarios/ingresar');
 		}
 		
 		$this->users->deactivate($id);
 		
-		$this->session->set_flashdata('mensaje', 'El usuario se ha desactivado exitosamente.');
-		redirect('/usuarios/administrar/');
-
+		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
+		
+		redirect('usuarios');
 	}
-	
+
+	public function activar($id)
+	{
+		// Is user not logged in?
+		if (!$this->session->userdata('user')) {
+			redirect('usuarios/ingresar');
+		}
+		
+		$this->users->activate($id);
+		
+		$this->session->set_flashdata('message', 'El usuario ha sido activado.');
+		
+		redirect('usuarios');
+	}
 }

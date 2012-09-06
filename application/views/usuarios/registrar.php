@@ -1,5 +1,5 @@
 			<!-- Page Head -->
-			<h2>Usuarios</h2></br>
+			<h2><?php echo $title; ?></h2></br>
 			
 			<div class="clear"></div> <!-- End .clear -->
 			
@@ -7,7 +7,7 @@
 				
 				<div class="content-box-header">
 					
-					<h3>Agregar Usuario</h3>
+					<h3>Datos del Usuario</h3>
 					
 					<div class="clear"></div>
 					

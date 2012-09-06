@@ -1,5 +1,5 @@
 			<!-- Page Head -->
-			<h2>Usuarios</h2></br>
+			<h2><?php echo $title; ?></h2></br>
 			
 			<div class="clear"></div> <!-- End .clear -->
 			
@@ -7,7 +7,7 @@
 				
 				<div class="content-box-header">
 					
-					<h3>Editar Usuario</h3>
+					<h3>Datos del Usuario</h3>
 					
 					<div class="clear"></div>
 					
@@ -32,13 +32,13 @@
 								</p>
 								
 								<p>
-									<label>Contraseña *</label>
+									<label>Contraseña</label>
 									<input class="text-input medium-input" type="password" id="password" name="password" />
 									<?php echo form_error('password'); ?>
 								</p>
 
 								<p>
-									<label>Repetir Contraseña *</label>
+									<label>Repetir Contraseña</label>
 									<input class="text-input medium-input" type="password" id="repassword" name="repassword" />
 									<?php echo form_error('repassword'); ?>
 								</p>

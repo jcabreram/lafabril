@@ -106,23 +106,11 @@
 				
 				<li>
 					<a href="#" class="nav-top-item<?php if (controller_name() == 'usuarios') { echo ' current'; } ?>">
-						Usuarios
-					</a>
-					<ul>
-						<li><a href="<?php echo site_url('usuarios/registrar'); ?>"<?php if (method_name() == 'usuarios/registrar') { echo ' class="current"'; } ?>>Registrar Usuario</a></li>
-						<li><a href="<?php echo site_url('usuarios/administrar'); ?>"<?php if (method_name() == 'usuarios/administrar') { echo ' class="current"'; } ?>>Administrar Usuarios</a></li>
-					</ul>
-				</li>
-				
-				<li>
-					<a href="#" class="nav-top-item">
 						Configuración
 					</a>
 					<ul>
-						<li><a href="#">General</a></li>
-						<li><a href="#">Diseño</a></li>
-						<li><a href="#">Tu Perfil</a></li>
-						<li><a href="#">Usuarios y permisos</a></li>
+						<li><a href="<?php echo site_url('usuarios'); ?>"<?php if (method_name() == 'usuarios/index') { echo ' class="current"'; } ?>>Administrar Usuarios</a></li>
+						<li><a href="<?php echo site_url('usuarios/registrar'); ?>"<?php if (method_name() == 'usuarios/registrar') { echo ' class="current"'; } ?>>Registrar Usuario</a></li>
 					</ul>
 				</li>      
 				

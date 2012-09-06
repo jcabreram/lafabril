@@ -11,7 +11,7 @@ class Users extends CI_Model
 	public function login($username, $password)
 	{
 		$username = $this->db->escape($username);
-		$password = $this->db->escape($password);
+		$password = $this->db->escape(sha1($password));
 
 		$sql = "SELECT id, nombre, departamento, activo FROM usuarios WHERE username = $username AND password = $password";
 		$query = $this->db->query($sql);
@@ -20,7 +20,7 @@ class Users extends CI_Model
 			$row = $query->row();
 
 			// If user is active
-			if ($row->activo == '1') {
+			if ($row->activo == 1) {
 				// Prepare data for saving
 				$data['user'] = array(
 					'id' => $row->id,
@@ -41,10 +41,10 @@ class Users extends CI_Model
 	public function signUp($username, $password, $fullName, $department, $status)
 	{
 		$username = $this->db->escape($username);
-		$password = $this->db->escape($password);
+		$password = $this->db->escape(sha1($password));
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
-		$status = $this->db->escape($status);
+		$status = $this->db->escape(intval($status));
 		
 
 		$sql = "INSERT INTO usuarios (id, username, password, nombre, departamento, activo)
@@ -52,6 +52,25 @@ class Users extends CI_Model
 		
 		return $this->db->query($sql);
 	}
+
+	public function getUsers()
+	{
+		$sql = 'SELECT * FROM usuarios';
+		$query = $this->db->query($sql);
+
+		// Returns the query result as an array of objects, or an empty array on failure
+		return $query->result();
+	}
+
+	public function getUser($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = 'SELECT * FROM usuarios WHERE id = ' . $id;
+		$query = $this->db->query($sql);
+
+		exit(var_dump($query->row()));
+	}	
 	
 	public function update($id, $username, $password, $fullName, $department, $status)
 	{
@@ -77,23 +96,13 @@ class Users extends CI_Model
 	
 	public function deactivate($id)
 	{
-		$sql = "UPDATE usuarios
-				SET activo='0'
-				WHERE id=$id";
-				
+		$sql = "UPDATE usuarios SET activo = 0 WHERE id = $id";
 		return $this->db->query($sql);
 	}
-	
-	public function get_users($id = FALSE)
+
+	public function activate($id)
 	{
-		if ($id === FALSE)
-		{
-			$query = $this->db->get('usuarios');
-			return $query->result_array();
-		}
-		
-		$query = $this->db->get_where('usuarios', array('id' => $id));
-		return $query->row_array();
+		$sql = "UPDATE usuarios SET activo = 1 WHERE id = $id";
+		return $this->db->query($sql);
 	}
-	
 }
