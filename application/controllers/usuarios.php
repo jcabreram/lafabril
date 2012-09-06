@@ -104,7 +104,7 @@ class Usuarios extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 	
-	public function administrar($success = '0')
+	public function administrar()
 	{
 		// Is user not logged in?
 		if (!$this->session->userdata('user')) {
@@ -116,7 +116,6 @@ class Usuarios extends CI_Controller
 		
 		// Get the array with the users in the database
 		$data['users'] = $this->users->get_users();
-		$data['success'] = $success;
 			
 		// Display views
 		$this->load->view('header', $data);
@@ -174,8 +173,7 @@ class Usuarios extends CI_Controller
 		
 		if ($_POST) {
 			if ($_POST['username'] != $_POST['originalUsername']) {
-				exit(var_dump($_POST));
-				$config[0][1]['rules'] .= '|is_unique[usuarios.username]';
+				$config[1]['rules'] .= '|is_unique[usuarios.username]';
 			}
 		}
 
