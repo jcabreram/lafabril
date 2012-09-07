@@ -75,7 +75,7 @@
 							 <a href="<?php echo site_url("usuarios/editar/$userData->id"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
 							 <?php
 							 if ($userData->activo == 1) {
-							 	echo '<a href="' . site_url("usuarios/desactivar/$userData->id") . '" title="Desactivar"><img src="' . site_url('resources/images/icons/cross_circle.png') . '" alt="Desactivar" /></a>';
+							 	echo '<a href="' . site_url("usuarios/desactivar/$userData->id") . '" title="Desactivar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Desactivar" /></a>';
 							 } else {
 							 	echo '<a href="' . site_url("usuarios/activar/$userData->id") . '" title="Activar"><img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activar" /></a>';
 							 } ?>
