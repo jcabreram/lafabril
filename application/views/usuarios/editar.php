@@ -15,19 +15,19 @@
 				
 				<div class="content-box-content">
 					
-						<form action="<?php echo site_url("usuarios/modificar/{$users_item['id']}"); ?>" method="post">
+						<form action="<?php echo site_url("usuarios/editar/$userData->id"); ?>" method="post">
 							
 							<fieldset> <!-- Set class to "column-left" or "column-right" on fieldsets to divide the form into columns -->
 								<p>
 									<label>Nombre Completo *</label>
-									<input class="text-input medium-input" value="<?php echo $users_item['nombre']; ?>" type="text" id="fullName" name="fullName" />
+									<input class="text-input medium-input" value="<?php echo set_value('fullName', $userData->nombre); ?>" type="text" id="fullName" name="fullName" />
 									<?php echo form_error('fullName'); ?>
 								</p>
 
 								<p>
 									<label>Nombre de Usuario *</label>
-									<input class="text-input medium-input" value="<?php echo $users_item['username']; ?>" type="text" id="username" name="username" />
-									<input value="<?php echo $users_item['username']; ?>" type="hidden" name="originalUsername" />
+									<input class="text-input medium-input" value="<?php echo set_value('username', $userData->username); ?>" type="text" id="username" name="username" />
+									<input value="<?php echo $userData->username; ?>" type="hidden" name="originalUsername" />
 									<?php echo form_error('username'); ?>
 								</p>
 								
@@ -47,22 +47,22 @@
 									<label>Departamento *</label>              
 									<select name="department" class="small-input">
 										<option value="">Escoge una opción</option>
-										<option <?php if($users_item['departamento'] == 'ventas') echo 'selected '; ?>value="ventas" <?php echo set_select('department', 'ventas'); ?>>Ventas</option>
-										<option <?php if($users_item['departamento'] == 'cuentasxcobrar') echo 'selected '; ?>value="cuentasxcobrar" <?php echo set_select('department', 'cuentasxcobrar'); ?>>Cuentas por Cobrar</option>
-										<option <?php if($users_item['departamento'] == 'admin') echo 'selected '; ?>value="admin" <?php echo set_select('department', 'admin'); ?>>Administración</option>
+										<option value="ventas" <?php echo set_select('department', 'ventas', (!$_POST & ($userData->departamento == 'ventas')) ? true : false); ?>>Ventas</option>
+										<option value="cuentasxcobrar" <?php echo set_select('department', 'cuentasxcobrar', (!$_POST & ($userData->departamento == 'cuentasxcobrar')) ? true : false); ?>>Cuentas por Cobrar</option>
+										<option value="admin" <?php echo set_select('department', 'admin', (!$_POST & ($userData->departamento == 'admin')) ? true : false); ?>>Administración</option>
 									</select> 
 									<?php echo form_error('department'); ?>
 								</p>
 								
 								<p>
 									<label>Estatus *</label>
-									<input type="radio" name="status" value="1" <?php if($users_item['activo'] == '1') echo 'checked'; ?> /> Activo<br />
-									<input type="radio" name="status" value="0" <?php if($users_item['activo'] == '0') echo 'checked'; ?> /> Inactivo
+									<input type="radio" name="status" value="1" <?php echo set_radio('status', '1', (!$_POST & ($userData->activo == 1)) ? true : false); ?> /> Activo<br />
+									<input type="radio" name="status" value="0" <?php echo set_radio('status', '0', (!$_POST & ($userData->activo == 0)) ? true : false); ?> /> Inactivo
 								</p>
 								
 								
 								<p>
-									<input class="button" type="submit" value="Actualizar" />
+									<input class="button" type="submit" value="Editar" />
 								</p>
 								
 							</fieldset>

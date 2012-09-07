@@ -120,7 +120,6 @@ class Usuarios extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('usuarios/index', $data);
 		$this->load->view('footer', $data);
-
 	}
 	
 	public function editar($id)
@@ -169,54 +168,46 @@ class Usuarios extends CI_Controller
 				'rules' => 'required'
 			),
 		);
+
+		// If the user tried to change the username
+		if (isset($_POST['username']) && ($_POST['username'] != $_POST['originalUsername'])) {
+			$config[1]['rules'] .= '|is_unique[usuarios.username]';
+		}
 		
-		if ($_POST) {
-			if ($_POST['username'] != $_POST['originalUsername']) {
-				$config[1]['rules'] .= '|is_unique[usuarios.username]';
-			}
+		// If the user tried to input some password
+		if (isset($_POST['password']) && (!empty($_POST['password']) || !empty($_POST['repassword']))) {
+			$config[2]['rules'] = 'required|' . $config[2]['rules'];
+			$config[3]['rules'] = 'required|' . $config[3]['rules'];
 		}
 
 		$this->form_validation->set_rules($config);
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->users->update($id, $_POST['username'], sha1($_POST['password']), $_POST['fullName'], $_POST['department'], intval($_POST['status'])))
-			{
-				$this->session->set_flashdata('mensaje', "El usuario {$_POST['username']} ha sido modificado.");
-				redirect('usuarios/administrar');
-			};
+			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
+				$this->session->set_flashdata('message', "El usuario {$_POST['username']} ha sido modificado.");
+				redirect('usuarios');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema actualizando a ' . $_POST['username'] . ', <a href="' . site_url('usuarios/editar/'.$id) . '" title="Intenta de Nuevo">intenta de nuevo</a>.');
+			}
 		}
 		
 		$data['title'] = "Modificar Usuario";
 		$data['user'] = $this->session->userdata('user');
 		
 		// Get the array with the row of the user in the database
-		$data['users_item'] = $this->users->get_users($id);
+		$data['userData'] = $this->users->getUser($id);
 		
-		if (empty($data['users_item']))
-		{
-			show_404();
+		// If the user doesn't exist
+		if (!is_object($data['userData'])) {
+			$this->session->set_flashdata('error', 'Tuvimos un problema accediendo al usuario, <a href="' . site_url('usuarios/editar/'.$id) . '" title="Intenta de Nuevo">intenta de nuevo</a>.');
+			redirect('usuarios');
 		}
 			
 		// Display views
 		$this->load->view('header', $data);
-		$this->load->view('usuarios/modificar', $data);
+		$this->load->view('usuarios/editar', $data);
 		$this->load->view('footer', $data);
-
-	}
-	
-	public function desactivar($id)
-	{
-		// Is user not logged in?
-		if (!$this->session->userdata('user')) {
-			redirect('usuarios/ingresar');
-		}
-		
-		$this->users->deactivate($id);
-		
-		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
-		
-		redirect('usuarios');
 	}
 
 	public function activar($id)
@@ -229,6 +220,20 @@ class Usuarios extends CI_Controller
 		$this->users->activate($id);
 		
 		$this->session->set_flashdata('message', 'El usuario ha sido activado.');
+		
+		redirect('usuarios');
+	}
+	
+	public function desactivar($id)
+	{
+		// Is user not logged in?
+		if (!$this->session->userdata('user')) {
+			redirect('usuarios/ingresar');
+		}
+		
+		$this->users->deactivate($id);
+		
+		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
 		
 		redirect('usuarios');
 	}

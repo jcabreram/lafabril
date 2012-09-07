@@ -14,6 +14,15 @@
 				</div> <!-- End .content-box-header -->
 				
 				<div class="content-box-content">
+
+						<!-- Notification -->
+						<div class="notification attention png_bg">
+							<!-- Close Cross -->
+							<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
+							<!-- Notification Message -->
+							<div>Una vez creados, los usuarios no pueden ser eliminados.</div>
+						</div>
+						<!-- End Notification -->
 					
 						<form action="<?php echo site_url('usuarios/registrar'); ?>" method="post">
 							

@@ -27,6 +27,17 @@
 			<!-- End Notification -->
 		<?php endif; ?>
 
+		<?php if ($this->session->flashdata('error')) : ?>
+			<!-- Notification (success type) -->
+			<div class="notification error png_bg">
+				<!-- Close Cross -->
+				<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
+				<!-- Notification Message -->
+				<div><?php echo $this->session->flashdata('error'); ?></div>
+			</div>
+			<!-- End Notification -->
+		<?php endif; ?>
+
 		<?php if (count($usersData) > 0) : ?>	
 
 			<!-- Users Table -->
@@ -82,7 +93,7 @@
 				<!-- Close Cross -->
 				<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
 				<!-- Notification Message -->
-				<div>No pudimos encontrar ningún usuario. Debió ocurrir un error, <a href="<?php echo site_url('usuarios'); ?>" title="Intenta de nuevo">intenta de nuevo</a>.</div>
+				<div>No pudimos encontrar a ningún usuario. Debió ocurrir un error, <a href="<?php echo site_url('usuarios'); ?>" title="Intenta de nuevo">intenta de nuevo</a>.</div>
 			</div>
 			<!-- End Notification -->
 
