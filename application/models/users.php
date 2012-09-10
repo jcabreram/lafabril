@@ -2,12 +2,9 @@
 
 class Users extends CI_Model
 {
-	public function __construct()
-	{
-		$this->load->database();
-		$this->load->library('session');
-	}
-	
+	/**
+	 * @return false in case of failure and an array in case of success
+	 */
 	public function login($username, $password)
 	{
 		$username = $this->db->escape($username);
@@ -17,22 +14,7 @@ class Users extends CI_Model
 		$query = $this->db->query($sql);
 		
 		if($query->num_rows() == 1) {
-			$row = $query->row();
-
-			// If user is active
-			if ($row->activo == 1) {
-				// Prepare data for saving
-				$data['user'] = array(
-					'id' => $row->id,
-					'nombre' => $row->nombre,
-					'departamento' => $row->departamento
-	 			);
-
-				// Save session data
-				$this->session->set_userdata($data);
-
-				return true;
-			}
+			return $query->row_array();
 		}
 
 		return false;
@@ -58,8 +40,8 @@ class Users extends CI_Model
 		$sql = 'SELECT * FROM usuarios';
 		$query = $this->db->query($sql);
 
-		// Returns the query result as an array of objects, or an empty array on failure
-		return $query->result();
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
 	}
 
 	public function getUser($id)
@@ -69,8 +51,8 @@ class Users extends CI_Model
 		$sql = 'SELECT * FROM usuarios WHERE id = ' . $id;
 		$query = $this->db->query($sql);
 
-		// Returns the query result as an object or an empty array on failure
-		return $query->row();
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->row_array();
 	}	
 	
 	public function update($id, $username, $password, $fullName, $department, $status)
@@ -82,9 +64,9 @@ class Users extends CI_Model
 		$status = $this->db->escape(intval($status));
 
 		if (!$password) {
-			$sql = "UPDATE usuarios SET username=$username, nombre=$fullName, departamento=$department, activo=$status WHERE id=$id";
+			$sql = "UPDATE usuarios SET username = $username, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
 		} else {
-			$sql = "UPDATE usuarios	SET username=$username, password=$password, nombre=$fullName, departamento=$department, activo=$status WHERE id=$id";
+			$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
 		}
 		
 		return $this->db->query($sql);
