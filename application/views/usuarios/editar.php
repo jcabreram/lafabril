@@ -9,30 +9,38 @@
 
 	<div class="content-box-content">
 
+		<?php if ($this->session->flashdata('error')) : ?>
+		<!-- Notification -->
+		<div class="notification error png_bg">
+			<!-- Message -->
+			<div><?php echo $this->session->flashdata('error'); ?></div>
+		</div>
+		<?php endif; ?>
+
 		<form action="<?php echo site_url('usuarios/registrar'); ?>" method="post">
 
 			<p>
 				<label>Nombre Completo *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('fullName', $userData['nombre']); ?>" type="text" id="fullName" name="fullName" />
+				<input class="text-input medium-input" value="<?php echo set_value('fullName', $userData['nombre']); ?>" type="text" name="fullName" />
 				<?php echo form_error('fullName'); ?>
 			</p>
 
 			<p>
 				<label>Nombre de Usuario *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('username', $userData['username']); ?>" type="text" id="username" name="username" />
+				<input class="text-input medium-input" value="<?php echo set_value('username', $userData['username']); ?>" type="text" name="username" />
 				<input value="<?php echo $userData['username']; ?>" type="hidden" name="originalUsername" />
 				<?php echo form_error('username'); ?>
 			</p>
 			
 			<p>
 				<label>Contraseña</label>
-				<input class="text-input medium-input" type="password" id="password" name="password" />
+				<input class="text-input medium-input" type="password" name="password" />
 				<?php echo form_error('password'); ?>
 			</p>
 
 			<p>
 				<label>Repetir Contraseña</label>
-				<input class="text-input medium-input" type="password" id="repassword" name="repassword" />
+				<input class="text-input medium-input" type="password" name="repassword" />
 				<?php echo form_error('repassword'); ?>
 			</p>
 			

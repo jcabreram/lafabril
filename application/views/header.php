@@ -105,7 +105,7 @@
 				</li>
 				
 				<li>
-					<a href="#" class="nav-top-item<?php if (controller_name() == 'usuarios') { echo ' current'; } ?>">
+					<a href="#" class="nav-top-item<?php if (controller_name() == ('usuarios' || 'sucursales')) { echo ' current'; } ?>">
 						Configuración
 					</a>
 					<ul>

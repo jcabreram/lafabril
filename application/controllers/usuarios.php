@@ -68,9 +68,11 @@ class Usuarios extends CI_Controller
 		// If validation was successful
 		if ($this->form_validation->run()) {
 			if($this->users->signUp($_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
-				$this->session->set_flashdata('message', 'El usuario "' . $_POST['username'] . '" ha sido registrado.');
+				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '" ha sido registrado.');
 				redirect('usuarios');
-			};
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar al usuario, intenta de nuevo.');
+			}
 		}
 
 		$data['title'] = "Registrar Usuario";
@@ -154,10 +156,10 @@ class Usuarios extends CI_Controller
 		// If validation was successful
 		if ($this->form_validation->run()) {
 			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
-				$this->session->set_flashdata('message', "El usuario {$_POST['username']} ha sido modificado.");
+				$this->session->set_flashdata('message', 'El usuario ' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . ' ha sido modificado.');
 				redirect('usuarios');
 			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema actualizando a ' . $_POST['username'] . ', <a href="' . site_url('usuarios/editar/' . $id) . '" title="Intenta de Nuevo">intenta de nuevo</a>.');
+				$this->session->set_flashdata('error', 'Tuvimos un problema intentando actualizar al usuario, intenta de nuevo.');
 			}
 		}
 		
@@ -170,7 +172,7 @@ class Usuarios extends CI_Controller
 			redirect('usuarios');
 		}
 
-		$data['title'] = "Modificar Usuario";
+		$data['title'] = "Editar Usuario";
 		$data['user'] = $this->session->userdata('user');
 			
 		// Display views

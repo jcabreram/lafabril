@@ -57,30 +57,33 @@ class Users extends CI_Model
 	
 	public function update($id, $username, $password, $fullName, $department, $status)
 	{
+		$id = $this->db->escape(intval($id));
 		$username = $this->db->escape($username);
-		$password = (empty($password)) ? false : $this->db->escape(sha1($password));
+		$password = (empty($password)) ? 'NULL' : $this->db->escape(sha1($password));
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
 		$status = $this->db->escape(intval($status));
 
-		if (!$password) {
-			$sql = "UPDATE usuarios SET username = $username, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
-		} else {
-			$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
-		}
-		
+		$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
+
 		return $this->db->query($sql);
 	}
 	
 	public function deactivate($id)
 	{
+		$id = $this->db->escape(intval($id));
+
 		$sql = "UPDATE usuarios SET activo = 0 WHERE id = $id";
+
 		return $this->db->query($sql);
 	}
 
 	public function activate($id)
 	{
+		$id = $this->db->escape(intval($id));
+
 		$sql = "UPDATE usuarios SET activo = 1 WHERE id = $id";
+		
 		return $this->db->query($sql);
 	}
 }

@@ -17,17 +17,17 @@
 		</div>
 		<?php endif; ?>
 
-		<form action="<?php echo site_url('sucursales/registrar'); ?>" method="post">
+		<form action="<?php echo site_url('sucursales/editar/' . $branch['id_sucursal']); ?>" method="post">
 
 			<p>
 				<label>Nombre *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('name'); ?>" type="text" name="name" />
+				<input class="text-input medium-input" value="<?php echo set_value('name', $branch['nombre']); ?>" type="text" name="name" />
 				<?php echo form_error('name'); ?>
 			</p>
 
 			<p>
 				<label>Dirección</label>
-				<input class="text-input medium-input" value="<?php echo set_value('address'); ?>" type="text" name="address" />
+				<input class="text-input medium-input" value="<?php echo set_value('address', $branch['direccion']); ?>" type="text" name="address" />
 				<?php echo form_error('address'); ?>
 			</p>
 
