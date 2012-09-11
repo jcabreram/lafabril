@@ -73,14 +73,22 @@
 			
 			<div id="login-content">
 				
-				<form action="<?php echo site_url('usuarios/ingresar'); ?>" method="post">
+				<form action="<?php echo site_url('ingresar'); ?>" method="post">
 				
 					<?php if ($_POST) : ?>
-					<div class="notification information png_bg">
-						<div>
-							Usuario y/o contraseña incorrectos.	
-						</div>
-					</div>
+						<?php if ($error == 'nonexistent') : ?>
+							<div class="notification error png_bg">
+								<div>
+									Usuario y/o contraseña incorrectos.	
+								</div>
+							</div>
+						<?php elseif ($error == 'inactive') : ?>
+							<div class="notification attention png_bg">
+								<div>
+									Usuario inactivo.	
+								</div>
+							</div>
+						<?php endif; ?>
 					<?php endif; ?>
 					
 					<p>
@@ -94,7 +102,7 @@
 					</p>
 					<div class="clear"></div>
 					<p id="remember-password">
-						<input type="checkbox" />Recordarme
+						<input type="checkbox" name="remember" value="on" />Recordarme
 					</p>
 					<div class="clear"></div>
 					<p>

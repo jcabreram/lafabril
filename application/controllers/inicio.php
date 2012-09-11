@@ -2,20 +2,31 @@
 
 class Inicio extends CI_Controller
 {
-	public function index()
+	public function __construct()
 	{
+		parent::__construct();
+
 		// Is user not logged in?
 		if (!$this->session->userdata('user')) {
-			redirect('/usuarios/ingresar');
+			redirect('ingresar');
+		}
+		// User doesn't want to be remembered?
+		elseif (!$this->session->userdata('remember') && (($this->session->userdata('lastActivity') + $this->config->item('maximumIdleTime')) < time())) {
+			redirect('salir');
 		}
 
-		// Page info
+		// We need it to know his idle time
+		$this->session->set_userdata('lastActivity', time());
+	}
+
+	public function index()
+	{
 		$data['title'] = 'Inicio';
 		$data['user'] = $this->session->userdata('user');
 
 		// Display views
-		$this->load->view('header.php', $data);
-		$this->load->view('index.php', $data);
-		$this->load->view('footer.php', $data);
+		$this->load->view('header', $data);
+		$this->load->view('inicio/index', $data);
+		$this->load->view('footer', $data);
 	}
 }
