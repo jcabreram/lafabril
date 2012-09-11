@@ -74,7 +74,7 @@
 			<div id="profile-links">
 				Bienvenido, <a href="#" title="Edita tu perfil"><?php echo $user['nombre']; ?></a>.<br />
 				<br />
-				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="<?php echo site_url('usuarios/salir'); ?>" title="Cerrar Sesión">Salir</a>
+				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="<?php echo site_url('salir'); ?>" title="Cerrar Sesión">Salir</a>
 			</div>        
 			
 			<ul id="main-nav">  <!-- Accordion Menu -->
@@ -105,12 +105,14 @@
 				</li>
 				
 				<li>
-					<a href="#" class="nav-top-item<?php if (controller_name() == 'usuarios') { echo ' current'; } ?>">
+					<a href="#" class="nav-top-item<?php if ((controller_name() == 'usuarios') || (controller_name() == 'sucursales')) { echo ' current'; } ?>">
 						Configuración
 					</a>
 					<ul>
 						<li><a href="<?php echo site_url('usuarios'); ?>"<?php if (method_name() == 'usuarios/index') { echo ' class="current"'; } ?>>Administrar Usuarios</a></li>
 						<li><a href="<?php echo site_url('usuarios/registrar'); ?>"<?php if (method_name() == 'usuarios/registrar') { echo ' class="current"'; } ?>>Registrar Usuario</a></li>
+						<li><a href="<?php echo site_url('sucursales'); ?>"<?php if (method_name() == 'sucursales/index') { echo ' class="current"'; } ?>>Administrar Sucursales</a></li>
+						<li><a href="<?php echo site_url('sucursales/registrar'); ?>"<?php if (method_name() == 'sucursales/registrar') { echo ' class="current"'; } ?>>Registrar Sucursal</a></li>
 					</ul>
 				</li>      
 				

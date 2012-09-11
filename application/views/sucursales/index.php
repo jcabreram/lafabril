@@ -6,7 +6,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Lista de Usuarios</h3>	
+		<h3>Lista de Sucursales</h3>	
 	</div>
 	
 	<!-- Content Box Content -->			
@@ -32,7 +32,7 @@
 		</div>
 	<?php endif; ?>
 
-	<?php if (count($usersData) > 0) : ?>	
+	<?php if (count($branches) > 0) : ?>	
 
 		<!-- Users Table -->
 		<table>
@@ -40,37 +40,20 @@
 			<thead>
 				<tr>
 				   <th>Nombre</th>
-				   <th>Nombre de Usuario</th>
-				   <th>Departamento</th>
-				   <th>Estatus</th>
+				   <th>Dirección</th>
 				   <th>Opciones</th>
 				</tr>
 			</thead>
 			
 			<tbody>
-			<?php foreach ($usersData as $userData) : ?>
+			<?php foreach ($branches as $branch) : ?>
 				<tr>
-					<td><?php echo $userData['nombre']; ?></td>
-					<td><?php echo $userData['username']; ?></td>
-					<td><?php echo $userData['departamento']; ?></td>
-					<!-- Active/Inactive Image  -->
-					<td><?php
-						if ($userData['activo'] == 1) {
-							echo '<img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activo" />';
-						} else {
-							echo '<img src="' . site_url('resources/images/icons/cross_circle.png') . '" alt="Inactivo" />';
-						}	
-					?></td>
-					<!-- End Active/Inactive Image  -->
+					<td><?php echo $branch['nombre']; ?></td>
+					<td><?php echo $branch['direccion']; ?></td>
 					<td>
 						<!-- Options Icons -->
-						 <a href="<?php echo site_url("usuarios/editar/{$userData['id']}"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
-						 <?php
-						 if ($userData['activo'] == 1) {
-						 	echo '<a href="' . site_url("usuarios/desactivar/{$userData['id']}") . '" title="Desactivar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Desactivar" /></a>';
-						 } else {
-						 	echo '<a href="' . site_url("usuarios/activar/{$userData['id']}") . '" title="Activar"><img src="' . site_url('resources/images/icons/tick.png') . '" alt="Activar" /></a>';
-						 } ?>
+						 <a href="<?php echo site_url("sucursales/editar/{$branch['id_sucursal']}"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
+						 <a href="<?php echo site_url("sucursales/eliminar/{$branch['id_sucursal']}"); ?>" title="Eliminar"><img src="<?php echo site_url('resources/images/icons/cross.png'); ?>" alt="Eliminar" /></a>
 					</td>
 				</tr>
 			<?php endforeach; ?>
