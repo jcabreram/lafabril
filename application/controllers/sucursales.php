@@ -40,6 +40,11 @@ class Sucursales extends CI_Controller
 				'field' => 'address', 
 				'label' => 'dirección', 
 				'rules' => 'trim|max_length[255]'
+			),
+			array(
+				'field' => 'status',
+				'label' => 'estatus',
+				'rules' => 'required'
 			)
 		);
 
@@ -47,7 +52,7 @@ class Sucursales extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->branches->create($_POST['name'], $_POST['address'])) {
+			if($this->branches->create($_POST['name'], $_POST['address'], $_POST['status'])) {
 				$this->session->set_flashdata('message', 'La sucursal "' . htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8') . '" ha sido registrada.');
 				redirect('sucursales');
 			} else {
@@ -97,6 +102,11 @@ class Sucursales extends CI_Controller
 				'field' => 'address', 
 				'label' => 'dirección', 
 				'rules' => 'trim|max_length[255]'
+			),
+			array(
+				'field' => 'status',
+				'label' => 'estatus',
+				'rules' => 'required'
 			)
 		);
 
@@ -104,7 +114,7 @@ class Sucursales extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->branches->update($id, $_POST['name'], $_POST['address'])) {
+			if($this->branches->update($id, $_POST['name'], $_POST['address'], $_POST['status'])) {
 				$this->session->set_flashdata('message', 'La sucursal "' . htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8') . '" ha sido modificada.');
 				redirect('sucursales');
 			} else {
@@ -130,10 +140,17 @@ class Sucursales extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 
-	public function eliminar($id)
+	public function activar($id)
 	{
-		$this->branches->delete($id);
-		$this->session->set_flashdata('message', 'La sucursal ha sido eliminada.');
+		$this->branches->setStatus($id, 1);
+		$this->session->set_flashdata('message', 'La sucursal ha sido desactivada.');
 		redirect('sucursales');
+	}
+
+	public function desactivar($id)
+	{
+		$this->branches->setStatus($id, 0);
+		$this->session->set_flashdata('message', 'La sucursal ha sido activada.');
+		redirect('sucursales');		
 	}
 }
