@@ -2,12 +2,13 @@
 
 class Branches extends CI_Model
 {
-	public function create($name, $address)
+	public function create($name, $address, $status)
 	{
 		$name = $this->db->escape($name);
 		$address = empty($address) ? 'NULL' : $this->db->escape($address);
+		$status = $this->db->escape(intval($status));
 
-		$sql = "INSERT INTO sucursales (id_sucursal, nombre, direccion) VALUES (NULL, $name, $address)";
+		$sql = "INSERT INTO sucursales (id_sucursal, nombre, direccion, estatus) VALUES (NULL, $name, $address, $status)";
 
 		return $this->db->query($sql);
 	}
@@ -32,22 +33,24 @@ class Branches extends CI_Model
 		return $query->row_array();
 	}
 
-	public function update($id, $name, $address)
+	public function update($id, $name, $address, $status)
 	{
 		$id = $this->db->escape(intval($id));
 		$name = $this->db->escape($name);
 		$address = empty($address) ? 'NULL' : $this->db->escape($address);
+		$status = $this->db->escape(intval($status));
 
-		$sql = "UPDATE sucursales SET nombre = $name, direccion = $address WHERE id_sucursal = $id";
+		$sql = "UPDATE sucursales SET nombre = $name, direccion = $address, estatus = $status WHERE id_sucursal = $id";
 
 		return $this->db->query($sql);
 	}
 
-	public function delete($id)
+	public function setStatus($id, $status)
 	{
 		$id = $this->db->escape(intval($id));
+		$status = $this->db->escape(intval($status));
 
-		$sql = "DELETE FROM sucursales WHERE id_sucursal = $id";
+		$sql = "UPDATE sucursales SET estatus = $status WHERE id_sucursal = $id";
 
 		return $this->db->query($sql);
 	}

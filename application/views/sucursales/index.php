@@ -41,6 +41,7 @@
 				<tr>
 				   <th>Nombre</th>
 				   <th>Dirección</th>
+				   <th>Estatus</th>
 				   <th>Opciones</th>
 				</tr>
 			</thead>
@@ -50,10 +51,22 @@
 				<tr>
 					<td><?php echo $branch['nombre']; ?></td>
 					<td><?php echo $branch['direccion']; ?></td>
+					<td><?php
+						if ($branch['estatus'] == 1) {
+							echo '<img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activo" />';
+						} else {
+							echo '<img src="' . site_url('resources/images/icons/cross_circle.png') . '" alt="Inactivo" />';
+						}	
+					?></td>
 					<td>
 						<!-- Options Icons -->
 						 <a href="<?php echo site_url("sucursales/editar/{$branch['id_sucursal']}"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
-						 <a href="<?php echo site_url("sucursales/eliminar/{$branch['id_sucursal']}"); ?>" title="Eliminar"><img src="<?php echo site_url('resources/images/icons/cross.png'); ?>" alt="Eliminar" /></a>
+						 <?php
+						 if ($branch['estatus'] == 1) {
+						 	echo '<a href="' . site_url("sucursales/desactivar/{$branch['id_sucursal']}") . '" title="Desactivar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Desactivar" /></a>';
+						 } else {
+						 	echo '<a href="' . site_url("sucursales/activar/{$branch['id_sucursal']}") . '" title="Activar"><img src="' . site_url('resources/images/icons/tick.png') . '" alt="Activar" /></a>';
+						 } ?>
 					</td>
 				</tr>
 			<?php endforeach; ?>

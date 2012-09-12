@@ -68,21 +68,13 @@ class Users extends CI_Model
 
 		return $this->db->query($sql);
 	}
-	
-	public function deactivate($id)
+
+	public function setStatus($id, $status)
 	{
 		$id = $this->db->escape(intval($id));
+		$status = $this->db->escape(intval($status));
 
-		$sql = "UPDATE usuarios SET activo = 0 WHERE id = $id";
-
-		return $this->db->query($sql);
-	}
-
-	public function activate($id)
-	{
-		$id = $this->db->escape(intval($id));
-
-		$sql = "UPDATE usuarios SET activo = 1 WHERE id = $id";
+		$sql = "UPDATE usuarios SET activo = $status WHERE id = $id";
 		
 		return $this->db->query($sql);
 	}
