@@ -183,14 +183,14 @@ class Usuarios extends CI_Controller
 
 	public function activar($id)
 	{
-		$this->users->activate($id);
+		$this->users->setStatus($id, 1);
 		$this->session->set_flashdata('message', 'El usuario ha sido activado.');
 		redirect('usuarios');
 	}
 	
 	public function desactivar($id)
 	{	
-		$this->users->deactivate($id);
+		$this->users->setStatus($id, 0);
 		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
 		redirect('usuarios');
 	}

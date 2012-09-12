@@ -65,9 +65,8 @@
 			<p>
 				<label>Estatus *</label>
 				<input type="radio" name="status" value="1" <?php echo set_radio('status', '1', true); ?> /> Activo<br />
-				<input type="radio" name="status" value="0" <?php echo set_radio('status', '0'); ?> /> Inactivo
+				<input type="radio" name="status" value="0" <?php echo set_radio('status', '0'); ?> /> Inactivo<br />
 			</p>
-
 
 			<p>
 				<input class="button" type="submit" value="Registrar" />

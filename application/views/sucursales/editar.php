@@ -31,6 +31,11 @@
 				<?php echo form_error('address'); ?>
 			</p>
 
+			<p>
+				<label>Estatus *</label>
+				<input type="radio" name="status" value="1" <?php echo set_radio('status', '1', (!$_POST & ($branch['estatus'] == 1)) ? true : false); ?> /> Activo<br />
+				<input type="radio" name="status" value="0" <?php echo set_radio('status', '0', (!$_POST & ($branch['estatus'] == 0)) ? true : false); ?> /> Inactivo
+			</p>
 
 			<p>
 				<input class="button" type="submit" value="Registrar" />
