@@ -79,8 +79,8 @@
     settings: {
       opacity      : 0,
       overlay      : true,
-      loadingImage : 'resources/images/loading.gif',
-      closeImage   : 'resources/images/closelabel.gif',
+      loadingImage : 'http://lafabril/resources/images/loading.gif',
+      closeImage   : 'http://lafabril/resources/images/closelabel.gif',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
       faceboxHtml  : '\
     <div id="facebox" style="display:none;"> \

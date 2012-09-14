@@ -3,7 +3,7 @@ $(document).ready(function(){
 	//Sidebar Accordion Menu:
 		
 		$("#main-nav li ul").hide(); //Hide all sub menus
-		$("#main-nav li a.current").parent().find("ul").slideToggle("slow"); // Slide down the current menu item's sub menu
+		$("#main-nav li a.current").parent().find("ul").show(); // Slide down the current menu item's sub menu
 		
 		$("#main-nav li a.nav-top-item").click( // When a top menu item is clicked...
 			function () {
@@ -35,7 +35,7 @@ $(document).ready(function(){
 
     //Minimize Content Box
 		
-		$(".content-box-header h3").css({ "cursor":"s-resize" }); // Give the h3 in Content Box Header a different cursor
+		/*$(".content-box-header h3").css({ "cursor":"s-resize" }); // Give the h3 in Content Box Header a different cursor
 		$(".content-box-header-toggled").next().hide(); // Hide the content of the header if it has the class "content-box-header-toggled"
 		
 		$(".content-box-header h3").click( // When the h3 is clicked...
@@ -44,11 +44,11 @@ $(document).ready(function(){
 			  $(this).parent().toggleClass("content-box-header-toggled"); // Give the Content Box Header a special class for styling and hiding
 			  $(this).parent().find(".content-box-tabs").toggle(); // Toggle the tabs
 			}
-		);
+		);*/
 
     // Content box tabs:
 		
-		$('.content-box .content-box-content div.tab-content').hide(); // Hide the content divs
+		/*$('.content-box .content-box-content div.tab-content').hide(); // Hide the content divs
 		$('.content-box-content div.default-tab').show(); // Show the div with class "default-tab"
 		$('ul.content-box-tabs li a.default-tab').addClass('current'); // Set the class of the default tab link to "current"
 		
@@ -61,7 +61,7 @@ $(document).ready(function(){
 				$(currentTab).show(); // Show the content div with the id equal to the id of clicked tab
 				return false; 
 			}
-		);
+		);*/
 
     //Close button:
 		
@@ -95,6 +95,3 @@ $(document).ready(function(){
 		$(".wysiwyg").wysiwyg();
 
 });
-  
-  
-  
