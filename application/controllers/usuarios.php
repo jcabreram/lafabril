@@ -19,6 +19,8 @@ class Usuarios extends CI_Controller
 		$this->session->set_userdata('lastActivity', time());
 
 		$this->load->model('users');
+		$this->load->model('userBranches');
+		$this->load->model('branches');
 	}
 
 	public function index()
@@ -180,6 +182,10 @@ class Usuarios extends CI_Controller
 		
 		// Get the array with the row of the user in the database
 		$data['userData'] = $this->users->getUser($id);
+		// Get the array with the rows of the branches of the user in the database
+		$data['userBranchesData'] = $this->userBranches->getUserBranches($id);
+		// Get the array with the rows of all the branches in the database
+		$data['branchesData'] = $this->branches->getBranches();
 		
 		// If the user doesn't exist
 		if (!is_array($data['userData'])) {
