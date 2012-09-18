@@ -20,7 +20,12 @@ class Usuarios extends CI_Controller
 
 		$this->load->model('users');
 	}
-	
+
+	public function index()
+	{
+		$this->listar();
+	}
+
 	public function registrar()
 	{
 		// Load form validation library
@@ -84,19 +89,29 @@ class Usuarios extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 
-	public function index()
+	public function listar()
 	{
+		// We need it to populate the filter form
+		$this->load->helper('form');
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
 		$data['title'] = "Usuarios";
 		$data['user'] = $this->session->userdata('user');
+		$data['filters'] = $filters;
 		
 		// Get the array with the users in the database
-		$data['usersData'] = $this->users->getUsers();
-			
+		$data['usersData'] = $this->users->getUsers($filters['department'], $filters['status']);
+		
 		// Display views
 		$this->load->view('header', $data);
-		$this->load->view('usuarios/index', $data);
+		$this->load->view('usuarios/listar', $data);
+		$this->load->view('usuarios/filterForm', $data);
 		$this->load->view('footer', $data);
 	}
+
 	
 	public function editar($id)
 	{
@@ -156,7 +171,7 @@ class Usuarios extends CI_Controller
 		// If validation was successful
 		if ($this->form_validation->run()) {
 			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
-				$this->session->set_flashdata('message', 'El usuario ' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . ' ha sido modificado.');
+				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '"" ha sido modificado.');
 				redirect('usuarios');
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema intentando actualizar al usuario, intenta de nuevo.');
@@ -183,15 +198,93 @@ class Usuarios extends CI_Controller
 
 	public function activar($id)
 	{
-		$this->users->setStatus($id, 1);
+		$this->users->setStatus($id, '1');
 		$this->session->set_flashdata('message', 'El usuario ha sido activado.');
 		redirect('usuarios');
 	}
 	
 	public function desactivar($id)
 	{	
-		$this->users->setStatus($id, 0);
+		$this->users->setStatus($id, '0');
 		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
 		redirect('usuarios');
+	}
+
+	public function filtrar()
+	{
+		if ($_POST) {
+			$filters = array();
+
+			$department = isset($_POST['department']) ? trim($_POST['department']) : false;
+			$status = isset($_POST['status']) ? trim($_POST['status']) : false;
+
+			if ($department !== false && $department != '') {
+				$filters['departamento'] = $department;
+			}
+
+			if ($status !== false && $status != '') {
+				switch ($status) {
+					case '1':
+						$filters['estatus'] = 'activo';
+						break;
+
+					case '0':
+						$filters['estatus'] = 'inactivo';
+						break;
+				}
+			}
+
+			if (count($filters) > 0) {
+				redirect('usuarios/listar/' . $this->uri->assoc_to_uri($filters));
+			} else {
+				redirect('usuarios');
+			}
+		}
+
+		redirect();
+	}
+
+	public function exportar()
+	{
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// Data we could need in our PDF
+		$data['title'] = "Reporte de Usuarios";
+		$data['user'] = $this->session->userdata('user');
+		$data['filters'] = $filters;
+		
+		// Get the array with the users in the database
+		$data['users'] = $this->users->getUsers($filters['department'], $filters['status']);
+
+		$html = $this->load->view('reportes/usuarios', $data, true);
+		createPDF($html, 'reporte');
+	}
+
+	private function _sanitizeFilters($dirtyFilters)
+	{
+		$filters['department'] = isset($dirtyFilters['departamento']) ? trim($dirtyFilters['departamento']) : '';
+		$filters['status'] = isset($dirtyFilters['estatus']) ? trim($dirtyFilters['estatus']) : '';
+
+		if ($filters['status'] != '') {
+			switch ($filters['status']) {
+				case 'activo':
+					$filters['status'] = '1';
+					break;
+
+				case 'inactivo':
+					$filters['status'] = '0';
+					break;
+				
+				default:
+					$filters['status'] = 'ERROR';
+					break;
+			}
+		}
+
+		return $filters;
 	}
 }

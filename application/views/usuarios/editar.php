@@ -17,7 +17,7 @@
 		</div>
 		<?php endif; ?>
 
-		<form action="<?php echo site_url('usuarios/registrar'); ?>" method="post">
+		<form action="<?php echo site_url('usuarios/editar/' . $userData['id']); ?>" method="post">
 
 			<p>
 				<label>Nombre Completo *</label>
@@ -57,8 +57,8 @@
 			
 			<p>
 				<label>Estatus *</label>
-				<input type="radio" name="status" value="1" <?php echo set_radio('status', '1', (!$_POST & ($userData['activo'] == 1)) ? true : false); ?> /> Activo<br />
-				<input type="radio" name="status" value="0" <?php echo set_radio('status', '0', (!$_POST & ($userData['activo'] == 0)) ? true : false); ?> /> Inactivo
+				<input type="radio" name="status" value="1" <?php echo set_radio('status', '1', (!$_POST & ($userData['activo'] == '1')) ? true : false); ?> /> Activo<br />
+				<input type="radio" name="status" value="0" <?php echo set_radio('status', '0', (!$_POST & ($userData['activo'] == '0')) ? true : false); ?> /> Inactivo
 			</p>
 			
 			

@@ -26,7 +26,7 @@ class Users extends CI_Model
 		$password = $this->db->escape(sha1($password));
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
-		$status = $this->db->escape(intval($status));
+		$status = $this->db->escape($status);
 		
 
 		$sql = "INSERT INTO usuarios (id, username, password, nombre, departamento, activo)
@@ -35,10 +35,25 @@ class Users extends CI_Model
 		return $this->db->query($sql);
 	}
 
-	public function getUsers()
+	public function getUsers($department = false, $status = false)
 	{
-		$sql = 'SELECT * FROM usuarios';
-		$query = $this->db->query($sql);
+		// Trim returns an empty string if it's argument is false
+		$department = trim($department);
+		$status = trim($status);
+
+		$this->db->select('*');
+		$this->db->from('usuarios');
+		$this->db->order_by('activo', 'DESC');
+
+		if ($department !== '') {
+			$this->db->where('departamento', $department);
+		}
+		
+		if ($status !== '') {
+			$this->db->where('activo', $status);
+		}
+
+		$query = $this->db->get();
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();
@@ -62,7 +77,7 @@ class Users extends CI_Model
 		$password = (empty($password)) ? 'NULL' : $this->db->escape(sha1($password));
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
-		$status = $this->db->escape(intval($status));
+		$status = $this->db->escape($status);
 
 		$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
 
@@ -72,7 +87,7 @@ class Users extends CI_Model
 	public function setStatus($id, $status)
 	{
 		$id = $this->db->escape(intval($id));
-		$status = $this->db->escape(intval($status));
+		$status = $this->db->escape($status);
 
 		$sql = "UPDATE usuarios SET activo = $status WHERE id = $id";
 		
