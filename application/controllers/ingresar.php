@@ -26,7 +26,7 @@ class Ingresar extends CI_Controller
 			// If login was correct
 			if (is_array($user)) {
 				// If user is active
-				if ($user['activo'] == 1) {
+				if ($user['activo'] == '1') {
 					// Prepare data for saving
 					$sessionData['user'] = array(
 						'id' => $user['id'],

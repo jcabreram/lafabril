@@ -6,7 +6,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Lista de Sucursales</h3>	
+		<h3>Lista de Sucursales</h3>
 	</div>
 	
 	<!-- Content Box Content -->			
