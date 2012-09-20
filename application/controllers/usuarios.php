@@ -119,6 +119,9 @@ class Usuarios extends CI_Controller
 	{
 		// Load form validation library
 		$this->load->library('form_validation');
+		
+		// Load array helper for custom function array_flatten()
+		$this->load->helper('array');
 
 		// Setting error delimiters
 		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
@@ -172,11 +175,12 @@ class Usuarios extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
-				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '"" ha sido modificado.');
+			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'], $_POST['sucursales'])) {
+				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '" ha sido modificado.');
 				redirect('usuarios');
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema intentando actualizar al usuario, intenta de nuevo.');
+				redirect('usuarios');
 			}
 		}
 		
