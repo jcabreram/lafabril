@@ -92,8 +92,8 @@
                         Clientes
 					</a>
 					<ul>
-						<li><a href="#">Administrar Clientes</a></li> <!-- Add class "current" to sub menu items also -->
-						<li><a href="#messages" rel="modal">Agregar Cliente</a></li>
+						<li><a href="<?php echo site_url('clientes'); ?>"<?php if (methodName() == 'clientes/index') { echo ' class="current"'; } ?>>Administrar Clientes</a></li>
+						<li><a href="<?php echo site_url('clientes/registrar'); ?>"<?php if (methodName() == 'clientes/registrar') { echo ' class="current"'; } ?>>Agregar Cliente</a></li>
 					</ul>
 				</li>
 				
