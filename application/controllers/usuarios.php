@@ -252,18 +252,45 @@ class Usuarios extends CI_Controller
 		$filters = $this->uri->uri_to_assoc(3);
 		$filters = $this->_sanitizeFilters($filters);
 
-		// Data we could need in our PDF
+		// Data we need in our PDF
 		$data['title'] = "Reporte de Usuarios";
 		$data['user'] = $this->session->userdata('user');
-		$data['filters'] = $filters;
 		
 		// Get the array with the users in the database
 		$data['users'] = $this->users->getUsers($filters['department'], $filters['status']);
+
+		if ($filters['department'] == '') {
+			$data['department'] = 'todos';
+		} else {
+			$data['department'] = $filters['department'];
+		}
+
+		if ($filters['status'] == '') {
+			$data['status'] = 'todos';
+		} else {
+			switch ($filters['status']) {
+				case '1':
+					$data['status'] = 'activo';
+					break;
+
+				case '0':
+					$data['status'] = 'inactivo';
+					break;
+
+				default:
+					$data['status'] = 'ERROR';
+					break;
+			}
+		}
 
 		$html = $this->load->view('reportes/usuarios', $data, true);
 		createPDF($html, 'reporte');
 	}
 
+	/**
+	 * @return   $filters['department'] as an empty string or a department string.
+	 * @return   $filters['status'] as an empty string or a string containing 1, 0.
+	 */
 	private function _sanitizeFilters($dirtyFilters)
 	{
 		$filters['department'] = isset($dirtyFilters['departamento']) ? trim($dirtyFilters['departamento']) : '';
@@ -280,7 +307,7 @@ class Usuarios extends CI_Controller
 					break;
 				
 				default:
-					$filters['status'] = 'ERROR';
+					$filters['status'] = '';
 					break;
 			}
 		}
