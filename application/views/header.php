@@ -74,6 +74,8 @@
 			<div id="profile-links">
 				Bienvenido, <a href="#" title="Edita tu perfil"><?php echo $user['nombre']; ?></a>.<br />
 				<br />
+				Fecha: <?php echo date('d/m/Y'); ?>, Hora: <?php echo date('H:i'); ?><br />
+				<br />
 				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="<?php echo site_url('salir'); ?>" title="Cerrar Sesión">Salir</a>
 			</div>        
 			

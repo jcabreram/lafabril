@@ -1,0 +1,53 @@
+body {
+	margin: 190px 50px 50px;
+}
+
+.header {
+	position: fixed;
+	top: 50px;
+	left: 50px;
+}
+
+h1 {
+	font-size: 18px;
+	font-weight: bold;
+	margin-bottom: 100px;
+}
+
+h2 {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 100px;
+	/* margin-bottom: 10px; */
+}
+
+.filters {
+	margin: 0 0 25px;
+}
+
+.filters th {
+	font-weight: bold;
+}
+
+.filters th, .filters td {
+	padding: 5px 0;
+	font-size: 12px;
+}
+
+.filters td {
+	padding: 5px  0 5px 20px;
+	font-size: 12px;
+}
+
+.catalog {
+	width: 100%;
+}
+
+.catalog th {
+	font-weight: bold;
+}
+
+.catalog th, .catalog td {
+	padding: 10px 0;
+	font-size: 12px;
+}

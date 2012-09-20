@@ -207,7 +207,7 @@ def("DOMPDF_DEFAULT_PAPER_SIZE", "letter");
  * Used if no suitable fonts can be found. This must exist in the font folder.
  * @var string
  */
-def("DOMPDF_DEFAULT_FONT", "serif");
+def("DOMPDF_DEFAULT_FONT", "helvetica");
 
 /**
  * Image DPI setting
@@ -256,7 +256,7 @@ def("DOMPDF_DPI", 96);
  *
  * @var bool
  */
-def("DOMPDF_ENABLE_PHP", false);
+def("DOMPDF_ENABLE_PHP", true);
 
 /**
  * Enable inline Javascript
