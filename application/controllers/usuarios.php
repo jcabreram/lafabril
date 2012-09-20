@@ -175,6 +175,9 @@ class Usuarios extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
+			if (!isset($_POST['sucursales'])) {
+				$_POST['sucursales'] = array();
+			}
 			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'], $_POST['sucursales'])) {
 				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '" ha sido modificado.');
 				redirect('usuarios');

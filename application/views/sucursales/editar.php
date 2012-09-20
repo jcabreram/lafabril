@@ -38,7 +38,7 @@
 			</p>
 
 			<p>
-				<input class="button" type="submit" value="Registrar" />
+				<input class="button" type="submit" value="Actualizar" />
 			</p>
 
 		</form>
