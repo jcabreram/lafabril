@@ -81,7 +81,7 @@
 			<!-- Close link -->
 			<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
 			<!-- Message -->
-			<div>No pudimos encontrar a ningún usuario. Debió ocurrir un error, <a href="<?php echo site_url('usuarios'); ?>" title="Intenta de nuevo">intenta de nuevo</a>.</div>
+			<div>No pudimos encontrar ninguna sucursal. Debió ocurrir un error, <a href="<?php echo site_url('sucursales'); ?>" title="Intenta de nuevo">intenta de nuevo</a>.</div>
 		</div>
 
 	<?php endif; ?> 

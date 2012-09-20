@@ -18,35 +18,37 @@
 		<?php endif; ?>
 
 		<form action="<?php echo site_url('usuarios/editar/' . $userData['id']); ?>" method="post">
-
+			
+			<fieldset class="column-left">
+			
 			<p>
 				<label>Nombre Completo *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('fullName', $userData['nombre']); ?>" type="text" name="fullName" />
+				<input class="text-input large-input" value="<?php echo set_value('fullName', $userData['nombre']); ?>" type="text" name="fullName" />
 				<?php echo form_error('fullName'); ?>
 			</p>
 
 			<p>
 				<label>Nombre de Usuario *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('username', $userData['username']); ?>" type="text" name="username" />
+				<input class="text-input large-input" value="<?php echo set_value('username', $userData['username']); ?>" type="text" name="username" />
 				<input value="<?php echo $userData['username']; ?>" type="hidden" name="originalUsername" />
 				<?php echo form_error('username'); ?>
 			</p>
 			
 			<p>
 				<label>Contraseña</label>
-				<input class="text-input medium-input" type="password" name="password" />
+				<input class="text-input large-input" type="password" name="password" />
 				<?php echo form_error('password'); ?>
 			</p>
 
 			<p>
 				<label>Repetir Contraseña</label>
-				<input class="text-input medium-input" type="password" name="repassword" />
+				<input class="text-input large-input" type="password" name="repassword" />
 				<?php echo form_error('repassword'); ?>
 			</p>
 			
 			<p>
 				<label>Departamento *</label>              
-				<select name="department" class="small-input">
+				<select name="department" class="medium-input">
 					<option value="">Escoge una opción</option>
 					<option value="ventas" <?php echo set_select('department', 'ventas', (!$_POST & ($userData['departamento'] == 'ventas')) ? true : false); ?>>Ventas</option>
 					<option value="cuentasxcobrar" <?php echo set_select('department', 'cuentasxcobrar', (!$_POST & ($userData['departamento'] == 'cuentasxcobrar')) ? true : false); ?>>Cuentas por Cobrar</option>
@@ -65,6 +67,26 @@
 			<p>
 				<input class="button" type="submit" value="Editar" />
 			</p>
+			
+			</fieldset>
+			
+			<fieldset class="column-right">
+			
+			
+			<p><label>Sucursales</label></p>
+			
+				<?php foreach ($branchesData as $branch) : ?>
+					<p>
+						<input type="checkbox" name="sucursales[]" value="<?php echo $branch['id_sucursal'].'" ';
+							foreach($userBranchesData as $ids_sucursal)
+								if(in_array($branch['id_sucursal'], $ids_sucursal))
+							        echo "checked"; ?>  />
+						<?php echo $branch['nombre']; ?>
+					</p>
+				<?php endforeach; ?>
+			
+			</fieldset>
+			<div class="clear"></div><!-- End .clear -->
 
 		</form>
 

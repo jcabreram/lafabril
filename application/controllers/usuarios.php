@@ -19,6 +19,8 @@ class Usuarios extends CI_Controller
 		$this->session->set_userdata('lastActivity', time());
 
 		$this->load->model('users');
+		$this->load->model('userBranches');
+		$this->load->model('branches');
 	}
 
 	public function index()
@@ -117,6 +119,9 @@ class Usuarios extends CI_Controller
 	{
 		// Load form validation library
 		$this->load->library('form_validation');
+		
+		// Load array helper for custom function array_flatten()
+		$this->load->helper('array');
 
 		// Setting error delimiters
 		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
@@ -170,16 +175,21 @@ class Usuarios extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
-				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '"" ha sido modificado.');
+			if($this->users->update($id, $_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'], $_POST['sucursales'])) {
+				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '" ha sido modificado.');
 				redirect('usuarios');
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema intentando actualizar al usuario, intenta de nuevo.');
+				redirect('usuarios');
 			}
 		}
 		
 		// Get the array with the row of the user in the database
 		$data['userData'] = $this->users->getUser($id);
+		// Get the array with the rows of the branches of the user in the database
+		$data['userBranchesData'] = $this->userBranches->getUserBranches($id);
+		// Get the array with the rows of all the branches in the database
+		$data['branchesData'] = $this->branches->getBranches();
 		
 		// If the user doesn't exist
 		if (!is_array($data['userData'])) {

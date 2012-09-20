@@ -70,7 +70,8 @@ class Users extends CI_Model
 		return $query->row_array();
 	}	
 	
-	public function update($id, $username, $password, $fullName, $department, $status)
+	
+	public function update($id, $username, $password, $fullName, $department, $status, $sucursales)
 	{
 		$id = $this->db->escape(intval($id));
 		$username = $this->db->escape($username);
@@ -78,11 +79,31 @@ class Users extends CI_Model
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
 		$status = $this->db->escape($status);
+		//$sucursales = $this->db->escape($sucursales);
+		$resultado = TRUE;
 
 		$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
 
-		return $this->db->query($sql);
+		if(!$this->db->query($sql))
+			$resultado = FALSE;
+		
+				
+		//var_dump($sucursales);
+		
+		if (is_array($sucursales) && !empty($sucursales)) {
+			$sql2 = "DELETE FROM usuarios_sucursales WHERE id_usuario = $id";
+			if(!$this->db->query($sql2))
+				$resultado = FALSE;
+			foreach ($sucursales as $sucursal) {
+				$sql3 = "INSERT INTO usuarios_sucursales(id_usuario,id_sucursal) VALUES ($id, $sucursal)";
+				if(!$this->db->query($sql3))
+					$resultado = FALSE;
+			}	
+		}
+		
+		return $resultado;
 	}
+	
 
 	public function setStatus($id, $status)
 	{
