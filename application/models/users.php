@@ -90,7 +90,7 @@ class Users extends CI_Model
 				
 		//var_dump($sucursales);
 		
-		if (is_array($sucursales) && !empty($sucursales)) {
+		if (is_array($sucursales)) {
 			$sql2 = "DELETE FROM usuarios_sucursales WHERE id_usuario = $id";
 			if(!$this->db->query($sql2))
 				$resultado = FALSE;
