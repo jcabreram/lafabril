@@ -96,13 +96,24 @@
 						<li><a href="<?php echo site_url('clientes/registrar'); ?>"<?php if (methodName() == 'clientes/registrar') { echo ' class="current"'; } ?>>Agregar Cliente</a></li>
 					</ul>
 				</li>
-				
+
+				<li>
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'pedidos') { echo ' current'; } ?>">
+						Pedidos
+					</a>
+					<ul>
+						<li><a href="<?php echo site_url('pedidos'); ?>">Administrar Pedidos</a></li>
+						<li><a href="<?php echo site_url('pedidos/registrar'); ?>">Agregar Pedidos</a></li>
+					</ul>	
+				</li>
+
 				<li>
 					<a href="#" class="nav-top-item">
 						Ventas
 					</a>
 					<ul>
-						<li><a href="#">Administrar Pedidos</a></li>
+						<li><a href="#">Administrar Notas de Venta</a></li>
+						<li><a href="#">Administrar Facturas</a></li>
 					</ul>
 				</li>
 				
