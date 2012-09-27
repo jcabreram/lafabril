@@ -43,7 +43,7 @@ class Users extends CI_Model
 
 		$this->db->select('*');
 		$this->db->from('usuarios');
-		$this->db->order_by('activo', 'DESC');
+		$this->db->order_by('nombre', 'ASC');
 
 		if ($department !== '') {
 			$this->db->where('departamento', $department);
@@ -75,15 +75,19 @@ class Users extends CI_Model
 	{
 		$id = $this->db->escape(intval($id));
 		$username = $this->db->escape($username);
-		$password = (empty($password)) ? 'NULL' : $this->db->escape(sha1($password));
+		$password = (empty($password)) ? false : $this->db->escape(sha1($password));
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
 		$status = $this->db->escape($status);
 		//$sucursales = $this->db->escape($sucursales);
 		$resultado = TRUE;
 
-		$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
-
+		if (!$password) {
+			$sql = "UPDATE usuarios	SET username = $username, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
+		} else {
+			$sql = "UPDATE usuarios	SET username = $username, password = $password, nombre = $fullName, departamento = $department, activo = $status WHERE id = $id";
+		}
+		
 		if(!$this->db->query($sql))
 			$resultado = FALSE;
 		

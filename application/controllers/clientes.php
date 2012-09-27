@@ -290,7 +290,7 @@ class Clientes extends CI_Controller
 	public function desactivar($id)
 	{
 		$this->clients->setStatus($id, 0);
-		$this->session->set_flashdata('message', 'La cliente ha sido activado.');
+		$this->session->set_flashdata('message', 'El cliente ha sido activado.');
 		redirect('clientes');		
 	}
 }
