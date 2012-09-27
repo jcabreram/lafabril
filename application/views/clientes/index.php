@@ -41,9 +41,10 @@
 				<tr>
 				   <th>Nombre</th>
 				   <th>RFC</th>
-				   <th>Tipo de Contribuyente</th>
+				   <th>Tipo</th>
 				   <th>Límite de Crédito</th>
 				   <th>Días de Crédito</th>
+				   <th>Estatus</th>
 				   <th>Opciones</th>
 				</tr>
 			</thead>
@@ -60,14 +61,21 @@
 					} ?></td>
 					<td><?php echo $client['limite_credito']; ?></td>
 					<td><?php echo $client['dias_credito']; ?></td>
+					<td><?php
+						if ($client['activo'] == 1) {
+							echo '<img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activo" />';
+						} else {
+							echo '<img src="' . site_url('resources/images/icons/cross_circle.png') . '" alt="Inactivo" />';
+						}	
+					?></td>
 					<td>
 						<!-- Options Icons -->
 						 <a href="<?php echo site_url("clientes/editar/{$client['id_cliente']}"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
 						 <?php
 						 if ($client['activo'] == 1) {
-						 	echo '<a href="' . site_url("sucursales/desactivar/{$client['id_cliente']}") . '" title="Desactivar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Desactivar" /></a>';
+						 	echo '<a href="' . site_url("clientes/desactivar/{$client['id_cliente']}") . '" title="Desactivar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Desactivar" /></a>';
 						 } else {
-						 	echo '<a href="' . site_url("sucursales/activar/{$client['id_cliente']}") . '" title="Activar"><img src="' . site_url('resources/images/icons/tick.png') . '" alt="Activar" /></a>';
+						 	echo '<a href="' . site_url("clientes/activar/{$client['id_cliente']}") . '" title="Activar"><img src="' . site_url('resources/images/icons/tick.png') . '" alt="Activar" /></a>';
 						 } ?>
 					</td>
 				</tr>

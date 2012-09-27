@@ -78,7 +78,7 @@ class Clients extends CI_Model
 		$id = $this->db->escape(intval($id));
 		$status = $this->db->escape(intval($status));
 
-		$sql = "UPDATE clientes SET activo = $status WHERE id_sucursal = $id";
+		$sql = "UPDATE clientes SET activo = $status WHERE id_cliente = $id";
 
 		return $this->db->query($sql);
 	}

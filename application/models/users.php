@@ -43,7 +43,7 @@ class Users extends CI_Model
 
 		$this->db->select('*');
 		$this->db->from('usuarios');
-		$this->db->order_by('activo', 'DESC');
+		$this->db->order_by('nombre', 'ASC');
 
 		if ($department !== '') {
 			$this->db->where('departamento', $department);

@@ -88,7 +88,7 @@
 				</li>
 				
 				<li> 
-					<a href="#" class="nav-top-item"> <!-- Add the class "current" to current menu item -->
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
                         Clientes
 					</a>
 					<ul>

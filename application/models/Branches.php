@@ -15,7 +15,7 @@ class Branches extends CI_Model
 
 	public function getBranches()
 	{
-		$sql = 'SELECT * FROM sucursales';
+		$sql = 'SELECT * FROM sucursales ORDER BY nombre ASC';
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
