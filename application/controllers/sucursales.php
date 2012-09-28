@@ -45,6 +45,11 @@ class Sucursales extends CI_Controller
 				'field' => 'status',
 				'label' => 'estatus',
 				'rules' => 'required'
+			),
+			array(
+				'field' => 'iva',
+				'label' => 'IVA',
+				'rules' => 'required|numeric'
 			)
 		);
 
@@ -52,7 +57,7 @@ class Sucursales extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->branches->create($_POST['name'], $_POST['address'], $_POST['status'])) {
+			if($this->branches->create($_POST['name'], $_POST['address'], $_POST['status'], $_POST['iva'])) {
 				$this->session->set_flashdata('message', 'La sucursal "' . htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8') . '" ha sido registrada.');
 				redirect('sucursales');
 			} else {
@@ -107,6 +112,11 @@ class Sucursales extends CI_Controller
 				'field' => 'status',
 				'label' => 'estatus',
 				'rules' => 'required'
+			),
+			array(
+				'field' => 'iva',
+				'label' => 'IVA',
+				'rules' => 'required|numeric'
 			)
 		);
 
@@ -114,7 +124,7 @@ class Sucursales extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->branches->update($id, $_POST['name'], $_POST['address'], $_POST['status'])) {
+			if($this->branches->update($id, $_POST['name'], $_POST['address'], $_POST['status'], $_POST['iva'])) {
 				$this->session->set_flashdata('message', 'La sucursal "' . htmlspecialchars($_POST['name'], ENT_QUOTES, 'UTF-8') . '" ha sido modificada.');
 				redirect('sucursales');
 			} else {
