@@ -54,7 +54,7 @@
 				<tr>
 					<td><?php echo $client['nombre']; ?></td>
 					<td><?php echo $client['rfc']; ?></td>
-					<td><?php if ($client['tipo_contribuyente'] = 'F') {
+					<td><?php if ($client['tipo_contribuyente'] == 'F') {
 						echo 'Persona física';
 					} else {
 						echo 'Persona moral';

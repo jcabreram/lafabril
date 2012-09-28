@@ -30,6 +30,12 @@
 				<input class="text-input medium-input" value="<?php echo set_value('address'); ?>" type="text" name="address" />
 				<?php echo form_error('address'); ?>
 			</p>
+			
+			<p>
+				<label>IVA (en formato decimal) *</label>
+				<input class="text-input small-input" value="<?php echo set_value('iva'); ?>" type="text" name="iva" />
+				<?php echo form_error('iva'); ?>
+			</p>
 
 			<p>
 				<label>Estatus *</label>
