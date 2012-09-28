@@ -4,18 +4,10 @@
 <div class="content-box"> <!-- Start Content Box -->
 
 	<div class="content-box-header">
-		<h3>Datos del Usuario</h3>
+		<h3>Datos del Pedido</h3>
 	</div> <!-- End .content-box-header -->
 
 	<div class="content-box-content">
-
-		<!-- Notification -->
-		<div class="notification attention png_bg">
-			<!-- Close link -->
-			<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
-			<!-- Message -->
-			<div>Una vez creados, los usuarios no pueden ser eliminados.</div>
-		</div>
 
 		<?php if ($this->session->flashdata('error')) : ?>
 		<!-- Notification -->
@@ -25,29 +17,50 @@
 		</div>
 		<?php endif; ?>
 
-		<form action="<?php echo site_url('usuarios/registrar'); ?>" method="post">
+		<form action="<?php echo site_url('pedidos/registrar'); ?>" method="post">
 
 			<p>
-				<label>Nombre Completo *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('fullName'); ?>" type="text" name="fullName" />
-				<?php echo form_error('fullName'); ?>
+				<label>Sucursal *</label>              
+				<select name="branch" class="small-input">
+					<option value="">Escoge una opción</option>
+					<?php foreach ($branches as $branch) : ?>
+					<option value="<?php echo $branch['id_sucursal']; ?>"><?php echo $branch['nombre']; ?></option>
+					<?php endforeach; ?>
+				</select> 
+				<?php echo form_error('branch'); ?>
 			</p>
 
 			<p>
-				<label>Nombre de Usuario *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('username'); ?>" type="text" name="username" />
-				<?php echo form_error('username'); ?>
+				<label>Vendedor *</label>              
+				<select name="salesman" class="small-input">
+					<option value="">Escoge una opción</option>
+					<?php foreach ($salesmen as $salesman) : ?>
+					<option value="<?php echo $salesman['id_vendedor']; ?>"><?php echo $salesman['nombre']; ?></option>
+					<?php endforeach; ?>
+				</select> 
+				<?php echo form_error('salesman'); ?>
 			</p>
 
 			<p>
-				<label>Contraseña *</label>
-				<input class="text-input medium-input" type="password" name="password" />
+				<label>Cliente *</label>              
+				<select name="client" class="small-input">
+					<option value="">Escoge una opción</option>
+					<?php foreach ($clients as $client) : ?>
+					<option value="<?php echo $client['id_cliente']; ?>"><?php echo $client['nombre']; ?></option>
+					<?php endforeach; ?>
+				</select> 
+				<?php echo form_error('client'); ?>
+			</p>
+
+			<p>
+				<label>Fecha del Pedido *</label>
+				<input class="text-input medium-input" type="text" name="password" />
 				<?php echo form_error('password'); ?>
 			</p>
 
 			<p>
-				<label>Repetir Contraseña *</label>
-				<input class="text-input medium-input" type="password" name="repassword" />
+				<label>Fecha de Entrega *</label>
+				<input class="text-input medium-input" type="text" name="repassword" />
 				<?php echo form_error('repassword'); ?>
 			</p>
 
