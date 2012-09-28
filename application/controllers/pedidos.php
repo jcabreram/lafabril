@@ -28,6 +28,11 @@ class Pedidos extends CI_Controller
 
 	public function registrar()
 	{
+		// Load necessary models
+		$this->load->model('userBranches');
+		$this->load->model('salesmen');
+		$this->load->model('clients');
+
 		// Load form validation library
 		$this->load->library('form_validation');
 
@@ -57,6 +62,9 @@ class Pedidos extends CI_Controller
 
 		$data['title'] = "Registrar Pedido";
 		$data['user'] = $this->session->userdata('user');
+		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
+		$data['salesmen'] = $this->salesmen->getAll();
+		$data['clients'] = $this->clients->getClientes();
 			
 		// Display views
 		$this->load->view('header', $data);
