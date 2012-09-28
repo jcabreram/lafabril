@@ -49,6 +49,9 @@
 		
 		<!-- jQuery WYSIWYG Plugin -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery.wysiwyg.js"></script>
+
+		<!-- Custom Scripts -->
+		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/functionality.js"></script>
 		
 		<!-- Internet Explorer .png-fix -->
 		
