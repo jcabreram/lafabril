@@ -20,19 +20,33 @@ class Users extends CI_Model
 		return false;
 	}
 
-	public function signUp($username, $password, $fullName, $department, $status)
+	public function signUp($username, $password, $fullName, $department, $status, $sucursales)
 	{
 		$username = $this->db->escape($username);
 		$password = $this->db->escape(sha1($password));
 		$fullName = $this->db->escape($fullName);
 		$department = $this->db->escape($department);
 		$status = $this->db->escape($status);
+		$resultado = TRUE;
 		
 
 		$sql = "INSERT INTO usuarios (id, username, password, nombre, departamento, activo)
 				VALUES (NULL, $username, $password, $fullName, $department, $status)";
 		
-		return $this->db->query($sql);
+		if(!$this->db->query($sql))
+			$resultado = FALSE;
+			
+		$id = $this->db->insert_id();
+			
+		if (is_array($sucursales)) {
+			foreach ($sucursales as $sucursal) {
+				$sql2 = "INSERT INTO usuarios_sucursales(id_usuario,id_sucursal) VALUES ($id, $sucursal)";
+				if(!$this->db->query($sql2))
+					$resultado = FALSE;
+			}	
+		}
+		
+		return $resultado;
 	}
 
 	public function getAll($filters = false)
