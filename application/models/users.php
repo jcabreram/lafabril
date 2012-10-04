@@ -35,21 +35,21 @@ class Users extends CI_Model
 		return $this->db->query($sql);
 	}
 
-	public function getUsers($department = false, $status = false)
+	public function getAll($filters = false)
 	{
-		// Trim returns an empty string if it's argument is false
-		$department = trim($department);
-		$status = trim($status);
+		// Filters
+		$department = isset($filters['department']) ? $filters['department'] : false;
+		$status = isset($filters['status']) ? $filters['status'] : false;
 
 		$this->db->select('*');
 		$this->db->from('usuarios');
 		$this->db->order_by('nombre', 'ASC');
 
-		if ($department !== '') {
+		if ($department !== false) {
 			$this->db->where('departamento', $department);
 		}
 		
-		if ($status !== '') {
+		if ($status !== false) {
 			$this->db->where('activo', $status);
 		}
 

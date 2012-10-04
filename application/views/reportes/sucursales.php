@@ -2,34 +2,28 @@
 
 <table class="filters">
 	<tr>
-		<th>Departamento</th>
-		<td><?php echo $department; ?></td>
-	</tr>
-	<tr>
 		<th>Estatus</th>
 		<td><?php echo $status; ?></td>
 	</tr>
 </table>
 
-<?php if (count($users) > 0) : ?>
+<?php if (count($branches) > 0) : ?>
 <table class="catalog">
 	<thead>
 		<tr>
 		   <th>Nombre</th>
-		   <th>Nombre de Usuario</th>
-		   <th>Departamento</th>
+		   <th>Dirección</th>
 		   <th>Estatus</th>
 		</tr>
 	</thead>
 
 	<tbody>
-	<?php foreach ($users as $user) : ?>
+	<?php foreach ($branches as $branch) : ?>
 		<tr>
-			<td><?php echo $user['nombre']; ?></td>
-			<td><?php echo $user['username']; ?></td>
-			<td><?php echo $user['departamento']; ?></td>
+			<td><?php echo $branch['nombre']; ?></td>
+			<td><?php echo $branch['direccion']; ?></td>
 			<td><?php 
-				if ($user['activo'] == 1) {
+				if ($branch['estatus'] == 1) {
 					echo 'Activo';
 				} else {
 					echo 'Inactivo';
@@ -40,7 +34,7 @@
 	</tbody>
 </table>
 <?php else : ?>
-<p>No existen usuarios con esas especificaciones.</p>
+<p>No existen sucursales con esas especificaciones.</p>
 <?php endif; ?>
 
 </body>
