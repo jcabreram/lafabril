@@ -74,13 +74,19 @@ class Usuarios extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->users->signUp($_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'])) {
+			if (!isset($_POST['sucursales'])) {
+				$_POST['sucursales'] = array();
+			}
+			if($this->users->signUp($_POST['username'], $_POST['password'], $_POST['fullName'], $_POST['department'], $_POST['status'], $_POST['sucursales'])) {
 				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') . '" ha sido registrado.');
 				redirect('usuarios');
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar al usuario, intenta de nuevo.');
 			}
 		}
+		
+		// Get the array with the rows of all the branches in the database
+		$data['branchesData'] = $this->branches->getActiveBranches();
 
 		$data['title'] = "Registrar Usuario";
 		$data['user'] = $this->session->userdata('user');

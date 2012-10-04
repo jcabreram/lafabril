@@ -26,6 +26,8 @@
 		<?php endif; ?>
 
 		<form action="<?php echo site_url('usuarios/registrar'); ?>" method="post">
+		
+		<fieldset class="column-left">
 
 			<p>
 				<label>Nombre Completo *</label>
@@ -71,6 +73,23 @@
 			<p>
 				<input class="button" type="submit" value="Registrar" />
 			</p>
+			
+			</fieldset>
+			
+			<fieldset class="column-right">
+			
+			<p><label>Sucursales</label></p>
+			
+				<?php foreach ($branchesData as $branch) : ?>
+					<p>
+						<input type="checkbox" name="sucursales[]" value=<?php echo '"' . $branch['id_sucursal'].'" ' . "/>";
+						echo $branch['nombre']; ?>
+					</p>
+				<?php endforeach; ?>
+			
+			</fieldset>
+			
+			<div class="clear"></div><!-- End .clear -->
 
 		</form>
 
