@@ -88,7 +88,7 @@ class Usuarios extends CI_Controller
 		// Get the array with the rows of all the branches in the database
 		$data['branchesData'] = $this->branches->getActiveBranches();
 
-		$data['title'] = "Registrar Usuario";
+		$data['title'] = 'Registrar Usuario';
 		$data['user'] = $this->session->userdata('user');
 			
 		// Display views
@@ -97,30 +97,6 @@ class Usuarios extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 
-	public function listar()
-	{
-		// We need it to populate the filter form
-		$this->load->helper('form');
-
-		// Fetch filters from uri
-		$filters = $this->uri->uri_to_assoc(3);
-		$filters = $this->_sanitizeFilters($filters);
-
-		$data['title'] = "Usuarios";
-		$data['user'] = $this->session->userdata('user');
-		$data['filters'] = $filters;
-		
-		// Get the array with the users in the database
-		$data['usersData'] = $this->users->getUsers($filters['department'], $filters['status']);
-		
-		// Display views
-		$this->load->view('header', $data);
-		$this->load->view('usuarios/listar', $data);
-		$this->load->view('usuarios/filterForm', $data);
-		$this->load->view('footer', $data);
-	}
-
-	
 	public function editar($id)
 	{
 		// Load form validation library
@@ -215,18 +191,50 @@ class Usuarios extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 
-	public function activar($id)
+	private function _sanitizeFilters($dirtyFilters)
 	{
-		$this->users->setStatus($id, '1');
-		$this->session->set_flashdata('message', 'El usuario ha sido activado.');
-		redirect('usuarios');
+		$filters = array();
+
+		if (isset($dirtyFilters['departamento']) && trim($dirtyFilters['departamento']) !== '') {
+			$filters['department'] = trim($dirtyFilters['departamento']);
+		}
+
+		if (isset($dirtyFilters['estatus']) && trim($dirtyFilters['estatus']) !== '') {
+			switch ($dirtyFilters['estatus']) {
+				case 'activo':
+					$filters['status'] = '1';
+					break;
+
+				case 'inactivo':
+					$filters['status'] = '0';
+					break;
+			}
+		}
+
+		return $filters;
 	}
-	
-	public function desactivar($id)
-	{	
-		$this->users->setStatus($id, '0');
-		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
-		redirect('usuarios');
+
+	public function listar()
+	{
+		// We need it to populate the filter form
+		$this->load->helper('form');
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+		
+		// Get the array with the users in the database
+		$data['usersData'] = $this->users->getAll($filters);
+		
+		$data['title'] = 'Usuarios';
+		$data['user'] = $this->session->userdata('user');
+		$data['filters'] = $filters;
+
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('usuarios/listar', $data);
+		$this->load->view('usuarios/filterForm', $data);
+		$this->load->view('footer', $data);
 	}
 
 	public function filtrar()
@@ -271,66 +279,48 @@ class Usuarios extends CI_Controller
 		$filters = $this->uri->uri_to_assoc(3);
 		$filters = $this->_sanitizeFilters($filters);
 
-		// Data we need in our PDF
+		// Data we may need in our PDF
 		$data['title'] = "Reporte de Usuarios";
-		$data['user'] = $this->session->userdata('user');
 		
 		// Get the array with the users in the database
-		$data['users'] = $this->users->getUsers($filters['department'], $filters['status']);
+		$data['users'] = $this->users->getAll($filters);
 
-		if ($filters['department'] == '') {
-			$data['department'] = 'todos';
+		if (!isset($filters['department'])) {
+			$data['department'] = 'Todos';
 		} else {
 			$data['department'] = $filters['department'];
 		}
 
-		if ($filters['status'] == '') {
-			$data['status'] = 'todos';
+		if (!isset($filters['status'])) {
+			$data['status'] = 'Todos';
 		} else {
 			switch ($filters['status']) {
 				case '1':
-					$data['status'] = 'activo';
+					$data['status'] = 'Activo';
 					break;
 
 				case '0':
-					$data['status'] = 'inactivo';
-					break;
-
-				default:
-					$data['status'] = 'ERROR';
+					$data['status'] = 'Inactivo';
 					break;
 			}
 		}
 
-		$html = $this->load->view('reportes/usuarios', $data, true);
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes/usuarios', $data, true);
 		createPDF($html, 'reporte');
 	}
 
-	/**
-	 * @return   $filters['department'] as an empty string or a department string.
-	 * @return   $filters['status'] as an empty string or a string containing 1, 0.
-	 */
-	private function _sanitizeFilters($dirtyFilters)
+	public function activar($id)
 	{
-		$filters['department'] = isset($dirtyFilters['departamento']) ? trim($dirtyFilters['departamento']) : '';
-		$filters['status'] = isset($dirtyFilters['estatus']) ? trim($dirtyFilters['estatus']) : '';
-
-		if ($filters['status'] != '') {
-			switch ($filters['status']) {
-				case 'activo':
-					$filters['status'] = '1';
-					break;
-
-				case 'inactivo':
-					$filters['status'] = '0';
-					break;
-				
-				default:
-					$filters['status'] = '';
-					break;
-			}
-		}
-
-		return $filters;
+		$this->users->setStatus($id, '1');
+		$this->session->set_flashdata('message', 'El usuario ha sido activado.');
+		redirect('usuarios');
+	}
+	
+	public function desactivar($id)
+	{	
+		$this->users->setStatus($id, '0');
+		$this->session->set_flashdata('message', 'El usuario ha sido desactivado.');
+		redirect('usuarios');
 	}
 }
