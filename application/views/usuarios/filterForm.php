@@ -6,7 +6,7 @@
 
 		<p>
 			<label>Departamento</label>
-			<select name="department">
+			<select name="department"><?php if (!isset($filters['department'])) { $filters['department'] = ''; } ?>
 				<option value="" <?php echo setSelect('', $filters['department']); ?>>Todos</option>
 				<option value="ventas" <?php echo setSelect('ventas', $filters['department']); ?>>Ventas</option>
 				<option value="cuentasxcobrar" <?php echo setSelect('cuentasxcobrar', $filters['department']); ?>>Cuentas por Cobrar</option>
@@ -15,7 +15,7 @@
 		</p>
 
 		<p>
-			<label>Estatus</label>
+			<label>Estatus</label><?php if (!isset($filters['status'])) { $filters['status'] = ''; } ?>
 			<input type="radio" name="status" value="" <?php echo setRadio('', $filters['status']); ?> /> Todos<br />
 			<input type="radio" name="status" value="1" <?php echo setRadio('1', $filters['status']); ?> /> Activo<br />
 			<input type="radio" name="status" value="0" <?php echo setRadio('0', $filters['status']); ?> /> Inactivo<br />

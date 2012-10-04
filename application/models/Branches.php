@@ -14,10 +14,20 @@ class Branches extends CI_Model
 		return $this->db->query($sql);
 	}
 
-	public function getBranches()
+	public function getAll($filters = false)
 	{
-		$sql = 'SELECT * FROM sucursales ORDER BY nombre ASC';
-		$query = $this->db->query($sql);
+		// Filters
+		$status = isset($filters['status']) ? $filters['status'] : false;
+
+		$this->db->select('*');
+		$this->db->from('sucursales');
+		$this->db->order_by('nombre', 'ASC');
+
+		if ($status !== false) {
+			$this->db->where('estatus', $status);
+		}
+
+		$query = $this->db->get();
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();

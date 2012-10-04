@@ -21,6 +21,11 @@ class Sucursales extends CI_Controller
 		$this->load->model('branches');
 	}
 
+	public function index()
+	{
+		$this->listar();
+	}
+
 	public function registrar()
 	{
 		// Load form validation library
@@ -71,20 +76,6 @@ class Sucursales extends CI_Controller
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('sucursales/registrar', $data);
-		$this->load->view('footer', $data);
-	}
-
-	public function index()
-	{
-		$data['title'] = "Sucursales";
-		$data['user'] = $this->session->userdata('user');
-		
-		// Get the array with the users in the database
-		$data['branches'] = $this->branches->getBranches();
-			
-		// Display views
-		$this->load->view('header', $data);
-		$this->load->view('sucursales/index', $data);
 		$this->load->view('footer', $data);
 	}
 
@@ -148,6 +139,110 @@ class Sucursales extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('sucursales/editar', $data);
 		$this->load->view('footer', $data);
+	}
+
+	private function _sanitizeFilters($dirtyFilters)
+	{
+		$filters = array();
+
+		if (isset($dirtyFilters['estatus']) && trim($dirtyFilters['estatus']) !== '') {
+			switch ($dirtyFilters['estatus']) {
+				case 'activo':
+					$filters['status'] = '1';
+					break;
+
+				case 'inactivo':
+					$filters['status'] = '0';
+					break;
+			}
+		}
+
+		return $filters;
+	}
+
+	public function listar()
+	{
+		// We need it to populate the filter form
+		$this->load->helper('form');
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// Get the array with the users in the database
+		$data['branches'] = $this->branches->getAll($filters);
+		
+		$data['title'] = 'Sucursales';
+		$data['user'] = $this->session->userdata('user');
+		$data['filters'] = $filters;
+
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('sucursales/listar', $data);
+		$this->load->view('sucursales/filterForm', $data);
+		$this->load->view('footer', $data);
+	}
+
+	public function filtrar()
+	{
+		if ($_POST) {
+			$filters = array();
+
+			$status = isset($_POST['status']) ? trim($_POST['status']) : false;
+
+			if ($status !== false && $status !== '') {
+				switch ($status) {
+					case '1':
+						$filters['estatus'] = 'activo';
+						break;
+
+					case '0':
+						$filters['estatus'] = 'inactivo';
+						break;
+				}
+			}
+
+			if (count($filters) > 0) {
+				redirect('sucursales/listar/' . $this->uri->assoc_to_uri($filters));
+			} else {
+				redirect('sucursales');
+			}
+		}
+
+		redirect();
+	}
+
+	public function exportar()
+	{
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// Data we may need in our PDF
+		$data['title'] = "Reporte de Sucursales";
+		
+		// Get the array with the users in the database
+		$data['branches'] = $this->branches->getAll($filters);
+
+		if (!isset($filters['status'])) {
+			$data['status'] = 'Todos';
+		} else {
+			switch ($filters['status']) {
+				case '1':
+					$data['status'] = 'Activo';
+					break;
+
+				case '0':
+					$data['status'] = 'Inactivo';
+					break;
+			}
+		}
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes/sucursales', $data, true);
+		createPDF($html, 'reporte');
 	}
 
 	public function activar($id)
