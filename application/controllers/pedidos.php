@@ -42,9 +42,14 @@ class Pedidos extends CI_Controller
 		// Define validation rules
 		$config = array(
 			array(
-				'field' => 'fullName', 
+				'field' => 'fecha_pedido', 
+				'label' => 'fecha del pedido', 
+				'rules' => 'required, exact_length[10], alpha_dash'
+			),
+			array(
+				'field' => 'fecha_entrega', 
 				'label' => 'nombre completo', 
-				'rules' => 'trim|required|max_length[255]'
+				'rules' => 'required, exact_length[10], alpha_dash'
 			)
 		);
 
@@ -52,9 +57,10 @@ class Pedidos extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->orders->register()) {
-				$this->session->set_flashdata('message', 'El pedido ha sido registrado.');
-				redirect('pedidos');
+			$usuario = $this->session->userdata('user');
+			$usuario_captura = $usuario['id'];
+			if($id_pedido = $this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], $_POST['status'], $usuario_captura)) {
+				redirect("pedidos/registrar_detalles/$id_pedido");
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pedido, intenta de nuevo.');
 			}
@@ -76,4 +82,60 @@ class Pedidos extends CI_Controller
 	{
 
 	}
+	
+	public function registrar_detalles($id_pedido)
+	{
+		// Load necessary models
+		$this->load->model('userBranches');
+		$this->load->model('salesmen');
+		$this->load->model('clients');
+		$this->load->model('branches');
+		$this->load->model('orders');
+		
+
+		// Load form validation library
+		$this->load->library('form_validation');
+
+		// Setting error delimiters
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		// Define validation rules
+		$config = array(
+			array(
+				'field' => 'fecha_pedido', 
+				'label' => 'fecha del pedido', 
+				'rules' => 'required, exact_length[10], alpha_dash'
+			),
+			array(
+				'field' => 'fecha_entrega', 
+				'label' => 'nombre completo', 
+				'rules' => 'required, exact_length[10], alpha_dash'
+			)
+		);
+
+		$this->form_validation->set_rules($config);
+
+		// If validation was successful
+		if ($this->form_validation->run()) {
+			$usuario = $this->session->userdata('user');
+			$usuario_captura = $usuario['id'];
+			if($this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], $_POST['status'], $usuario_captura)) {
+				$this->session->set_flashdata('message', 'El pedido ha sido registrado.');
+				redirect('pedidos');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pedido, intenta de nuevo.');
+			}
+		}
+
+		$data['title'] = "Registrar detalles del pedido";
+		$data['user'] = $this->session->userdata('user');
+		$data['order'] = $this->orders->getOrder($id_pedido);
+		$data['sucursal'] = $this-<branches->getBranch($data['order']['id_sucursal'])
+			
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pedidos/registrar_detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
 }
