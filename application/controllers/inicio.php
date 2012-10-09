@@ -17,12 +17,17 @@ class Inicio extends CI_Controller
 
 		// We need it to know his idle time
 		$this->session->set_userdata('lastActivity', time());
+		
+		$this->load->model('orders');
 	}
 
 	public function index()
 	{
 		$data['title'] = 'Inicio';
 		$data['user'] = $this->session->userdata('user');
+		
+		// Clean up all the orders that have no details
+		$this->orders->limpiar_vacias();
 
 		// Display views
 		$this->load->view('header', $data);

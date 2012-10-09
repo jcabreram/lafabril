@@ -25,6 +25,17 @@ class Orders extends CI_Model
 		}
 	}
 	
+	public function addLine ($id_pedido, $id_producto, $id_cantidad, $precio) {
+		$id_pedido = $this->db->escape(intval($id_pedido));
+		$id_producto = $this->db->escape(intval($id_producto));
+		$precio = $this->db->escape($precio);
+		
+		$sql = "INSERT INTO pedidos_detalles (id_pedido_detalle, id_pedido, id_producto, cantidad, precio, cantidad_surtida)
+				VALUES (NULL, $id_pedido, $id_producto, $id_cantidad, $precio, 0)";
+		
+		return $this->db->query($sql);
+	}
+	
 	public function getOrder($id)
 	{
 		$id = $this->db->escape(intval($id));
@@ -35,5 +46,37 @@ class Orders extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->row_array();
 	}	
+	
+	public function getOrderDetail($id) {
+		$id = $this->db->escape(intval($id));
+
+		$sql = "SELECT pd.*, productos.* FROM pedidos_detalles as pd INNER JOIN productos ON pd.id_producto=productos.id_producto WHERE id_pedido = $id";
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}
+	
+	public function eliminar($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = "DELETE FROM pedidos_detalles WHERE id_pedido_detalle = $id";
+		
+		return $this->db->query($sql);
+	}
+	
+	public function limpiar_vacias()
+	{
+	
+		// Removes all the items in pedidos that have no corresponding id on pedidos_detalles and that have more than 2 hours of having been created
+		$sql = "DELETE pedidos
+				FROM pedidos
+				LEFT JOIN pedidos_detalles
+				ON pedidos.id_pedido=pedidos_detalles.id_pedido
+				WHERE pedidos_detalles.id_pedido IS NULL AND (now() - pedidos.fecha_captura) > (120*60);";
+				
+		return $this->db->query($sql);
+	}
 	
 }
