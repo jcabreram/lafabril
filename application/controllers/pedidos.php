@@ -42,13 +42,28 @@ class Pedidos extends CI_Controller
 		// Define validation rules
 		$config = array(
 			array(
+				'field' => 'branch', 
+				'label' => 'sucursal', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'salesman', 
+				'label' => 'vendedor', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'client', 
+				'label' => 'cliente', 
+				'rules' => 'callback_not_default'
+			),
+			array(
 				'field' => 'fecha_pedido', 
 				'label' => 'fecha del pedido', 
 				'rules' => 'required, exact_length[10], alpha_dash'
 			),
 			array(
 				'field' => 'fecha_entrega', 
-				'label' => 'nombre completo', 
+				'label' => 'fecha de entrega', 
 				'rules' => 'required, exact_length[10], alpha_dash'
 			)
 		);
@@ -59,10 +74,11 @@ class Pedidos extends CI_Controller
 		if ($this->form_validation->run()) {
 			$usuario = $this->session->userdata('user');
 			$usuario_captura = $usuario['id'];
-			if($id_pedido = $this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], $_POST['status'], $usuario_captura)) {
+			if($id_pedido = $this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], 'A', $usuario_captura)) {
 				redirect("pedidos/registrar_detalles/$id_pedido");
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pedido, intenta de nuevo.');
+				redirect("pedidos/registrar");
 			}
 		}
 
@@ -76,6 +92,15 @@ class Pedidos extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/registrar', $data);
 		$this->load->view('footer', $data);
+	}
+	
+	public function not_default($str) {
+	  if ($str == 'escoge') {
+	    $this->form_validation->set_message('not_default', 'Escoge una opción');
+	    return FALSE;
+	  } else {
+	    return TRUE;
+	  }
 	}
 
 	public function listar()
@@ -91,7 +116,7 @@ class Pedidos extends CI_Controller
 		$this->load->model('clients');
 		$this->load->model('branches');
 		$this->load->model('orders');
-		
+		$this->load->model('products');
 
 		// Load form validation library
 		$this->load->library('form_validation');
@@ -102,14 +127,14 @@ class Pedidos extends CI_Controller
 		// Define validation rules
 		$config = array(
 			array(
-				'field' => 'fecha_pedido', 
-				'label' => 'fecha del pedido', 
-				'rules' => 'required, exact_length[10], alpha_dash'
+				'field' => 'cantidad', 
+				'label' => 'cantidad', 
+				'rules' => 'required, greater_than[0]'
 			),
 			array(
-				'field' => 'fecha_entrega', 
-				'label' => 'nombre completo', 
-				'rules' => 'required, exact_length[10], alpha_dash'
+				'field' => 'precio', 
+				'label' => 'precio unitario', 
+				'rules' => 'required, greater_than[0]'
 			)
 		);
 
@@ -118,10 +143,8 @@ class Pedidos extends CI_Controller
 		// If validation was successful
 		if ($this->form_validation->run()) {
 			$usuario = $this->session->userdata('user');
-			$usuario_captura = $usuario['id'];
-			if($this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], $_POST['status'], $usuario_captura)) {
+			if($this->orders->addLine($id_pedido, $_POST['id_producto'], $_POST['cantidad'], $_POST['precio'])) {
 				$this->session->set_flashdata('message', 'El pedido ha sido registrado.');
-				redirect('pedidos');
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pedido, intenta de nuevo.');
 			}
@@ -130,12 +153,36 @@ class Pedidos extends CI_Controller
 		$data['title'] = "Registrar detalles del pedido";
 		$data['user'] = $this->session->userdata('user');
 		$data['order'] = $this->orders->getOrder($id_pedido);
-		$data['sucursal'] = $this-<branches->getBranch($data['order']['id_sucursal'])
-			
+		$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
+		$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
+		$data['cliente'] = $this->clients->getCliente($data['order']['id_cliente']);
+		$data['products'] = $this->products->getProducts();
+		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
+		$data['order_id'] = $id_pedido;
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($subtotal, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['order_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio'];
+		}
+		
+		$data['subtotal'] = $subtotal;
+		
+		// The total is equal to the subtotal plus its tax
+		$data['total'] = $subtotal + $subtotal * $data['sucursal']['iva']; 
+		
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/registrar_detalles', $data);
 		$this->load->view('footer', $data);
+	}
+	
+	public function eliminar($id_pedido, $id)
+	{	
+		$this->orders->eliminar($id);
+		redirect("pedidos/registrar_detalles/$id_pedido");
 	}
 
 }
