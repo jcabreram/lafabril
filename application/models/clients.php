@@ -35,6 +35,15 @@ class Clients extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();
 	}
+	
+	public function getActiveClients()
+	{
+		$sql = 'SELECT * FROM clientes WHERE activo = 1';
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}
 
 	public function getCliente($id)
 	{
