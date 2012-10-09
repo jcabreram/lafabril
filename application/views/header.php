@@ -20,6 +20,8 @@
 		<!-- Invalid Stylesheet. This makes stuff look pretty. Remove it if you want the CSS completely valid -->
 		<link rel="stylesheet" href="<?php echo base_url();?>resources/css/invalid.css" type="text/css" media="screen" />	
 		
+		<link rel="stylesheet" href="<?php echo base_url();?>resources/css/jquery-ui-1.9.0.custom.css" type="text/css" media="screen" />	
+
 		<!-- Colour Schemes
 	  
 		Default colour scheme is green. Uncomment prefered stylesheet to use it.
@@ -52,6 +54,16 @@
 
 		<!-- Custom Scripts -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/functionality.js"></script>
+		
+		<!-- jQuery UI -->
+		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery-ui-1.9.0.custom.js"></script>
+		
+		<script> 
+			$(function() {$("#fecha, #fecha2").datepicker({
+				dateFormat:'yy-mm-dd'
+			});});
+		</script>
+		
 		
 		<!-- Internet Explorer .png-fix -->
 		

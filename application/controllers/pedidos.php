@@ -42,13 +42,28 @@ class Pedidos extends CI_Controller
 		// Define validation rules
 		$config = array(
 			array(
+				'field' => 'branch', 
+				'label' => 'sucursal', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'salesman', 
+				'label' => 'vendedor', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'client', 
+				'label' => 'cliente', 
+				'rules' => 'callback_not_default'
+			),
+			array(
 				'field' => 'fecha_pedido', 
 				'label' => 'fecha del pedido', 
 				'rules' => 'required, exact_length[10], alpha_dash'
 			),
 			array(
 				'field' => 'fecha_entrega', 
-				'label' => 'nombre completo', 
+				'label' => 'fecha de entrega', 
 				'rules' => 'required, exact_length[10], alpha_dash'
 			)
 		);
@@ -63,6 +78,7 @@ class Pedidos extends CI_Controller
 				redirect("pedidos/registrar_detalles/$id_pedido");
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pedido, intenta de nuevo.');
+				redirect("pedidos/registrar");
 			}
 		}
 
@@ -76,6 +92,15 @@ class Pedidos extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/registrar', $data);
 		$this->load->view('footer', $data);
+	}
+	
+	public function not_default($str) {
+	  if ($str == 'escoge') {
+	    $this->form_validation->set_message('not_default', 'Escoge una opción');
+	    return FALSE;
+	  } else {
+	    return TRUE;
+	  }
 	}
 
 	public function listar()
@@ -159,6 +184,5 @@ class Pedidos extends CI_Controller
 		$this->orders->eliminar($id);
 		redirect("pedidos/registrar_detalles/$id_pedido");
 	}
-
 
 }
