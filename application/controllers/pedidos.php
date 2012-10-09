@@ -92,7 +92,6 @@ class Pedidos extends CI_Controller
 		$this->load->model('branches');
 		$this->load->model('orders');
 		$this->load->model('products');
-		
 
 		// Load form validation library
 		$this->load->library('form_validation');
@@ -105,12 +104,12 @@ class Pedidos extends CI_Controller
 			array(
 				'field' => 'cantidad', 
 				'label' => 'cantidad', 
-				'rules' => 'required, numeric'
+				'rules' => 'required, greater_than[0]'
 			),
 			array(
 				'field' => 'precio', 
 				'label' => 'precio unitario', 
-				'rules' => 'required, numeric'
+				'rules' => 'required, greater_than[0]'
 			)
 		);
 
@@ -135,7 +134,20 @@ class Pedidos extends CI_Controller
 		$data['products'] = $this->products->getProducts();
 		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
 		$data['order_id'] = $id_pedido;
-			
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($subtotal, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['order_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio'];
+		}
+		
+		$data['subtotal'] = $subtotal;
+		
+		// The total is equal to the subtotal plus its tax
+		$data['total'] = $subtotal + $subtotal * $data['sucursal']['iva']; 
+		
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/registrar_detalles', $data);

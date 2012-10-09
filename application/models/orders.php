@@ -3,6 +3,9 @@
 class Orders extends CI_Model
 {
 	public function register ($id_sucursal, $id_vendedor, $id_cliente, $fecha_pedido, $fecha_entrega, $estatus, $usuario_captura) {
+		
+		$this->load->model('folios');
+		
 		$id_sucursal = $this->db->escape(intval($id_sucursal));
 		$id_vendedor = $this->db->escape(intval($id_vendedor));
 		$id_cliente = $this->db->escape(intval($id_cliente));
@@ -10,18 +13,43 @@ class Orders extends CI_Model
 		$fecha_entrega = $this->db->escape($fecha_entrega);
 		$estatus = $this->db->escape($estatus);
 		$usuario_captura = $this->db->escape(intval($usuario_captura));
+		$tipo_documento = $this->db->escape('P');
 		
 		$fecha_captura = date("Y-m-d H:i:s");
 		$fecha_captura = $this->db->escape($fecha_captura);
-		//$id_pedido = $this->db->insert_id();
+		$resultado = TRUE;
+		
+		// We get the last folio of the orders in that branch
+		$ultimo_folio = $this->folios->getLastFolio($id_sucursal, 'P');
+		$folio_actual = ++$ultimo_folio['ultimo_folio'];
 		
 		$sql = "INSERT INTO pedidos (id_pedido, id_sucursal, id_vendedor, id_cliente, fecha_pedido, fecha_entrega, estatus, fecha_captura, usuario_captura)
 				VALUES (NULL, $id_sucursal, $id_vendedor, $id_cliente, $fecha_pedido, $fecha_entrega, $estatus, $fecha_captura, $usuario_captura)";
 		
 		if ($this->db->query($sql)) {
-			return $this->db->insert_id();
+			$id_pedido = $this->db->insert_id();
 		} else {
-			return false;
+			$resultado = FALSE;
+		}
+		
+		// Insert the next folio for the document in the folios table
+		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+					VALUES (NULL, $id_pedido, $id_sucursal, $tipo_documento, $folio_actual)";
+					
+		if (!$this->db->query($sql))
+			$resultado = FALSE;
+		
+		// Update the value of the last folio
+		$sql = "UPDATE folios_prefijo SET ultimo_folio=$folio_actual WHERE tipo_documento = $tipo_documento AND id_sucursal = $id_sucursal";
+		
+		if (!$this->db->query($sql))
+			$resultado = FALSE;
+		
+		// If there were no problems creating the order, return its ID. If there were, return false.
+		if ($resultado) {
+			return $id_pedido;
+		} else {
+			return FALSE;
 		}
 	}
 	

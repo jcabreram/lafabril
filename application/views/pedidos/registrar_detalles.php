@@ -135,9 +135,9 @@
 				<tr>
 				   <th>Producto</th>
 				   <th>Cantidad</th>
-				   <th>Precio unitario</th>
-				   <th>Importe</th>
-				   <th>Opciones</th>
+				   <th style="text-align:right">Precio unitario</th>
+				   <th style="text-align:right">Importe</th>
+				   <th style="text-align:center">Opciones</th>
 				</tr>
 			</thead>
 			
@@ -146,14 +146,47 @@
 				<tr>
 					<td><?php echo $orderData['nombre']; ?></td>
 					<td><?php echo $orderData['cantidad'].' '.$orderData['udm']; ?></td>
-					<td>$<?php echo number_format($orderData['precio'], 2, '.', ','); ?></td>
-					<td>$<?php echo number_format($orderData['cantidad']*$orderData['precio'], 2, '.', ',');?></td>
-					<td>
+					<td style="text-align:right">$<?php echo number_format($orderData['precio'], 2, '.', ','); ?></td>
+					<td style="text-align:right">$<?php echo number_format($orderData['cantidad']*$orderData['precio'], 2, '.', ',');?></td>
+					<td style="text-align:center">
 						<!-- Options Icons -->
 						<?php echo '<a href="' . site_url("pedidos/eliminar/{$order['id_pedido']}/{$orderData['id_pedido_detalle']}") . '" title="Eliminar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Eliminar" /></a>'; ?>
 					</td>
 				</tr>
 			<?php endforeach; ?>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:right"><b>Subtotal:</b></td>
+				<td style="text-align:right">$<?php echo number_format($subtotal, 2, '.', ','); ?></td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:right"><b>IVA:</b></td>
+				<td style="text-align:right"><?php echo $sucursal['iva']*100; ?>%</td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:right"><b>Total:</b></td>
+				<td style="text-align:right">$<?php echo number_format($total, 2, '.', ','); ?></td>
+				<td></td>
+			</tr>
+			
 			<tr>
 				<td></td>
 				<td></td>
@@ -165,6 +198,7 @@
 					</p>
 				</td>
 			</tr>
+			
 			</tbody>
 
 		</table>
