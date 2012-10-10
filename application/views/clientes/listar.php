@@ -7,6 +7,12 @@
 	<!-- Content Box Header -->
 	<div class="content-box-header">
 		<h3>Lista de Clientes</h3>
+
+		<ul class="content-box-tabs">
+			<li><a href="#" class="current">Tabla</a></li>
+			<li><a href="#filtrar" rel="modal">Filtrar</a></li>
+			<li><a href="<?php echo site_url('clientes/exportar' . getParameters()); ?>" target="_blank">Exportar a PDF</a></li>
+		</ul>
 	</div>
 	
 	<!-- Content Box Content -->			
@@ -42,10 +48,10 @@
 				   <th>Nombre</th>
 				   <th>RFC</th>
 				   <th>Tipo</th>
-				   <th>Límite de Crédito</th>
-				   <th>Días de Crédito</th>
-				   <th>Estatus</th>
-				   <th>Opciones</th>
+				   <th class="textAlign-right">Límite de Crédito</th>
+				   <th class="textAlign-center">Días de Crédito</th>
+				   <th class="textAlign-center">Estatus</th>
+				   <th class="textAlign-center">Opciones</th>
 				</tr>
 			</thead>
 			
@@ -59,9 +65,9 @@
 					} else {
 						echo 'Persona moral';
 					} ?></td>
-					<td><?php echo $client['limite_credito']; ?></td>
-					<td><?php echo $client['dias_credito']; ?></td>
-					<td><?php
+					<td class="textAlign-right">$<?php echo number_format($client['limite_credito']); ?></td>
+					<td class="textAlign-center"><?php echo $client['dias_credito']; ?></td>
+					<td class="textAlign-center"><?php
 						if ($client['activo'] == 1) {
 							echo '<img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activo" />';
 						} else {
@@ -91,7 +97,7 @@
 			<!-- Close link -->
 			<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
 			<!-- Message -->
-			<div>No pudimos encontrar ninguna sucursal. Debió ocurrir un error, <a href="<?php echo site_url('clientes'); ?>" title="Intenta de nuevo">intenta de nuevo</a>.</div>
+			<div>No pudimos encontrar ningún cliente. Debió ocurrir un error, <a href="<?php echo site_url('clientes'); ?>" title="Intenta de nuevo">intenta de nuevo</a>.</div>
 		</div>
 
 	<?php endif; ?> 

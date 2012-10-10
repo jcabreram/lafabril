@@ -27,10 +27,25 @@ class Clients extends CI_Model
 		return $this->db->query($sql);
 	}
 
-	public function getClientes()
+	public function getAll($filters = false)
 	{
-		$sql = 'SELECT * FROM clientes';
-		$query = $this->db->query($sql);
+		// Filters
+		$typeOfPerson = isset($filters['typeOfPerson']) ? $filters['typeOfPerson'] : false;
+		$status = isset($filters['status']) ? $filters['status'] : false;
+
+		$this->db->select('*');
+		$this->db->from('clientes');
+		$this->db->order_by('nombre', 'ASC');
+
+		if ($typeOfPerson !== false) {
+			$this->db->where('tipo_contribuyente', $typeOfPerson);
+		}
+		
+		if ($status !== false) {
+			$this->db->where('activo', $status);
+		}
+
+		$query = $this->db->get();
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();

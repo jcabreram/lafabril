@@ -47,8 +47,8 @@
 				<tr>
 				   <th>Nombre</th>
 				   <th>Dirección</th>
-				   <th>Estatus</th>
-				   <th>Opciones</th>
+				   <th class="textAlign-center">Estatus</th>
+				   <th class="textAlign-center">Opciones</th>
 				</tr>
 			</thead>
 			
@@ -57,14 +57,14 @@
 				<tr>
 					<td><?php echo $branch['nombre']; ?></td>
 					<td><?php echo $branch['direccion']; ?></td>
-					<td><?php
+					<td class="textAlign-center"><?php
 						if ($branch['estatus'] == 1) {
 							echo '<img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activo" />';
 						} else {
 							echo '<img src="' . site_url('resources/images/icons/cross_circle.png') . '" alt="Inactivo" />';
 						}	
 					?></td>
-					<td>
+					<td class="textAlign-center">
 						<!-- Options Icons -->
 						 <a href="<?php echo site_url("sucursales/editar/{$branch['id_sucursal']}"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
 						 <?php

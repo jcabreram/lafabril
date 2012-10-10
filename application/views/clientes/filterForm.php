@@ -1,8 +1,17 @@
 <div id="filtrar" style="display: none">
 
-	<h3>Filtrado de Sucursales</h3>
+	<h3>Filtrado de Clientes</h3>
 
-	<form action="<?php echo site_url('sucursales/filtrar'); ?>" method="post">
+	<form action="<?php echo site_url('clientes/filtrar'); ?>" method="post">
+
+		<p>
+			<label>Tipo de Persona</label><?php if (!isset($filters['typeOfPerson'])) { $filters['typeOfPerson'] = ''; } ?>
+			<select name="typeOfPerson">
+				<option value="" <?php echo setSelect('', $filters['typeOfPerson']); ?>>Todos</option>
+				<option value="F" <?php echo setSelect('F', $filters['typeOfPerson']); ?>>Persona Física</option>
+				<option value="M" <?php echo setSelect('M', $filters['typeOfPerson']); ?>>Persona Moral</option>
+			</select>
+		</p>
 
 		<p>
 			<label>Estatus</label><?php if (!isset($filters['status'])) { $filters['status'] = ''; } ?>
