@@ -47,9 +47,9 @@
 				<tr>
 				   <th>Nombre</th>
 				   <th>Nombre de Usuario</th>
-				   <th>Departamento</th>
-				   <th>Estatus</th>
-				   <th>Opciones</th>
+				   <th class="textAlign-center">Departamento</th>
+				   <th class="textAlign-center">Estatus</th>
+				   <th class="textAlign-center">Opciones</th>
 				</tr>
 			</thead>
 			
@@ -58,9 +58,9 @@
 				<tr>
 					<td><?php echo $userData['nombre']; ?></td>
 					<td><?php echo $userData['username']; ?></td>
-					<td><?php echo $userData['departamento']; ?></td>
+					<td class="textAlign-center"><?php echo $userData['departamento']; ?></td>
 					<!-- Active/Inactive Image  -->
-					<td><?php
+					<td class="textAlign-center"><?php
 						if ($userData['activo'] == '1') {
 							echo '<img src="' . site_url('resources/images/icons/tick_circle.png') . '" alt="Activo" />';
 						} else {
@@ -68,7 +68,7 @@
 						}	
 					?></td>
 					<!-- End Active/Inactive Image  -->
-					<td>
+					<td class="textAlign-center">
 						<!-- Options Icons -->
 						 <a href="<?php echo site_url("usuarios/editar/{$userData['id']}"); ?>" title="Editar"><img src="<?php echo site_url('resources/images/icons/pencil.png'); ?>" alt="Editar" /></a>
 						 <?php
