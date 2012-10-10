@@ -59,12 +59,12 @@ class Pedidos extends CI_Controller
 			array(
 				'field' => 'fecha_pedido', 
 				'label' => 'fecha del pedido', 
-				'rules' => 'required, exact_length[10], alpha_dash'
+				'rules' => 'required|exact_length[10]|alpha_dash'
 			),
 			array(
 				'field' => 'fecha_entrega', 
 				'label' => 'fecha de entrega', 
-				'rules' => 'required, exact_length[10], alpha_dash'
+				'rules' => 'required|exact_length[10]|alpha_dash|callback_end_date_check'
 			)
 		);
 
@@ -86,7 +86,7 @@ class Pedidos extends CI_Controller
 		$data['user'] = $this->session->userdata('user');
 		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
 		$data['salesmen'] = $this->salesmen->getAll();
-		$data['clients'] = $this->clients->getClientes();
+		$data['clients'] = $this->clients->getActiveClients();
 			
 		// Display views
 		$this->load->view('header', $data);
@@ -95,13 +95,26 @@ class Pedidos extends CI_Controller
 	}
 	
 	public function not_default($str) {
-	  if ($str == 'escoge') {
-	    $this->form_validation->set_message('not_default', 'Escoge una opción');
-	    return FALSE;
-	  } else {
-	    return TRUE;
-	  }
+		if ($str == 'escoge') {
+			$this->form_validation->set_message('not_default', 'Escoge una opción');
+			return FALSE;
+		} else {
+	    	return TRUE;
+	    }
 	}
+	
+	public function end_date_check() 
+	{
+	    if(strtotime($this->input->post('fecha_pedido')) > strtotime($this->input->post('fecha_entrega'))) 
+	    { 
+	        $this->form_validation->set_message('end_date_check', 'La fecha de entrega debe de ser posterior a la de pedido.');
+	        return FALSE;
+	    }
+	    else 
+	    {
+	        return TRUE;
+	    }
+	} 
 
 	public function listar()
 	{
@@ -129,12 +142,12 @@ class Pedidos extends CI_Controller
 			array(
 				'field' => 'cantidad', 
 				'label' => 'cantidad', 
-				'rules' => 'required, greater_than[0]'
+				'rules' => 'required|greater_than[0]'
 			),
 			array(
 				'field' => 'precio', 
 				'label' => 'precio unitario', 
-				'rules' => 'required, greater_than[0]'
+				'rules' => 'required|greater_than[0]'
 			)
 		);
 
