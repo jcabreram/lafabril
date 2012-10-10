@@ -21,6 +21,11 @@ class Clientes extends CI_Controller
 		$this->load->model('clients');
 	}
 
+	public function index()
+	{
+		$this->listar();
+	}
+
 	public function registrar()
 	{
 		// Load form validation library
@@ -126,7 +131,7 @@ class Clientes extends CI_Controller
 				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['nombre'], ENT_QUOTES, 'UTF-8') . '" ha sido registrado.');
 				redirect('clientes');
 			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el usuario, intenta de nuevo.');
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar al cliente, intenta de nuevo.');
 			}
 		}
 
@@ -136,20 +141,6 @@ class Clientes extends CI_Controller
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('clientes/registrar', $data);
-		$this->load->view('footer', $data);
-	}
-
-	public function index()
-	{
-		$data['title'] = "Clientes";
-		$data['user'] = $this->session->userdata('user');
-		
-		// Get the array with the users in the database
-		$data['clients'] = $this->clients->getClientes();
-			
-		// Display views
-		$this->load->view('header', $data);
-		$this->load->view('clientes/index', $data);
 		$this->load->view('footer', $data);
 	}
 
@@ -278,6 +269,149 @@ class Clientes extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('clientes/editar', $data);
 		$this->load->view('footer', $data);
+	}
+
+	private function _sanitizeFilters($dirtyFilters)
+	{
+		$filters = array();
+
+		if (isset($dirtyFilters['tipo-de-persona']) && trim($dirtyFilters['tipo-de-persona']) !== '') {
+			switch ($dirtyFilters['tipo-de-persona']) {
+				case 'fisica':
+					$filters['typeOfPerson'] = 'F';
+					break;
+
+				case 'moral':
+					$filters['typeOfPerson'] = 'M';
+					break;
+			}
+		}
+
+		if (isset($dirtyFilters['estatus']) && trim($dirtyFilters['estatus']) !== '') {
+			switch ($dirtyFilters['estatus']) {
+				case 'activo':
+					$filters['status'] = '1';
+					break;
+
+				case 'inactivo':
+					$filters['status'] = '0';
+					break;
+			}
+		}
+		
+		return $filters;
+	}
+
+	public function listar()
+	{
+		// We need it to populate the filter form
+		$this->load->helper('form');
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// Get the array with the clients in the database
+		$data['clients'] = $this->clients->getAll($filters);
+
+		$data['title'] = "Clientes";
+		$data['user'] = $this->session->userdata('user');
+		$data['filters'] = $filters;
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('clientes/listar', $data);
+		$this->load->view('clientes/filterForm', $data);
+		$this->load->view('footer', $data);
+	}
+
+	public function filtrar()
+	{
+		if ($_POST) {
+			$filters = array();
+
+			$typeOfPerson = isset($_POST['typeOfPerson']) ? trim($_POST['typeOfPerson']) : false;
+			$status = isset($_POST['status']) ? trim($_POST['status']) : false;
+
+			if ($typeOfPerson !== false && $typeOfPerson != '') {
+				switch ($typeOfPerson) {
+					case 'F':
+						$filters['tipo-de-persona'] = 'fisica';
+						break;
+
+					case 'M':
+						$filters['tipo-de-persona'] = 'moral';
+						break;
+				}
+			}
+
+			if ($status !== false && $status != '') {
+				switch ($status) {
+					case '1':
+						$filters['estatus'] = 'activo';
+						break;
+
+					case '0':
+						$filters['estatus'] = 'inactivo';
+						break;
+				}
+			}
+
+			if (count($filters) > 0) {
+				redirect('clientes/listar/' . $this->uri->assoc_to_uri($filters));
+			} else {
+				redirect('clientes');
+			}
+		}
+
+		redirect();
+	}
+
+	public function exportar()
+	{
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// Data we may need in our PDF
+		$data['title'] = "Reporte de Clientes";
+		
+		// Get the array with the users in the database
+		$data['clients'] = $this->clients->getAll($filters);
+
+		if (!isset($filters['typeOfPerson'])) {
+			$data['typeOfPerson'] = 'Todos';
+		} else {
+			switch ($filters['typeOfPerson']) {
+				case 'F':
+					$data['typeOfPerson'] = 'Persona Física';
+					break;
+
+				case 'M':
+					$data['typeOfPerson'] = 'Persona Moral';
+					break;
+			}
+		}
+
+		if (!isset($filters['status'])) {
+			$data['status'] = 'Todos';
+		} else {
+			switch ($filters['status']) {
+				case '1':
+					$data['status'] = 'Activo';
+					break;
+
+				case '0':
+					$data['status'] = 'Inactivo';
+					break;
+			}
+		}
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes/clientes', $data, true);
+		createPDF($html, 'reporte');
 	}
 
 	public function activar($id)

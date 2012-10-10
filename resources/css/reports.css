@@ -2,6 +2,20 @@ body {
 	margin: 100px 50px 50px;
 }
 
+/*** GENERAL CLASSES ***/
+.textAlign-left {
+	text-align: left;
+}
+
+.textAlign-center {
+	text-align: center;
+}
+
+.textAlign-right {
+	text-align: right;
+}
+/*** GENERAL CLASSES ***/
+
 .header {
 	position: fixed;
 	top: 50px;
