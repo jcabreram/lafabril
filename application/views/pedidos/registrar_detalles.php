@@ -22,9 +22,9 @@
 		
 		<fieldset class="column-left">
 
-			<p><b>Sucursal</b>: <?php echo $sucursal['nombre'] ?></p>
-			<p><b>Vendedor</b>: <?php echo $vendedor['nombre'] ?></p>  
-			<p><b>Cliente</b>: <?php echo $cliente['nombre'] ?></p>        
+			<p><b>Sucursal</b>: <?php echo $order['sucursal_nombre'] ?></p>
+			<p><b>Vendedor</b>: <?php echo $order['vendedor'] ?></p>  
+			<p><b>Cliente</b>: <?php echo $order['cliente_nombre'] ?></p>        
 
 		</fieldset>
 		
@@ -174,8 +174,8 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td style="text-align:right"><b>IVA (<?php echo $sucursal['iva']*100; ?>%)</b></td>
-				<td style="text-align:right">$<?php echo number_format($sucursal['iva']*$subtotal, 2, '.', ','); ?></td>
+				<td style="text-align:right"><b>IVA (<?php echo $order['sucursal_iva']*100; ?>%)</b></td>
+				<td style="text-align:right">$<?php echo number_format($order['sucursal_iva']*$subtotal, 2, '.', ','); ?></td>
 				<td></td>
 			</tr>
 			
@@ -194,7 +194,8 @@
 				<td></td>
 				<td>
 					<p>
-						<a href="<?php echo site_url("pedidos"); ?>"><input class="button" type="submit" value="Finalizar" /></a>
+						<a href="<?php echo site_url('pedidos'); ?>"><input class="button" type="button" value="Finalizar" /></a>
+						<a href="<?php echo site_url('pedidos/imprimir/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
 					</p>
 				</td>
 			</tr>

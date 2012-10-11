@@ -117,8 +117,8 @@
 						Pedidos
 					</a>
 					<ul>
-						<li><a href="<?php echo site_url('pedidos'); ?>">Administrar Pedidos</a></li>
-						<li><a href="<?php echo site_url('pedidos/registrar'); ?>">Agregar Pedidos</a></li>
+						<li><a href="<?php echo site_url('pedidos'); ?>"<?php if ((methodName() == 'pedidos/index') || (methodName() == 'pedidos/listar')) { echo ' class="current"'; } ?>>Administrar Pedidos</a></li>
+						<li><a href="<?php echo site_url('pedidos/registrar'); ?>"<?php if ((methodName() == 'pedidos/registrar') || (methodName() == 'pedidos/registrar_detalles')) { echo ' class="current"'; } ?>>Registrar Pedido</a></li>
 					</ul>	
 				</li>
 

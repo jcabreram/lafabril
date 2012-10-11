@@ -163,12 +163,9 @@ class Pedidos extends CI_Controller
 			}
 		}
 
-		$data['title'] = "Registrar detalles del pedido";
+		$data['title'] = 'Registrar detalles del pedido';
 		$data['user'] = $this->session->userdata('user');
 		$data['order'] = $this->orders->getOrder($id_pedido);
-		$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
-		$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
-		$data['cliente'] = $this->clients->getCliente($data['order']['id_cliente']);
 		$data['products'] = $this->products->getProducts();
 		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
 		$data['order_id'] = $id_pedido;
@@ -184,7 +181,7 @@ class Pedidos extends CI_Controller
 		$data['subtotal'] = $subtotal;
 		
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['sucursal']['iva']; 
+		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
 		
 		// Display views
 		$this->load->view('header', $data);
@@ -198,4 +195,29 @@ class Pedidos extends CI_Controller
 		redirect("pedidos/registrar_detalles/$id_pedido");
 	}
 
+	public function imprimir($id)
+	{
+		// Necessary to create a PDF
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Load branches model
+		$this->load->model('clients');
+		
+		// Get the array with the users in the database
+		$data['order'] = $this->orders->getOrder($id);
+		$client = $this->clients->getClient($data['order']['id_cliente']);
+		
+		$data['clientAddress'] =  $client['calle'] . ' #' . $client['numero_exterior'];
+		
+		if ($client['numero_interior'] !== null) {
+			$data['clientAddress'] .= ' interior ' . $client['numero_interior'];
+		}
+
+		$data['clientAddress'] .= ' ' . $client['colonia'] . '. ' . $client['ciudad'] 
+		. ', ' . $client['municipio'] . ', ' . $client['estado'] . ', ' . $client['pais']
+		. '. C.P. ' . $client['codigo_postal'];
+
+		$html = $this->load->view('formatos/pedido', $data, true);
+		createPDF($html, 'formato');
+	}
 }
