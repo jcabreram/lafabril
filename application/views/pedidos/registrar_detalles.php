@@ -174,7 +174,7 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td style="text-align:right"><b>IVA (<?php echo $sucursal['iva']*100; ?>%)</b></td>
+				<td style="text-align:right"><b>IVA (<?php echo $sucursal['iva']*100; ?>%):</b></td>
 				<td style="text-align:right">$<?php echo number_format($sucursal['iva']*$subtotal, 2, '.', ','); ?></td>
 				<td></td>
 			</tr>
