@@ -118,7 +118,7 @@ class Pedidos extends CI_Controller
 
 	public function listar()
 	{
-
+		
 	}
 	
 	public function registrar_detalles($id_pedido)
@@ -200,11 +200,12 @@ class Pedidos extends CI_Controller
 		// Necessary to create a PDF
 		$this->load->helper(array('dompdf', 'file'));
 
-		// Load branches model
+		$this->load->model('branches');
 		$this->load->model('clients');
-		
-		// Get the array with the users in the database
+
+		$data['title'] = 'Pedido';
 		$data['order'] = $this->orders->getOrder($id);
+		$data['branch'] = $this->branches->getBranch($data['order']['id_sucursal']);
 		$client = $this->clients->getClient($data['order']['id_cliente']);
 		
 		$data['clientAddress'] =  $client['calle'] . ' #' . $client['numero_exterior'];
@@ -217,7 +218,19 @@ class Pedidos extends CI_Controller
 		. ', ' . $client['municipio'] . ', ' . $client['estado'] . ', ' . $client['pais']
 		. '. C.P. ' . $client['codigo_postal'];
 
-		$html = $this->load->view('formatos/pedido', $data, true);
+		$data['subtotal'] = 0;
+
+		foreach ($data['order']['products'] as $product) {
+			$data['subtotal'] += $product['cantidad'] * $product['precio'];
+		}
+
+		$data['iva'] = $data['subtotal'] * $data['order']['sucursal_iva'];
+		$data['total'] = $data['subtotal'] + $data['iva'];
+
+		$html = $this->load->view('formatos/header', $data, true);
+		$html .= $this->load->view('formatos/pedido', $data, true);
+		$html .= $this->load->view('formatos/footer', $data, true);
+
 		createPDF($html, 'formato');
 	}
 }

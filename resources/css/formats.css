@@ -1,0 +1,70 @@
+body {
+	margin: 141px 50px 50px;
+}
+
+/*** GENERAL CLASSES ***/
+.textAlign-left {
+	text-align: left;
+}
+
+.textAlign-center {
+	text-align: center;
+}
+
+.textAlign-right {
+	text-align: right;
+}
+/*** GENERAL CLASSES ***/
+
+h1 {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+h2 {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 25px;
+}
+
+.header {
+	position: fixed;
+	top: 50px;
+	left: 50px;
+}
+
+.header p {
+	font-size: 12px;
+	margin-top: 5px;
+}
+
+.information {
+	margin: 10px 0 25px;
+}
+
+.information th {
+	font-weight: bold;
+}
+
+.information th, .information td {
+	padding: 5px 0;
+	font-size: 12px;
+}
+
+.information td {
+	padding: 5px  0 5px 20px;
+	font-size: 12px;
+}
+
+.catalog {
+	width: 100%;
+}
+
+.catalog th {
+	font-weight: bold;
+}
+
+.catalog th, .catalog td {
+	padding: 10px 0;
+	font-size: 12px;
+}

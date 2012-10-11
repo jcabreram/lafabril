@@ -411,6 +411,7 @@ class Clientes extends CI_Controller
 
 		$html = $this->load->view('reportes/header', $data, true);
 		$html .= $this->load->view('reportes/clientes', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
 

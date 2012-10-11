@@ -107,8 +107,8 @@
 						Ventas
 					</a>
 					<ul>
-						<li><a href="<?php echo site_url('pedidos'); ?>">Administrar Pedidos</a></li>
-						<li><a href="<?php echo site_url('pedidos/registrar'); ?>">Agregar Pedido</a></li>
+						<li><a href="<?php echo site_url('pedidos'); ?>"<?php if ((methodName() == 'pedidos/index') || (methodName() == 'pedidos/listar')) { echo ' class="current"'; } ?>>Administrar Pedidos</a></li>
+						<li><a href="<?php echo site_url('pedidos/registrar'); ?>"<?php if ((methodName() == 'pedidos/registrar') || (methodName() == 'pedidos/registrar_detalles')) { echo ' class="current"'; } ?>>Agregar Pedido</a></li>
 						<li><a href="#">Administrar Notas de Venta</a></li>
 						<li><a href="#">Agregar Nota de Venta</a></li>
 						<li><a href="#">Administrar Facturas</a></li>

@@ -71,10 +71,11 @@ class Orders extends CI_Model
 		$id = $this->db->escape(intval($id));
 
 		$sql = 'SELECT 	pedidos.id_pedido,
+						sucursales.id_sucursal,
 						sucursales.nombre AS sucursal_nombre,
-						sucursales.direccion AS sucursal_direccion,
 						sucursales.iva AS sucursal_iva,
-						empleados.nombre AS vendedor,
+						vendedores.id_vendedor,
+						empleados.nombre AS vendedor_nombre,
 						clientes.id_cliente,
 						clientes.nombre AS cliente_nombre,
 						pedidos.fecha_pedido,

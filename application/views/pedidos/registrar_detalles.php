@@ -23,7 +23,7 @@
 		<fieldset class="column-left">
 
 			<p><b>Sucursal</b>: <?php echo $order['sucursal_nombre'] ?></p>
-			<p><b>Vendedor</b>: <?php echo $order['vendedor'] ?></p>  
+			<p><b>Vendedor</b>: <?php echo $order['vendedor_nombre'] ?></p>  
 			<p><b>Cliente</b>: <?php echo $order['cliente_nombre'] ?></p>        
 
 		</fieldset>

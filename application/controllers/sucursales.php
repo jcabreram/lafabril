@@ -225,7 +225,6 @@ class Sucursales extends CI_Controller
 		
 		// Get the array with the users in the database
 		$data['branches'] = $this->branches->getAll($filters);
-
 		if (!isset($filters['status'])) {
 			$data['status'] = 'Todos';
 		} else {
