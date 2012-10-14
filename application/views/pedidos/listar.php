@@ -6,7 +6,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Lista de Usuarios</h3>
+		<h3>Lista de Pedidos</h3>
 
 		<ul class="content-box-tabs">
 			<li><a href="#" class="current">Tabla</a></li>
