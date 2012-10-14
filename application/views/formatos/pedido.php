@@ -30,8 +30,8 @@
 		<tr>
 			<td><?php echo $product['nombre']; ?></td>
 			<td><?php echo $product['cantidad'] . ' ' . $product['udm']; ?></td>
-			<td class="textAlign-right">$<?php echo number_format($product['precio']); ?></td>
-			<td class="textAlign-right">$<?php echo number_format($product['cantidad'] * $product['precio']); ?></td>
+			<td class="textAlign-right">$<?php echo number_format($product['precio'], 2, '.', ','); ?></td>
+			<td class="textAlign-right">$<?php echo number_format($product['cantidad'] * $product['precio'], 2, '.', ','); ?></td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>
@@ -41,21 +41,21 @@
 			<td></td>
 			<td></td>
 			<th class="textAlign-right">Subtotal</th>
-			<td class="textAlign-right">$<?php echo number_format($subtotal); ?></td>
+			<td class="textAlign-right">$<?php echo number_format($subtotal, 2, '.', ','); ?></td>
 		</tr>
 
 		<tr>
 			<td></td>
 			<td></td>
 			<th class="textAlign-right">IVA (<?php echo $order['sucursal_iva'] * 100; ?>%)</th>
-			<td class="textAlign-right">$<?php echo number_format($iva); ?></td>
+			<td class="textAlign-right">$<?php echo number_format($iva, 2, '.', ','); ?></td>
 		</tr>
 
 		<tr>
 			<td></td>
 			<td></td>
 			<th class="textAlign-right">Total</th>
-			<td class="textAlign-right">$<?php echo number_format($total); ?></td>
+			<td class="textAlign-right">$<?php echo number_format($total, 2, '.', ','); ?></td>
 		</tr>
 	</tfoot>
 </table>

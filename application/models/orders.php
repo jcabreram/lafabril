@@ -64,10 +64,33 @@ class Orders extends CI_Model
 		return $this->db->query($sql);
 	}
 
+	public function getAll()
+	{
+		$sql = 'SELECT 	pedidos.id_pedido,
+						sucursales.id_sucursal,
+						sucursales.nombre AS sucursal_nombre,
+						sucursales.iva AS sucursal_iva,
+						vendedores.id_vendedor,
+						empleados.nombre AS vendedor_nombre,
+						clientes.id_cliente,
+						clientes.nombre AS cliente_nombre,
+						pedidos.fecha_pedido,
+						pedidos.fecha_entrega,
+						pedidos.estatus 
+				FROM pedidos
+				INNER JOIN sucursales ON pedidos.id_sucursal = sucursales.id_sucursal
+				INNER JOIN vendedores ON pedidos.id_vendedor = vendedores.id_vendedor
+				INNER JOIN empleados ON vendedores.id_empleado = empleados.id_empleado
+				INNER JOIN clientes ON pedidos.id_cliente = clientes.id_cliente';
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		$query->result_array();	
+	}
+
 	public function getOrder($id)
 	{
-		$order = array();
-
 		$id = $this->db->escape(intval($id));
 
 		$sql = 'SELECT 	pedidos.id_pedido,
@@ -91,13 +114,7 @@ class Orders extends CI_Model
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
-		$order = $query->row_array();
-
-		if (count($order) > 0) {
-			$order['products'] = $this->getOrderDetail($id);
-		}
-		
-		return $order;
+		$query->row_array();
 	}	
 	
 	public function getOrderDetail($id) {
