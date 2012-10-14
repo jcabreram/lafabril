@@ -64,6 +64,25 @@ class Orders extends CI_Model
 		return $this->db->query($sql);
 	}
 	
+	public function getAll()
+	{
+		$sql = 'SELECT pe.id_pedido, fp.prefijo, fo.folio, su.nombre AS nombre_sucursal, em.nombre AS nombre_vendedor, cl.nombre AS nombre_cliente, pe.fecha_pedido, pe.estatus
+				FROM pedidos AS pe
+				JOIN sucursales AS su ON pe.id_sucursal=su.id_sucursal
+				JOIN vendedores AS ve ON pe.id_vendedor=ve.id_vendedor
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN empleados AS em ON ve.id_empleado=em.id_empleado
+				JOIN folios AS fo ON pe.id_pedido=fo.id_documento AND fo.tipo_documento="P"
+				JOIN folios_prefijo AS fp ON pe.id_sucursal=fp.id_sucursal AND fp.tipo_documento="P"
+				ORDER BY fecha_pedido DESC';
+		$query = $this->db->query($sql);
+		
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+		
+		
+	}
+	
 	public function getOrder($id)
 	{
 		$id = $this->db->escape(intval($id));

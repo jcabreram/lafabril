@@ -118,7 +118,16 @@ class Pedidos extends CI_Controller
 
 	public function listar()
 	{
+		// Get the array with the clients in the database
+		$data['ordersData'] = $this->orders->getAll();
 
+		$data['title'] = "Pedidos";
+		$data['user'] = $this->session->userdata('user');
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pedidos/listar', $data);
+		$this->load->view('footer', $data);
 	}
 	
 	public function registrar_detalles($id_pedido)
