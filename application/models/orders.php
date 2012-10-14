@@ -2,8 +2,8 @@
 
 class Orders extends CI_Model
 {
-	public function register ($id_sucursal, $id_vendedor, $id_cliente, $fecha_pedido, $fecha_entrega, $estatus, $usuario_captura)
-	{	
+	public function register ($id_sucursal, $id_vendedor, $id_cliente, $fecha_pedido, $fecha_entrega, $estatus, $usuario_captura) {
+		
 		$this->load->model('folios');
 		
 		$id_sucursal = $this->db->escape(intval($id_sucursal));
@@ -63,72 +63,41 @@ class Orders extends CI_Model
 		
 		return $this->db->query($sql);
 	}
-
+	
 	public function getAll()
 	{
-		$sql = 'SELECT 	pedidos.id_pedido,
-						sucursales.id_sucursal,
-						sucursales.nombre AS sucursal_nombre,
-						sucursales.iva AS sucursal_iva,
-						vendedores.id_vendedor,
-						empleados.nombre AS vendedor_nombre,
-						clientes.id_cliente,
-						clientes.nombre AS cliente_nombre,
-						pedidos.fecha_pedido,
-						pedidos.fecha_entrega,
-						pedidos.estatus 
-				FROM pedidos
-				INNER JOIN sucursales ON pedidos.id_sucursal = sucursales.id_sucursal
-				INNER JOIN vendedores ON pedidos.id_vendedor = vendedores.id_vendedor
-				INNER JOIN empleados ON vendedores.id_empleado = empleados.id_empleado
-				INNER JOIN clientes ON pedidos.id_cliente = clientes.id_cliente';
-
+		$sql = 'SELECT pe.id_pedido, fp.prefijo, fo.folio, su.nombre AS nombre_sucursal, em.nombre AS nombre_vendedor, cl.nombre AS nombre_cliente, pe.fecha_pedido, pe.estatus
+				FROM pedidos AS pe
+				JOIN sucursales AS su ON pe.id_sucursal=su.id_sucursal
+				JOIN vendedores AS ve ON pe.id_vendedor=ve.id_vendedor
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN empleados AS em ON ve.id_empleado=em.id_empleado
+				JOIN folios AS fo ON pe.id_pedido=fo.id_documento AND fo.tipo_documento="P"
+				JOIN folios_prefijo AS fp ON pe.id_sucursal=fp.id_sucursal AND fp.tipo_documento="P"
+				ORDER BY fecha_pedido DESC';
 		$query = $this->db->query($sql);
-
+		
 		// Returns the query result as a pure array, or an empty array when no result is produced.
-		$query->result_array();	
+		return $query->result_array();
+		
+		
 	}
-
+	
 	public function getOrder($id)
 	{
 		$id = $this->db->escape(intval($id));
 
-		$sql = 'SELECT 	pedidos.id_pedido,
-						sucursales.id_sucursal,
-						sucursales.nombre AS sucursal_nombre,
-						sucursales.iva AS sucursal_iva,
-						vendedores.id_vendedor,
-						empleados.nombre AS vendedor_nombre,
-						clientes.id_cliente,
-						clientes.nombre AS cliente_nombre,
-						pedidos.fecha_pedido,
-						pedidos.fecha_entrega,
-						pedidos.estatus 
-				FROM pedidos
-				INNER JOIN sucursales ON pedidos.id_sucursal = sucursales.id_sucursal
-				INNER JOIN vendedores ON pedidos.id_vendedor = vendedores.id_vendedor
-				INNER JOIN empleados ON vendedores.id_empleado = empleados.id_empleado
-				INNER JOIN clientes ON pedidos.id_cliente = clientes.id_cliente
-				WHERE pedidos.id_pedido = ' . $id;
-
+		$sql = 'SELECT * FROM pedidos WHERE id_pedido = ' . $id;
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
-		$query->row_array();
+		return $query->row_array();
 	}	
 	
 	public function getOrderDetail($id) {
 		$id = $this->db->escape(intval($id));
 
-		$sql = 'SELECT 	pd.id_pedido_detalle,
-						p.nombre,
-						pd.cantidad,
-						p.udm,
-						pd.precio,
-						pd.cantidad_surtida
-		FROM pedidos_detalles AS pd 
-		INNER JOIN productos AS p ON pd.id_producto = p.id_producto
-		WHERE pd.id_pedido = ' . $id;
+		$sql = "SELECT pd.*, productos.* FROM pedidos_detalles as pd INNER JOIN productos ON pd.id_producto=productos.id_producto WHERE id_pedido = $id";
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.

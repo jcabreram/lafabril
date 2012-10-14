@@ -118,7 +118,16 @@ class Pedidos extends CI_Controller
 
 	public function listar()
 	{
+		// Get the array with the clients in the database
+		$data['ordersData'] = $this->orders->getAll();
+
+		$data['title'] = "Pedidos";
+		$data['user'] = $this->session->userdata('user');
 		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pedidos/listar', $data);
+		$this->load->view('footer', $data);
 	}
 	
 	public function registrar_detalles($id_pedido)
@@ -163,9 +172,12 @@ class Pedidos extends CI_Controller
 			}
 		}
 
-		$data['title'] = 'Registrar detalles del pedido';
+		$data['title'] = "Registrar detalles del pedido";
 		$data['user'] = $this->session->userdata('user');
 		$data['order'] = $this->orders->getOrder($id_pedido);
+		$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
+		$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
+		$data['cliente'] = $this->clients->getCliente($data['order']['id_cliente']);
 		$data['products'] = $this->products->getProducts();
 		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
 		$data['order_id'] = $id_pedido;
@@ -181,7 +193,7 @@ class Pedidos extends CI_Controller
 		$data['subtotal'] = $subtotal;
 		
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
+		$data['total'] = $subtotal + $subtotal * $data['sucursal']['iva']; 
 		
 		// Display views
 		$this->load->view('header', $data);
@@ -195,42 +207,4 @@ class Pedidos extends CI_Controller
 		redirect("pedidos/registrar_detalles/$id_pedido");
 	}
 
-	public function imprimir($id)
-	{
-		// Necessary to create a PDF
-		$this->load->helper(array('dompdf', 'file'));
-
-		$this->load->model('branches');
-		$this->load->model('clients');
-
-		$data['title'] = 'Pedido';
-		$data['order'] = $this->orders->getOrder($id);
-		$data['branch'] = $this->branches->getBranch($data['order']['id_sucursal']);
-		$client = $this->clients->getClient($data['order']['id_cliente']);
-		
-		$data['clientAddress'] =  $client['calle'] . ' #' . $client['numero_exterior'];
-		
-		if ($client['numero_interior'] !== null) {
-			$data['clientAddress'] .= ' interior ' . $client['numero_interior'];
-		}
-
-		$data['clientAddress'] .= ' ' . $client['colonia'] . '. ' . $client['ciudad'] 
-		. ', ' . $client['municipio'] . ', ' . $client['estado'] . ', ' . $client['pais']
-		. '. C.P. ' . $client['codigo_postal'];
-
-		$data['subtotal'] = 0;
-
-		foreach ($data['order']['products'] as $product) {
-			$data['subtotal'] += $product['cantidad'] * $product['precio'];
-		}
-
-		$data['iva'] = $data['subtotal'] * $data['order']['sucursal_iva'];
-		$data['total'] = $data['subtotal'] + $data['iva'];
-
-		$html = $this->load->view('formatos/header', $data, true);
-		$html .= $this->load->view('formatos/pedido', $data, true);
-		$html .= $this->load->view('formatos/footer', $data, true);
-
-		createPDF($html, 'formato');
-	}
 }
