@@ -114,20 +114,81 @@ class Pedidos extends CI_Controller
 	    {
 	        return TRUE;
 	    }
-	} 
+	}
+
+	private function _sanitizeFilters($dirtyFilters)
+	{
+		$filters = array();
+
+		if (isset($dirtyFilters['sucursal']) && trim($dirtyFilters['sucursal']) !== '') {
+			$filters['branch'] = $dirtyFilters['sucursal'];
+		}
+
+		if (isset($dirtyFilters['cliente']) && trim($dirtyFilters['cliente']) !== '') {
+			$filters['client'] = $dirtyFilters['cliente'];
+		}
+		
+		return $filters;
+	}
 
 	public function listar()
 	{
-		// Get the array with the clients in the database
-		$data['ordersData'] = $this->orders->getAll();
+		// We need it to populate the filter form
+		$this->load->helper('form');
 
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// Get the array with the clients in the database
+		$data['ordersData'] = $this->orders->getAll($filters);
+
+		// Get Active Branches
+		$this->load->model('branches');
+		$data['branches'] = $this->branches->getAll(array('status' => '1'));
+
+		// Get Active Clients
+		$this->load->model('clients');
+		$data['clients'] = $this->clients->getAll(array('status' => '1'));
+		
 		$data['title'] = "Pedidos";
 		$data['user'] = $this->session->userdata('user');
-		
+		$data['filters'] = $filters;
+
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/listar', $data);
+		$this->load->view('pedidos/filterForm', $data);
 		$this->load->view('footer', $data);
+	}
+
+	public function filtrar()
+	{
+		if ($_POST) {
+			$filters = array();
+
+			$branch = isset($_POST['branch']) ? trim($_POST['branch']) : false;
+			$client = isset($_POST['client']) ? trim($_POST['client']) : false;
+
+			if ($branch !== false && $branch !== '') {
+				// Is a numeric value? I mean, is it an id?
+				$filters['sucursal'] = $branch;
+			}
+
+			if ($client !== false && $client !== '') {
+				// Is a numeric value? I mean, is it an id?
+				$filters['cliente'] = $client;
+			}
+
+			if (count($filters) > 0) {
+				redirect('pedidos/listar/' . $this->uri->assoc_to_uri($filters));
+			} else {
+				redirect('pedidos');
+			}
+		}
+
+		// WTH is the user doing here?
+		redirect();
 	}
 	
 	public function registrar_detalles($id_pedido)
@@ -177,7 +238,7 @@ class Pedidos extends CI_Controller
 		$data['order'] = $this->orders->getOrder($id_pedido);
 		$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
 		$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
-		$data['cliente'] = $this->clients->getCliente($data['order']['id_cliente']);
+		$data['cliente'] = $this->clients->getClient($data['order']['id_cliente']);
 		$data['products'] = $this->products->getProducts();
 		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
 		$data['order_id'] = $id_pedido;
@@ -207,4 +268,146 @@ class Pedidos extends CI_Controller
 		redirect("pedidos/registrar_detalles/$id_pedido");
 	}
 
+	public function facturar($orderId)
+	{
+		/** IMPORTANT
+		 * Checkout what happen if $orderId is not supplied. (CRASH)
+		 */
+		
+		// To repopulate data
+		$this->load->library('form_validation');
+		
+		/*** Get order and it's products ***/
+		$order = $this->orders->getOrder($orderId);
+
+		if (count($order) === 0) {
+			// What were you doing here?
+			redirect();
+		}
+
+		$order['products'] = $this->orders->getOrderProducts($orderId);
+		/*** Get order and it's products ***/
+
+		
+		/*** VALIDATION ***/
+		if ($_POST) {
+			$errors = array(
+				'date' => array(),
+				'products' => array()
+			);
+			
+			if (isset($_POST['invoiceDate'])) {
+				$timestamp = strtotime($_POST['invoiceDate']);
+				$day = date('d', $timestamp);
+				$month = date('m', $timestamp);
+				$year = date('Y', $timestamp);
+				
+				if (!checkdate($month, $day, $year)) {
+					$errors['date'][] = 'Fecha inválida.';
+				}
+
+				if ($timestamp < strtotime($order['fecha_pedido'])) {
+					$errors['date'][] = 'La fecha de la factura debe ser posterior a la del pedido.';
+				}
+			} else {
+				// The is no date?
+				exit('There is no date?');
+				redirect();
+			}
+
+			if (isset($_POST['products']) && is_array($_POST['products'])) {
+				// Products to be saved into our database
+				$products = array(); 
+
+				foreach ($_POST['products'] as $productId => $productAmount) {
+					if ($productAmount === '' || $productAmount === '0') {
+						continue;
+					}
+
+					$filterOptions = array(
+						'options' => array(
+							'min_range' => 1
+						)
+					);
+
+					// Is $productId a natural number starting on 1?
+					if (filter_var($productId, FILTER_VALIDATE_INT, $filterOptions) === false) {
+						// $productId is not a number?
+						exit('$productId is not a number?');
+						redirect();
+					}
+
+					// Is $productAmount not a negative number?
+					if (!is_numeric($productAmount) || floatval($productAmount) < 0) {
+						$errors['products'][$productId] = 'Escribe un número positivo.';
+						continue;
+					}
+
+
+					/*** Verify if the product is in the order ***/
+					$inTheOrder = false;
+
+					foreach ($order['products'] as $key => $product) {
+						if ($productId === intval($product['id_producto'])) {
+							$inTheOrder = $key;
+						}
+					}
+					/*** Verify if the product is in the order ***/
+
+
+					if ($inTheOrder !== false) {
+						// Amount ordered - Amount delivered
+						$maximumAmount = $order['products'][$inTheOrder]['cantidad'] - $order['products'][$inTheOrder]['cantidad_surtida'];
+
+						if ($productAmount > $maximumAmount) {
+							$errors['products'][$productId] = 'Máximo ' . $maximumAmount . ' ' . $order['products'][$inTheOrder]['udm'] . '.';
+							continue;
+						} else {
+							$products[$productId] = $productAmount;
+						}
+					} else {
+						// You sent me a product not in the order?
+						exit('You sent me a product not in the order?');
+						redirect();
+					}
+				}
+			} else {
+				// The form was sent and there aren't products?
+				// I don't have an error for that...
+				exit('The form was sent and there are no products?');
+				redirect();
+			}
+		}
+		/*** VALIDATION ***/
+
+
+		// If validation was successful
+		if ($_POST && count($errors['date']) === 0 && count($errors['products']) === 0) {
+			// We need his data for damage control
+			$user = $this->session->userdata('user');
+
+			if (true) {
+				$this->session->set_flashdata('message', 'El pedido ha sido facturado.');
+				redirect('pedidos');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar facturar el pedido, intenta de nuevo.');
+			}
+		}
+
+		$data['title'] = 'Facturar Pedido';
+		$data['user'] = $this->session->userdata('user');
+		$data['order'] = $order;
+
+		if (isset($errors) && count($errors['products']) > 0) {
+			$data['errors']['products'] = $errors['products'];
+		}
+
+		if (isset($errors) && count($errors['date']) > 0) {
+			$data['errors']['date'] = $errors['date'][0];
+		}
+
+		$this->load->view('header', $data);
+		$this->load->view('pedidos/facturar', $data);
+		$this->load->view('footer', $data);
+	}
 }

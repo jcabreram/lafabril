@@ -64,9 +64,32 @@ class Orders extends CI_Model
 		return $this->db->query($sql);
 	}
 	
-	public function getAll()
+	public function getAll($filters = false)
 	{
-		$sql = 'SELECT pe.id_pedido, fp.prefijo, fo.folio, su.nombre AS nombre_sucursal, em.nombre AS nombre_vendedor, cl.nombre AS nombre_cliente, pe.fecha_pedido, pe.estatus
+		/*** PREPARE FILTERS ***/
+		$branch = isset($filters['branch']) ? $filters['branch'] : false;
+		$client = isset($filters['client']) ? $filters['client'] : false;
+		/*** PREPARE FILTERS ***/
+
+		$where = '';
+
+		if ($branch !== false) {
+			$where = 'WHERE pe.id_sucursal = ' . $this->db->escape(intval($branch));
+		}
+
+		if ($client !== false) {
+			$where .= ' AND pe.id_cliente = ' . $this->db->escape(intval($client));
+		}
+
+		$sql = 'SELECT 
+					pe.id_pedido, 
+					fp.prefijo, 
+					fo.folio, 
+					su.nombre AS nombre_sucursal, 
+					em.nombre AS nombre_vendedor, 
+					cl.nombre AS nombre_cliente, 
+					pe.fecha_pedido, 
+					pe.estatus
 				FROM pedidos AS pe
 				JOIN sucursales AS su ON pe.id_sucursal=su.id_sucursal
 				JOIN vendedores AS ve ON pe.id_vendedor=ve.id_vendedor
@@ -74,6 +97,7 @@ class Orders extends CI_Model
 				JOIN empleados AS em ON ve.id_empleado=em.id_empleado
 				JOIN folios AS fo ON pe.id_pedido=fo.id_documento AND fo.tipo_documento="P"
 				JOIN folios_prefijo AS fp ON pe.id_sucursal=fp.id_sucursal AND fp.tipo_documento="P"
+				' . $where . '
 				ORDER BY fecha_pedido DESC';
 		$query = $this->db->query($sql);
 		
@@ -87,17 +111,54 @@ class Orders extends CI_Model
 	{
 		$id = $this->db->escape(intval($id));
 
-		$sql = 'SELECT * FROM pedidos WHERE id_pedido = ' . $id;
+		$sql = 'SELECT 
+					pe.id_pedido, 
+					fp.prefijo, 
+					fo.folio, 
+					pe.id_sucursal,
+					su.nombre AS nombre_sucursal, 
+					su.iva AS sucursal_iva,
+					em.nombre AS nombre_vendedor, 
+					cl.nombre AS nombre_cliente, 
+					pe.fecha_pedido, 
+					pe.estatus
+				FROM pedidos AS pe
+				JOIN sucursales AS su ON pe.id_sucursal=su.id_sucursal
+				JOIN vendedores AS ve ON pe.id_vendedor=ve.id_vendedor
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN empleados AS em ON ve.id_empleado=em.id_empleado
+				JOIN folios AS fo ON pe.id_pedido=fo.id_documento AND fo.tipo_documento="P"
+				JOIN folios_prefijo AS fp ON pe.id_sucursal=fp.id_sucursal AND fp.tipo_documento="P"
+				WHERE id_pedido = ' . $id;
+
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->row_array();
 	}	
+
+	/**
+	 * The same as getOrderDetail
+	 */
+	public function getOrderProducts($orderId)
+	{
+		return $this->getOrderDetail($orderId);
+	}
 	
-	public function getOrderDetail($id) {
+	public function getOrderDetail($id)
+	{
 		$id = $this->db->escape(intval($id));
 
-		$sql = "SELECT pd.*, productos.* FROM pedidos_detalles as pd INNER JOIN productos ON pd.id_producto=productos.id_producto WHERE id_pedido = $id";
+		$sql = 'SELECT 	pd.id_pedido_detalle,
+						p.id_producto,
+						p.nombre,
+						pd.cantidad,
+						p.udm,
+						pd.precio,
+						pd.cantidad_surtida
+		FROM pedidos_detalles AS pd 
+		INNER JOIN productos AS p ON pd.id_producto = p.id_producto
+		WHERE pd.id_pedido = ' . $id;
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
@@ -126,4 +187,21 @@ class Orders extends CI_Model
 		return $this->db->query($sql);
 	}
 	
+	public function facturar($orderId, $date, $products, $userId)
+	{
+		$order = $this->getOrder($orderId);
+
+		$sql = "INSERT INTO facturas (id_factura, id_pedido, fecha, estatus, iva, id_sucursal, fecha_captura, usuario_captura)
+				VALUES (NULL, $orderId, $date, 'A', {$orderId['sucursal_iva']}, {$orderId['id_sucursal']}, NOW(), $userId)";
+
+		if ($this->db->query($sql)) {
+			$facturaId = $this->db->insert_id();
+
+			// Insert the next folio for the document in the folios table
+			$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+					VALUES (NULL, $id_pedido, $id_sucursal, $tipo_documento, $folio_actual)";			
+		}
+
+
+	}
 }

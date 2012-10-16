@@ -57,12 +57,9 @@
 		
 		<!-- jQuery UI -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery-ui-1.9.0.custom.js"></script>
-		
-		<script> 
-			$(function() {$("#fecha, #fecha2").datepicker({
-				dateFormat:'yy-mm-dd'
-			});});
-		</script>
+
+		<!-- Custom behavior -->
+		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/controller.js"></script>		
 		
 		
 		<!-- Internet Explorer .png-fix -->
