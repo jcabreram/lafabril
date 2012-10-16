@@ -254,7 +254,7 @@ class Clientes extends CI_Controller
 		}
 		
 		// Get the array with the row of the user in the database
-		$data['client'] = $this->clients->getCliente($id);
+		$data['client'] = $this->clients->getClient($id);
 		
 		// If the branch doesn't exist
 		if (!is_array($data['client'])) {
@@ -411,6 +411,7 @@ class Clientes extends CI_Controller
 
 		$html = $this->load->view('reportes/header', $data, true);
 		$html .= $this->load->view('reportes/clientes', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
 

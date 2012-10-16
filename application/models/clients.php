@@ -60,7 +60,7 @@ class Clients extends CI_Model
 		return $query->result_array();
 	}
 
-	public function getCliente($id)
+	public function getClient($id)
 	{
 		$id = $this->db->escape(intval($id));
 
