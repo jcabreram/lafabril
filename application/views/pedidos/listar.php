@@ -71,7 +71,7 @@
 					<td><?php echo $orderData['estatus']; ?></td>
 					<td>
 						<!-- Options Icons -->
-						 <a href="<?php echo site_url("notas_venta/crear/{$orderData['id_pedido']}"); ?>" title="Crear nota de venta" />Nota</a> | <a href="<?php echo site_url("facturas/crear/{$orderData['id_pedido']}"); ?>" title="Crear factura" />Factura</a>
+						 <a href="<?php echo site_url("notas_venta/crear/{$orderData['id_pedido']}"); ?>" title="Crear nota de venta" />Nota</a> | <a href="<?php echo site_url("pedidos/facturar/{$orderData['id_pedido']}"); ?>" title="Crear factura" />Factura</a>
 					</td>
 				</tr>
 			<?php endforeach; ?>
@@ -84,7 +84,7 @@
 		<!-- Notification (error type) -->
 		<div class="notification error png_bg">
 			<!-- Message -->
-			<div>No pudimos encontrar a ningún usuario con las especificaciones indicadas.</div>
+			<div>No pudimos encontrar ningún pedido con las especificaciones indicadas.</div>
 		</div>
 
 	<?php endif; ?> 

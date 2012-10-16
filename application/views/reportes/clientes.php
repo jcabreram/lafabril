@@ -52,6 +52,3 @@
 <?php else : ?>
 <p>No existen clientes con esas especificaciones.</p>
 <?php endif; ?>
-
-</body>
-</html>

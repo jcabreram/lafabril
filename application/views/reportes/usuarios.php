@@ -17,8 +17,8 @@
 		<tr>
 		   <th>Nombre</th>
 		   <th>Nombre de Usuario</th>
-		   <th>Departamento</th>
-		   <th>Estatus</th>
+		   <th class="textAlign-center">Departamento</th>
+		   <th class="textAlign-center">Estatus</th>
 		</tr>
 	</thead>
 
@@ -27,8 +27,8 @@
 		<tr>
 			<td><?php echo $user['nombre']; ?></td>
 			<td><?php echo $user['username']; ?></td>
-			<td><?php echo $user['departamento']; ?></td>
-			<td><?php 
+			<td class="textAlign-center"><?php echo $user['departamento']; ?></td>
+			<td class="textAlign-center"><?php 
 				if ($user['activo'] == 1) {
 					echo 'Activo';
 				} else {
