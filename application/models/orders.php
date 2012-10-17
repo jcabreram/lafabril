@@ -121,6 +121,7 @@ class Orders extends CI_Model
 					em.nombre AS nombre_vendedor, 
 					cl.nombre AS nombre_cliente, 
 					pe.fecha_pedido, 
+					pe.fecha_entrega,
 					pe.estatus
 				FROM pedidos AS pe
 				JOIN sucursales AS su ON pe.id_sucursal=su.id_sucursal
