@@ -31,9 +31,10 @@
 
 				<p><strong>Fecha del Pedido</strong>: <?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></p>
 				<p><strong>Estatus del Pedido</strong>: <?php echo $status; ?></p>
+				<?php if ($order['estatus'] === 'A') : ?>
 				<p><strong>Fecha de la Factura</strong>: <input type="text" name="invoiceDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" />
-					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?>
-				
+					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?></p>
+				<?php endif; ?>		
 
 			</fieldset>
 
@@ -53,7 +54,9 @@
 						<th class="textAlign-right">Precio</th>
 						<th>Cantidad Ordenada</th>
 						<th>Cantidad Surtida</th>
+						<?php if ($order['estatus'] === 'A') : ?>
 						<th>Cantidad Deseada</th>
+						<?php endif; ?>
 					</tr>
 				</thead>
 
@@ -64,12 +67,14 @@
 						<td class="textAlign-right">$<?php echo number_format($product['precio'], 2, '.', ','); ?></td>
 						<td><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?></td>
 						<td><?php echo $product['cantidad_surtida']; ?> <?php echo $product['udm']; ?></td>
+						<?php if ($order['estatus'] === 'A') : ?>
 						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input small-input" value="<?php echo isset($products[$product['id_producto']]) ? $products[$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
 							<?php echo $product['udm']; ?>
 							<?php if (isset($errors['products'][$product['id_producto']])) : ?>
 							<span class="input-notification error png_bg"><?php echo $errors['products'][$product['id_producto']]; ?></span>
 							<?php endif; ?>
 						</td>
+						<?php endif; ?>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
@@ -78,11 +83,10 @@
 				<p>Este pedido no contiene productos.</p>
 			<?php endif; ?>
 
+			<?php if ($order['estatus'] === 'A') : ?>
 			<br />
-
-			<p>
-				<input class="button" type="submit" value="Facturar" />
-			</p>
+			<p><input class="button" type="submit" value="Facturar" /></p>
+			<?php endif; ?>
 
 		</form>
 
