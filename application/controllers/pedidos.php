@@ -236,9 +236,9 @@ class Pedidos extends CI_Controller
 		$data['title'] = "Registrar detalles del pedido";
 		$data['user'] = $this->session->userdata('user');
 		$data['order'] = $this->orders->getOrder($id_pedido);
-		$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
-		$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
-		$data['cliente'] = $this->clients->getClient($data['order']['id_cliente']);
+		//$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
+		//$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
+		//$data['cliente'] = $this->clients->getClient($data['order']['id_cliente']);
 		$data['products'] = $this->products->getProducts();
 		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
 		$data['order_id'] = $id_pedido;
@@ -254,7 +254,7 @@ class Pedidos extends CI_Controller
 		$data['subtotal'] = $subtotal;
 		
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['sucursal']['iva']; 
+		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
 		
 		// Display views
 		$this->load->view('header', $data);
