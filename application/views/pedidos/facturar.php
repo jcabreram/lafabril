@@ -47,7 +47,7 @@
 			<br />
 
 			<?php if (count($order['products']) > 0) : ?>
-			<table>
+			<table id="invoiceProducts">
 				<thead>
 					<tr>
 						<th>Producto</th>
@@ -64,11 +64,11 @@
 				<?php foreach ($order['products'] as $product) : ?>
 					<tr>
 						<td><?php echo $product['nombre']; ?></td>
-						<td class="textAlign-right">$<?php echo number_format($product['precio'], 2, '.', ','); ?></td>
-						<td><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?></td>
+						<td class="textAlign-right productPrice">$<?php echo number_format($product['precio'], 2, '.', ','); ?></td>
+						<td class="maximumAmount"><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?></td>
 						<td><?php echo $product['cantidad_surtida']; ?> <?php echo $product['udm']; ?></td>
 						<?php if ($order['estatus'] === 'A') : ?>
-						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input small-input" value="<?php echo isset($products[$product['id_producto']]) ? $products[$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
+						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input small-input amountOrdered" value="<?php echo isset($_POST['products'][$product['id_producto']]) ? $_POST['products'][$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
 							<?php echo $product['udm']; ?>
 							<?php if (isset($errors['products'][$product['id_producto']])) : ?>
 							<span class="input-notification error png_bg"><?php echo $errors['products'][$product['id_producto']]; ?></span>
@@ -78,6 +78,34 @@
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
+
+				<?php if ($order['estatus'] === 'A') : ?>
+				<tfoot>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="textAlign-right"><strong>Subtotal</strong>:</td>
+						<td id="invoiceSubtotal"></td>
+					</tr>
+
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="textAlign-right"><strong>IVA (<?php echo $order['sucursal_iva'] * 100; ?>%)</strong>:</td>
+						<td id="invoiceTax"></td>
+					</tr>
+
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="textAlign-right"><strong>Total</strong>:</td>
+						<td id="invoiceTotal"></td>
+					</tr>
+				</tfoot>
+				<?php endif; ?>
 			</table>
 			<?php else : ?>
 				<p>Este pedido no contiene productos.</p>

@@ -405,11 +405,6 @@ class Pedidos extends CI_Controller
 		$data['user'] = $this->session->userdata('user');
 		$data['order'] = $order;
 
-		// To repopulate data
-		if (isset($products)) {
-			$data['products'] = $products;
-		}
-
 		// To show errors if there is any
 		if (isset($errors) && count($errors['products']) > 0) {
 			$data['errors']['products'] = $errors['products'];
