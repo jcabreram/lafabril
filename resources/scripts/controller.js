@@ -2,12 +2,12 @@ $(function() {
 
 	$("#fecha, #fecha2").datepicker({
 		dateFormat:'yy-mm-dd'
-	});
+	}).attr('readonly', 'readonly');
 
 	/*** All text inputs with .date class are going to have datepicker ***/
 	$('input[type="text"].date').datepicker({
 		dateFormat:'dd/mm/yy'
-	});
+	}).attr('readonly', 'readonly');
 
 
 	/*** CALCULATE INVOICE TOTAL ***/
