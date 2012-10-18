@@ -6,7 +6,7 @@ $(function() {
 
 	/*** All text inputs with .date class are going to have datepicker ***/
 	$('input[type="text"].date').datepicker({
-		dateFormat:'yy-mm-dd'
+		dateFormat:'dd/mm/yy'
 	});
 
 

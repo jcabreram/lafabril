@@ -30,7 +30,8 @@
 			<fieldset class="column-right">
 
 				<p><strong>Fecha del Pedido</strong>: <?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></p>
-				<p><strong>Fecha de la Factura</strong>: <input type="text" name="invoiceDate" class="text-input small-input date" value="<?php echo set_value('invoiceDate', date('Y-m-d')); ?>" />
+				<p><strong>Estatus del Pedido</strong>: <?php echo $status; ?></p>
+				<p><strong>Fecha de la Factura</strong>: <input type="text" name="invoiceDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" />
 					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?>
 				
 
@@ -63,7 +64,7 @@
 						<td class="textAlign-right">$<?php echo number_format($product['precio'], 2, '.', ','); ?></td>
 						<td><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?></td>
 						<td><?php echo $product['cantidad_surtida']; ?> <?php echo $product['udm']; ?></td>
-						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input small-input" value="<?php echo set_value("products[{$product['id_producto']}]", $product['cantidad'] - $product['cantidad_surtida']) ?>" />
+						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input small-input" value="<?php echo isset($products[$product['id_producto']]) ? $products[$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
 							<?php echo $product['udm']; ?>
 							<?php if (isset($errors['products'][$product['id_producto']])) : ?>
 							<span class="input-notification error png_bg"><?php echo $errors['products'][$product['id_producto']]; ?></span>
