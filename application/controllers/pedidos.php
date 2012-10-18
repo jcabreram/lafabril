@@ -274,10 +274,7 @@ class Pedidos extends CI_Controller
 		 * Checkout what happen if $orderId is not supplied. (CRASH)
 		 */
 		
-		// To repopulate data
-		$this->load->library('form_validation');
-		
-		/*** Get order and it's products ***/
+		/*** GET ORDER AND IT'S PRODUCTS ***/
 		$order = $this->orders->getOrder($orderId);
 
 		if (count($order) === 0) {
@@ -286,7 +283,7 @@ class Pedidos extends CI_Controller
 		}
 
 		$order['products'] = $this->orders->getOrderProducts($orderId);
-		/*** Get order and it's products ***/
+		/*** GET ORDER AND IT'S PRODUCTS ***/
 
 		
 		/*** VALIDATION ***/
@@ -295,9 +292,15 @@ class Pedidos extends CI_Controller
 				'date' => array(),
 				'products' => array()
 			);
+
 			
-			if (isset($_POST['invoiceDate'])) {
-				$timestamp = strtotime($_POST['invoiceDate']);
+			/*** VALIDATE INVOICE DATE ***/
+			if (isset($_POST['invoiceDate']) && count(explode('/', $_POST['invoiceDate'])) === 3) {
+				// Change date to a more managable format
+				$invoiceDate = explode('/', $_POST['invoiceDate']);
+				$invoiceDate = $invoiceDate['1'] . '/' . $invoiceDate['0'] . '/' . $invoiceDate['2'];
+
+				$timestamp = strtotime($invoiceDate);
 				$day = date('d', $timestamp);
 				$month = date('m', $timestamp);
 				$year = date('Y', $timestamp);
@@ -310,11 +313,14 @@ class Pedidos extends CI_Controller
 					$errors['date'][] = 'La fecha de la factura debe ser posterior a la del pedido.';
 				}
 			} else {
-				// The is no date?
-				exit('There is no date?');
+				// Is there no date?
+				exit('Is there no date?');
 				redirect();
 			}
+			/*** VALIDATE INVOICE DATE ***/
 
+
+			/*** VALIDATE PRODUCTS ***/
 			if (isset($_POST['products']) && is_array($_POST['products'])) {
 				// Products to be saved into our database
 				$products = array(); 
@@ -344,7 +350,7 @@ class Pedidos extends CI_Controller
 					}
 
 
-					/*** Verify if the product is in the order ***/
+					/*** VERIFY IF THE PRODUCT IS IN THE ORDER ***/
 					$inTheOrder = false;
 
 					foreach ($order['products'] as $key => $product) {
@@ -352,7 +358,7 @@ class Pedidos extends CI_Controller
 							$inTheOrder = $key;
 						}
 					}
-					/*** Verify if the product is in the order ***/
+					/*** VERIFY IF THE PRODUCT IS IN THE ORDER ***/
 
 
 					if ($inTheOrder !== false) {
@@ -363,7 +369,7 @@ class Pedidos extends CI_Controller
 							$errors['products'][$productId] = 'Máximo ' . $maximumAmount . ' ' . $order['products'][$inTheOrder]['udm'] . '.';
 							continue;
 						} else {
-							$products[$productId] = $productAmount;
+							$products[$productId] = array('amount' => $productAmount, 'price' => $order['products'][$inTheOrder]['precio']);
 						}
 					} else {
 						// You sent me a product not in the order?
@@ -377,16 +383,17 @@ class Pedidos extends CI_Controller
 				exit('The form was sent and there are no products?');
 				redirect();
 			}
+			/*** VALIDATE PRODUCTS ***/
 		}
 		/*** VALIDATION ***/
 
 
-		// If validation was successful
-		if ($_POST && count($errors['date']) === 0 && count($errors['products']) === 0) {
+		// If validation was successful & there are products to invoice for & if the order status is open
+		if ($_POST && count($errors['date']) === 0 && count($errors['products']) === 0 && count($products) > 0 && $order['estatus'] === 'A') {
 			// We need his data for damage control
 			$user = $this->session->userdata('user');
 
-			if (true) {
+			if ($this->orders->invoice($order, $products, date('Y-m-d', $timestamp), $user['id'])) {
 				$this->session->set_flashdata('message', 'El pedido ha sido facturado.');
 				redirect('pedidos');
 			} else {
@@ -398,13 +405,31 @@ class Pedidos extends CI_Controller
 		$data['user'] = $this->session->userdata('user');
 		$data['order'] = $order;
 
+		// To show errors if there is any
 		if (isset($errors) && count($errors['products']) > 0) {
 			$data['errors']['products'] = $errors['products'];
 		}
 
+		// To show errors if there is any
 		if (isset($errors) && count($errors['date']) > 0) {
 			$data['errors']['date'] = $errors['date'][0];
 		}
+
+
+		/*** TRANSLATE ORDER STATUS ***/
+		$data['status'] = '';
+
+		switch ($order['estatus']) {
+			case 'A':
+				$data['status'] = 'Abierto';
+				break;
+
+			case 'C':
+				$data['status'] = 'Cerrado';
+				break;
+		}
+		/*** TRANSLATE ORDER STATUS ***/
+
 
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/facturar', $data);

@@ -98,7 +98,7 @@ class Orders extends CI_Model
 				JOIN folios AS fo ON pe.id_pedido=fo.id_documento AND fo.tipo_documento="P"
 				JOIN folios_prefijo AS fp ON pe.id_sucursal=fp.id_sucursal AND fp.tipo_documento="P"
 				' . $where . '
-				ORDER BY fecha_pedido DESC';
+				ORDER BY fecha_pedido ASC';
 		$query = $this->db->query($sql);
 		
 		// Returns the query result as a pure array, or an empty array when no result is produced.
@@ -119,6 +119,7 @@ class Orders extends CI_Model
 					su.nombre AS nombre_sucursal, 
 					su.iva AS sucursal_iva,
 					em.nombre AS nombre_vendedor, 
+					pe.id_cliente,
 					cl.nombre AS nombre_cliente, 
 					pe.fecha_pedido, 
 					pe.fecha_entrega,
@@ -188,21 +189,101 @@ class Orders extends CI_Model
 		return $this->db->query($sql);
 	}
 	
-	public function facturar($orderId, $date, $products, $userId)
+	public function invoice($order, $products, $date, $userId)
 	{
-		$order = $this->getOrder($orderId);
+		$this->load->model('folios');
+		$this->load->model('clients');
 
+
+		/*** TRANSACTION STARTS ***/
+		$this->db->trans_start();
+		/*** TRANSACTION STARTS ***/
+
+
+		/*** INSERT INVOICE HEADER ***/
 		$sql = "INSERT INTO facturas (id_factura, id_pedido, fecha, estatus, iva, id_sucursal, fecha_captura, usuario_captura)
-				VALUES (NULL, $orderId, $date, 'A', {$orderId['sucursal_iva']}, {$orderId['id_sucursal']}, NOW(), $userId)";
+				VALUES (NULL, {$order['id_pedido']}, '$date', 'A', {$order['sucursal_iva']}, {$order['id_sucursal']}, NOW(), $userId)";
+		$this->db->query($sql);
+		/*** INSERT INVOICE HEADER ***/
 
-		if ($this->db->query($sql)) {
-			$facturaId = $this->db->insert_id();
 
-			// Insert the next folio for the document in the folios table
-			$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
-					VALUES (NULL, $id_pedido, $id_sucursal, $tipo_documento, $folio_actual)";			
+		$invoiceId = $this->db->insert_id();
+
+
+		/*** INSERT INVOICE PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
+		$total = 0.0;
+
+		foreach ($products as $productId => $productInformation) {
+			$sql = "INSERT INTO facturas_detalles (id_factura_detalle, id_factura, id_producto, cantidad)
+					VALUES (NULL, $invoiceId, $productId, {$productInformation['amount']})";
+			$this->db->query($sql);
+
+			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = {$productInformation['amount']} WHERE id_pedido = {$order['id_pedido']} AND id_producto = $productId";
+			$this->db->query($sql);
+
+			$total += $productInformation['amount'] * $productInformation['price'];
+		}
+		/*** INSERT INVOICE PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
+
+
+		/*** GET LAST FOLIO NUMBER ***/
+		$folioInformation = $this->folios->getLastFolio($order['id_sucursal'], 'F');
+		$currentFolio = intval($folioInformation['ultimo_folio']) + 1;
+		/*** GET LAST FOLIO NUMBER ***/
+
+
+		/*** INSERT NEW FOLIO FOR INVOICE ***/
+		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+				VALUES (NULL, $invoiceId, {$order['id_sucursal']}, 'F', $currentFolio)";
+		$this->db->query($sql);
+		/*** INSERT NEW FOLIO FOR INVOICE ***/
+
+
+		/*** UPDATE LAST FOLIO INFORMATION ***/
+		$sql = "UPDATE folios_prefijo SET ultimo_folio = $currentFolio WHERE tipo_documento = 'F' AND id_sucursal = {$order['id_sucursal']}";
+		$this->db->query($sql);
+		/*** UPDATE LAST FOLIO INFORMATION ***/
+
+
+		/*** CLOSE ORDER IF NECESSARY ***/
+		$closeOrder = true;
+		$orderProducts = $this->getOrderProducts($order['id_pedido']);
+
+		foreach ($orderProducts as $product) {
+			if ($product['cantidad'] !== $product['cantidad_surtida']) {
+				$closeOrder = false;
+				break;
+			}
 		}
 
+		if ($closeOrder === true) {
+			$sql = 'UPDATE pedidos SET estatus = "C" WHERE id_pedido = ' . $order['id_pedido'];
+			$this->db->query($sql);
+		}
+		/*** CLOSE ORDER IF NECESSARY ***/
 
+
+		$client = $this->clients->getClient($order['id_cliente']);
+		$dueDate = strtotime("+{$client['dias_credito']} days", strtotime($date));
+		$dueDate = date('Y-m-d', $dueDate);
+
+
+		/*** REGISTER INVOICE IN ACCOUNTS RECEIVABLE ***/
+		$sql = "INSERT INTO movimientos (id_movimiento, id_cliente, id_documento, importe, fecha_documento, fecha_vencimiento, saldo, id_sucursal)
+				VALUES (NULL, {$order['id_cliente']}, $invoiceId, $total, '$date', '$dueDate', $total, {$order['id_sucursal']})";
+		$this->db->query($sql);
+		/*** REGISTER INVOICE IN ACCOUNTS RECEIVABLE ***/
+
+
+		/*** TRANSACTION FINISHES ***/
+		$this->db->trans_complete();
+		/*** TRANSACTION FINISHES ***/
+
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
 	}
 }
