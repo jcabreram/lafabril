@@ -38,7 +38,7 @@
 			<p><b>Fecha de pedido</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($order['fecha_pedido'])); ?></p>  
 			<p><b>Fecha de entrega</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($order['fecha_entrega'])); ?></p>   
 			<p><b>Estatus</b>: <?php if ($order['estatus'] == 'A') {
-				echo 'Abierto'; }
+				echo 'Abierto'; } else if ($order['estatus'] == 'C') { echo 'Cerrado'; } 
 			?></p>  
 
 		</fieldset>
@@ -126,7 +126,7 @@
 				
 				<div class="content-box-header">
 					
-					<h3>Crear...</h3>
+					<h3>Opciones...</h3>
 					
 				</div> <!-- End .content-box-header -->
 				
@@ -136,11 +136,19 @@
 						<table>
 							<thead>
 								<tr>
+									<?php if ($order['estatus'] != 'C') : ?>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/facturar/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Factura" /></a>
+										<a href="<?php echo site_url('pedidos/facturar/' . $order_id); ?>" <?php ?> target="_blank"><input class="button" type="button" value="Factura" /></a>
 									</th>
 									<th style="text-align:center">
 										<a href="<?php echo site_url('pedidos/crear_nota/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Nota de venta" /></a>
+									</th>
+									<?php endif; ?>
+									<th style="text-align:center">
+										<a href="<?php echo site_url('pedidos/imprimir/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
+									</th>
+									<th style="text-align:center">
+										<a href="<?php echo site_url('pedidos/cancelar/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
 									</th>
 								</tr>
 							</tbody>
@@ -151,33 +159,4 @@
 				
 			</div> <!-- End .content-box -->
 			
-			<div class="content-box column-right"><!-- Start Content Box -->
-				
-				<div class="content-box-header">
-					
-					<h3>Operaciones</h3>
-					
-				</div> <!-- End .content-box-header -->
-				
-				<div class="content-box-content">
-					
-					<div class="tab-content default-tab">
-						<table>
-							<thead>
-								<tr>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/imprimir/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
-									</th>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/cancelar/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
-									</th>
-								</tr>
-							</tbody>
-						</table>
-						
-					</div> <!-- End #tab3 -->        
-					
-				</div> <!-- End .content-box-content -->
-				
-			</div> <!-- End .content-box -->
 			<div class="clear"></div>

@@ -50,7 +50,6 @@
 				   <th>Cliente</th>
 				   <th>Fecha</th>
 				   <th>Estatus</th>
-				   <th>Opciones</th>
 				</tr>
 			</thead>
 			
@@ -67,9 +66,6 @@
 					<td><?php echo $invoiceData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($invoiceData['fecha_factura'])); ?></td>
 					<td><?php echo $invoiceData['estatus']; ?></td>
-					<td>
-						 <a href="<?php echo site_url("facturas/detalles/{$invoiceData['id_factura']}"); ?>" title="Ver detalles de la factura" />Detalles</a>
-					</td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
