@@ -6,12 +6,12 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Lista de Pedidos</h3>
+		<h3>Lista de Facturas</h3>
 
 		<ul class="content-box-tabs">
 			<li><a href="#" class="current">Tabla</a></li>
 			<li><a href="#filtrar" rel="modal">Filtrar</a></li>
-			<li><a href="<?php echo site_url('pedidos/exportar' . getParameters()); ?>" target="_blank">Exportar a PDF</a></li>
+			<li><a href="<?php echo site_url('facturas/exportar' . getParameters()); ?>" target="_blank">Exportar a PDF</a></li>
 		</ul>
 	</div>
 	
@@ -38,7 +38,7 @@
 		</div>
 	<?php endif; ?>
 
-	<?php if (count($ordersData) > 0) : ?>	
+	<?php if (count($invoicesData) > 0) : ?>	
 
 		<!-- Users Table -->
 		<table>
@@ -47,11 +47,10 @@
 				<tr>
 				   <th>Folio</th>
 				   <th>Sucursal</th>
-				   <th>Vendedor</th>
 				   <th>Cliente</th>
-				   <th>Fecha de pedido</th>
+				   <th>Fecha</th>
 				   <th>Estatus</th>
-				   <th>Crear</th>
+				   <th>Opciones</th>
 				</tr>
 			</thead>
 			
@@ -61,17 +60,15 @@
 			?>
 			
 			<tbody>
-			<?php foreach ($ordersData as $orderData) : ?>
+			<?php foreach ($invoicesData as $invoiceData) : ?>
 				<tr>
-					<td><a href="<?php echo site_url("pedidos/detalles/{$orderData['id_pedido']}"); ?>" ><?php echo $orderData['prefijo'].str_pad($orderData['folio'], 9, "0", STR_PAD_LEFT); ?></a></td>
-					<td><?php echo $orderData['nombre_sucursal']; ?></td>
-					<td><?php echo $orderData['nombre_vendedor']; ?></td>
-					<td><?php echo $orderData['nombre_cliente']; ?></td>
-					<td><?php echo strftime('%d/%b/%Y',strtotime($orderData['fecha_pedido'])); ?></td>
-					<td><?php echo $orderData['estatus']; ?></td>
+					<td><?php echo $invoiceData['prefijo'].str_pad($invoiceData['folio'], 9, "0", STR_PAD_LEFT); ?></td>
+					<td><?php echo $invoiceData['nombre_sucursal']; ?></td>
+					<td><?php echo $invoiceData['nombre_cliente']; ?></td>
+					<td><?php echo strftime('%d/%b/%Y',strtotime($invoiceData['fecha_factura'])); ?></td>
+					<td><?php echo $invoiceData['estatus']; ?></td>
 					<td>
-						<!-- Options Icons -->
-						 <a href="<?php echo site_url("notas_venta/crear/{$orderData['id_pedido']}"); ?>" title="Crear nota de venta" />Nota</a> | <a href="<?php echo site_url("pedidos/facturar/{$orderData['id_pedido']}"); ?>" title="Crear factura" />Factura</a>
+						 <a href="<?php echo site_url("facturas/detalles/{$invoiceData['id_factura']}"); ?>" title="Ver detalles de la factura" />Detalles</a>
 					</td>
 				</tr>
 			<?php endforeach; ?>

@@ -100,7 +100,7 @@
 				</li>
 
 				<li>
-					<a href="#" class="nav-top-item<?php if (controllerName() == 'pedidos') { echo ' current'; } ?>">
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'pedidos' || controllerName() == 'facturas') { echo ' current'; } ?>">
 						Ventas
 					</a>
 					<ul>
@@ -108,7 +108,7 @@
 						<li><a href="<?php echo site_url('pedidos/registrar'); ?>"<?php if ((methodName() == 'pedidos/registrar') || (methodName() == 'pedidos/registrar_detalles')) { echo ' class="current"'; } ?>>Agregar Pedido</a></li>
 						<li><a href="#">Administrar Notas de Venta</a></li>
 						<li><a href="#">Agregar Nota de Venta</a></li>
-						<li><a href="#">Administrar Facturas</a></li>
+						<li><a href="<?php echo site_url('facturas'); ?>"<?php if ((methodName() == 'facturas/index') || (methodName() == 'facturas/listar')) { echo ' class="current"'; } ?>>Administrar Facturas</a></li>
 						<li><a href="#">Agregar Factura</a></li>
 					</ul>
 				</li>
