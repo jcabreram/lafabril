@@ -29,11 +29,15 @@ $(function() {
 
 			subtotal += parseFloat(price) * parseFloat(orderedAmount);
 		});
+		
+		subtotal.toFixed(2);
 
 		iva = $('#invoiceTax').prev().text().substring(5, 7) / 100;
 		tax = iva * subtotal;
+		tax.toFixed(2);
 
 		total = tax + subtotal;
+		total.toFixed(2);
 
 		$('#invoiceSubtotal').text('$' + subtotal.toString());
 		$('#invoiceTax').text('$' + tax.toString());

@@ -176,6 +176,15 @@ class Orders extends CI_Model
 		return $this->db->query($sql);
 	}
 	
+	public function cancelar($id_pedido)
+	{
+		$id_pedido = $this->db->escape(intval($id_pedido));
+
+		$sql = "UPDATE pedidos SET estatus='C' WHERE id_pedido = $id_pedido";
+		
+		return $this->db->query($sql);
+	}
+	
 	public function limpiar_vacias()
 	{
 	

@@ -262,10 +262,62 @@ class Pedidos extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 	
+	public function detalles($id_pedido)
+	{
+		// Load necessary models
+		$this->load->model('userBranches');
+		$this->load->model('salesmen');
+		$this->load->model('clients');
+		$this->load->model('branches');
+		$this->load->model('orders');
+		$this->load->model('products');
+
+
+		$data['title'] = "Detalles del pedido";
+		$data['user'] = $this->session->userdata('user');
+		$data['order'] = $this->orders->getOrder($id_pedido);
+		//$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
+		//$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
+		//$data['cliente'] = $this->clients->getClient($data['order']['id_cliente']);
+		$data['products'] = $this->products->getProducts();
+		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
+		$data['order_id'] = $id_pedido;
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($subtotal, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['order_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio'];
+		}
+		
+		$data['subtotal'] = $subtotal;
+		
+		// The total is equal to the subtotal plus its tax
+		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pedidos/detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
+	
 	public function eliminar($id_pedido, $id)
 	{	
 		$this->orders->eliminar($id);
 		redirect("pedidos/registrar_detalles/$id_pedido");
+	}
+	
+	public function cancelar($id_pedido)
+	{	
+		if($this->orders->cancelar($id_pedido)) {
+				$this->session->set_flashdata('message', 'El pedido ha sido cancelado.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar cancelar el pedido, intenta de nuevo.');
+			}
+		redirect("pedidos");
+		
 	}
 
 	public function facturar($orderId)
