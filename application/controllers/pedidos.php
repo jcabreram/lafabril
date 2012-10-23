@@ -487,4 +487,49 @@ class Pedidos extends CI_Controller
 		$this->load->view('pedidos/facturar', $data);
 		$this->load->view('footer', $data);
 	}
+
+	public function imprimir($id)
+	{
+		$data['order'] = $this->orders->getOrder($id);
+
+		if (count($data['order']) == 0) {
+			exit('Orden no encontrada.');
+		}
+
+		// Necessary to create a PDF
+		$this->load->helper(array('dompdf', 'file'));
+
+		$this->load->model('branches');
+		$this->load->model('clients');
+
+		$data['title'] = 'Pedido';
+		$data['order']['products'] = $this->orders->getOrderProducts($id);
+		$data['branch'] = $this->branches->getBranch($data['order']['id_sucursal']);
+		$client = $this->clients->getClient($data['order']['id_cliente']);
+		
+		$data['clientAddress'] =  $client['calle'] . ' #' . $client['numero_exterior'];
+		
+		if ($client['numero_interior'] !== null) {
+			$data['clientAddress'] .= ' interior ' . $client['numero_interior'];
+		}
+
+		$data['clientAddress'] .= ' ' . $client['colonia'] . '. ' . $client['ciudad'] 
+		. ', ' . $client['municipio'] . ', ' . $client['estado'] . ', ' . $client['pais']
+		. '. C.P. ' . $client['codigo_postal'];
+
+		$data['subtotal'] = 0;
+
+		foreach ($data['order']['products'] as $product) {
+			$data['subtotal'] += $product['cantidad'] * $product['precio'];
+		}
+
+		$data['iva'] = $data['subtotal'] * $data['order']['sucursal_iva'];
+		$data['total'] = $data['subtotal'] + $data['iva'];
+
+		$html = $this->load->view('formatos/header', $data, true);
+		$html .= $this->load->view('formatos/pedido', $data, true);
+		$html .= $this->load->view('formatos/footer', $data, true);
+
+		createPDF($html, 'formato');
+	}
 }
