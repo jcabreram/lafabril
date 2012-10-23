@@ -1,9 +1,9 @@
 <table class="information">
 	<tr>
 		<th>Cliente</th>
-		<td><?php echo $order['cliente_nombre']; ?></td>
+		<td><?php echo $order['nombre_cliente']; ?></td>
 		<th>Vendedor</th>
-		<td><?php echo $order['vendedor_nombre']; ?></td>
+		<td><?php echo $order['nombre_vendedor']; ?></td>
 	</tr>
 
 	<tr>

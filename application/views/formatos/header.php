@@ -14,7 +14,7 @@
 
 <div class="header">
 	<h1>La Fabril, S.A.</h1>
-	<p>Sucursal <?php echo $order['sucursal_nombre']; ?></p>
+	<p>Sucursal <?php echo $branch['nombre']; ?></p>
 	<p><?php echo $branch['direccion']; ?></p>
 	<h2><?php echo $title; ?></h2>
 </div> <!-- end .header -->
