@@ -81,7 +81,7 @@
 		<!-- Notification (error type) -->
 		<div class="notification error png_bg">
 			<!-- Message -->
-			<div>No pudimos encontrar ningún pedido con las especificaciones indicadas.</div>
+			<div>No pudimos encontrar ningún factura con las especificaciones indicadas.</div>
 		</div>
 
 	<?php endif; ?> 
