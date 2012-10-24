@@ -1,5 +1,3 @@
-<h2><?php echo $title; ?></h2>
-
 <table class="filters">
 	<tr>
 		<th>Tipo de Persona</th>

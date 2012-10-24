@@ -14,6 +14,8 @@
 
 <div class="header">
 	<h1>La Fabril, S.A.</h1>
+
+	<h2><?php echo $title; ?></h2>
 </div> <!-- end .header -->
 
 <script type="text/php">

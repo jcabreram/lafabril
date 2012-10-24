@@ -1,5 +1,5 @@
 body {
-	margin: 100px 50px 50px;
+	margin: 120px 50px 50px;
 }
 
 /*** GENERAL CLASSES ***/
@@ -30,6 +30,7 @@ h1 {
 h2 {
 	font-size: 14px;
 	font-weight: bold;
+	margin-top: 40px;
 }
 
 .filters {

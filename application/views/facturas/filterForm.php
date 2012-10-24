@@ -1,8 +1,8 @@
 <div id="filtrar" style="display: none">
 
-	<h3>Filtrado de Pedidos</h3>
+	<h3>Filtrado de Facturas</h3>
 
-	<form action="<?php echo site_url('pedidos/filtrar'); ?>" method="post">
+	<form action="<?php echo site_url('facturas/filtrar'); ?>" method="post">
 
 		<p>
 			<label>Sucursal</label><?php if (!isset($filters['branch'])) { $filters['branch'] = ''; } ?>

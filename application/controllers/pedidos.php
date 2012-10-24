@@ -127,6 +127,22 @@ class Pedidos extends CI_Controller
 		if (isset($dirtyFilters['cliente']) && trim($dirtyFilters['cliente']) !== '') {
 			$filters['client'] = $dirtyFilters['cliente'];
 		}
+
+		if (isset($dirtyFilters['estatus']) && trim($dirtyFilters['estatus']) !== '') {
+			switch ($dirtyFilters['estatus']) {
+				case 'abierto':
+					$filters['status'] = 'A';
+					break;
+
+				case 'cerrado':
+					$filters['status'] = 'C';
+					break;
+
+				case 'cancelado':
+					$filters['status'] = 'X';
+					break;
+			}
+		}
 		
 		return $filters;
 	}
@@ -140,19 +156,17 @@ class Pedidos extends CI_Controller
 		$filters = $this->uri->uri_to_assoc(3);
 		$filters = $this->_sanitizeFilters($filters);
 
-		// Get the array with the clients in the database
-		$data['ordersData'] = $this->orders->getAll($filters);
-
-		// Get Active Branches
+		// To populate the filter form
 		$this->load->model('branches');
-		$data['branches'] = $this->branches->getAll(array('status' => '1'));
-
-		// Get Active Clients
 		$this->load->model('clients');
-		$data['clients'] = $this->clients->getAll(array('status' => '1'));
+
+		// Get orders
+		$data['ordersData'] = $this->orders->getAll($filters);
 		
 		$data['title'] = "Pedidos";
 		$data['user'] = $this->session->userdata('user');
+		$data['branches'] = $this->branches->getAll(array('status' => '1')); // Active branches
+		$data['clients'] = $this->clients->getAll(array('status' => '1')); // Active clients
 		$data['filters'] = $filters;
 
 		// Display views
@@ -169,6 +183,7 @@ class Pedidos extends CI_Controller
 
 			$branch = isset($_POST['branch']) ? trim($_POST['branch']) : false;
 			$client = isset($_POST['client']) ? trim($_POST['client']) : false;
+			$status = isset($_POST['status']) ? trim($_POST['status']) : false;
 
 			if ($branch !== false && $branch !== '') {
 				// Is a numeric value? I mean, is it an id?
@@ -178,6 +193,22 @@ class Pedidos extends CI_Controller
 			if ($client !== false && $client !== '') {
 				// Is a numeric value? I mean, is it an id?
 				$filters['cliente'] = $client;
+			}
+
+			if ($status !== false && $status !== '') {
+				switch ($status) {
+					case 'A':
+						$filters['estatus'] = 'abierto';
+						break;
+
+					case 'C':
+						$filters['estatus'] = 'cerrado';
+						break;
+
+					case 'X':
+						$filters['estatus'] = 'cancelado';
+						break;
+				}
 			}
 
 			if (count($filters) > 0) {
@@ -490,41 +521,39 @@ class Pedidos extends CI_Controller
 
 	public function imprimir($id)
 	{
-		$data['order'] = $this->orders->getOrder($id);
+		$order = $this->orders->getOrder($id);
 
-		if (count($data['order']) == 0) {
+		if (count($order) === 0) {
+			// We kill the script because usually the PDF is opened in a different tab.
 			exit('Orden no encontrada.');
 		}
 
 		// Necessary to create a PDF
 		$this->load->helper(array('dompdf', 'file'));
+		
+		$this->load->model('branches'); // This is mandatory to create the PDF header
+		$this->load->model('clients'); // This model is necessary because the format has the client address
 
-		$this->load->model('branches');
-		$this->load->model('clients');
+		$order['products'] = $this->orders->getOrderProducts($id);
+		$data = $this->branches->getBranch($order['id_sucursal']);
+		$clientAddress = $this->clients->getClientAddress($order['id_cliente']);
+
+		$subtotal = 0;
+
+		foreach ($order['products'] as $product) {
+			$subtotal += $product['cantidad'] * $product['precio'];
+		}
+
+		$iva = $subtotal * $order['sucursal_iva'];
+		$total = $subtotal + $iva;
 
 		$data['title'] = 'Pedido';
-		$data['order']['products'] = $this->orders->getOrderProducts($id);
-		$data['branch'] = $this->branches->getBranch($data['order']['id_sucursal']);
-		$client = $this->clients->getClient($data['order']['id_cliente']);
-		
-		$data['clientAddress'] =  $client['calle'] . ' #' . $client['numero_exterior'];
-		
-		if ($client['numero_interior'] !== null) {
-			$data['clientAddress'] .= ' interior ' . $client['numero_interior'];
-		}
-
-		$data['clientAddress'] .= ' ' . $client['colonia'] . '. ' . $client['ciudad'] 
-		. ', ' . $client['municipio'] . ', ' . $client['estado'] . ', ' . $client['pais']
-		. '. C.P. ' . $client['codigo_postal'];
-
-		$data['subtotal'] = 0;
-
-		foreach ($data['order']['products'] as $product) {
-			$data['subtotal'] += $product['cantidad'] * $product['precio'];
-		}
-
-		$data['iva'] = $data['subtotal'] * $data['order']['sucursal_iva'];
-		$data['total'] = $data['subtotal'] + $data['iva'];
+		$data['branch'] = $branch;
+		$data['order'] = $order;
+		$data['clientAddress'] = $clientAddress;
+		$data['subtotal'] = $subtotal;
+		$data['iva'] = $iva;
+		$data['total'] = $total;
 
 		$html = $this->load->view('formatos/header', $data, true);
 		$html .= $this->load->view('formatos/pedido', $data, true);
