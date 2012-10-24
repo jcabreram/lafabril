@@ -1,5 +1,3 @@
-<h2><?php echo $title; ?></h2>
-
 <table class="filters">
 	<tr>
 		<th>Estatus</th>
@@ -13,7 +11,7 @@
 		<tr>
 		   <th>Nombre</th>
 		   <th>Dirección</th>
-		   <th>Estatus</th>
+		   <th class="textAlign-center">Estatus</th>
 		</tr>
 	</thead>
 
@@ -22,7 +20,7 @@
 		<tr>
 			<td><?php echo $branch['nombre']; ?></td>
 			<td><?php echo $branch['direccion']; ?></td>
-			<td><?php 
+			<td class="textAlign-center"><?php 
 				if ($branch['estatus'] == 1) {
 					echo 'Activo';
 				} else {

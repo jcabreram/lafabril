@@ -69,16 +69,21 @@ class Orders extends CI_Model
 		/*** PREPARE FILTERS ***/
 		$branch = isset($filters['branch']) ? $filters['branch'] : false;
 		$client = isset($filters['client']) ? $filters['client'] : false;
+		$status = isset($filters['status']) ? $filters['status'] : false;
 		/*** PREPARE FILTERS ***/
 
 		$where = '';
 
 		if ($branch !== false) {
-			$where = 'WHERE pe.id_sucursal = ' . $this->db->escape(intval($branch));
+			$where .= 'WHERE pe.id_sucursal = ' . $this->db->escape(intval($branch));
 		}
 
 		if ($client !== false) {
 			$where .= ' AND pe.id_cliente = ' . $this->db->escape(intval($client));
+		}
+
+		if ($status !== false) {
+			$where .= ' AND pe.estatus = ' . $this->db->escape($status);
 		}
 
 		$sql = 'SELECT 

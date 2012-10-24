@@ -333,7 +333,7 @@ class Clientes extends CI_Controller
 			$typeOfPerson = isset($_POST['typeOfPerson']) ? trim($_POST['typeOfPerson']) : false;
 			$status = isset($_POST['status']) ? trim($_POST['status']) : false;
 
-			if ($typeOfPerson !== false && $typeOfPerson != '') {
+			if ($typeOfPerson !== false && $typeOfPerson !== '') {
 				switch ($typeOfPerson) {
 					case 'F':
 						$filters['tipo-de-persona'] = 'fisica';
@@ -345,7 +345,7 @@ class Clientes extends CI_Controller
 				}
 			}
 
-			if ($status !== false && $status != '') {
+			if ($status !== false && $status !== '') {
 				switch ($status) {
 					case '1':
 						$filters['estatus'] = 'activo';

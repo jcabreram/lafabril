@@ -106,4 +106,21 @@ class Clients extends CI_Model
 
 		return $this->db->query($sql);
 	}
+
+	public function getClientAddress($id)
+	{
+		$client = $this->getClient($id);
+
+		$clientAddress =  $client['calle'] . ' #' . $client['numero_exterior'];
+		
+		if ($client['numero_interior'] !== null) {
+			$clientAddress .= ' interior ' . $client['numero_interior'];
+		}
+
+		$clientAddress .= ' ' . $client['colonia'] . '. ' . $client['ciudad'] 
+		. ', ' . $client['municipio'] . ', ' . $client['estado'] . ', ' . $client['pais']
+		. '. C.P. ' . $client['codigo_postal'];
+
+		return $clientAddress;
+	}
 }
