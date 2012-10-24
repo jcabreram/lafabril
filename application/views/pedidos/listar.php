@@ -51,7 +51,6 @@
 				   <th>Cliente</th>
 				   <th>Fecha de pedido</th>
 				   <th>Estatus</th>
-				   <th>Crear</th>
 				</tr>
 			</thead>
 			
@@ -69,10 +68,6 @@
 					<td><?php echo $orderData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($orderData['fecha_pedido'])); ?></td>
 					<td><?php echo $orderData['estatus']; ?></td>
-					<td>
-						<!-- Options Icons -->
-						 <a href="<?php echo site_url("notas_venta/crear/{$orderData['id_pedido']}"); ?>" title="Crear nota de venta" />Nota</a> | <a href="<?php echo site_url("pedidos/facturar/{$orderData['id_pedido']}"); ?>" title="Crear factura" />Factura</a>
-					</td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>

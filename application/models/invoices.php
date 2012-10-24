@@ -47,4 +47,34 @@ class Invoices extends CI_Model
 		return $query->result_array();
 	}
 	
+	public function getInvoice($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = 'SELECT 
+					fa.id_factura,
+					fa.id_pedido, 
+					pe.id_cliente,
+					cl.nombre AS nombre_cliente,
+					fp.prefijo, 
+					fo.folio, 
+					fa.fecha AS fecha_factura,
+					fa.estatus,
+					fa.iva,
+					fa.id_sucursal,
+					su.nombre
+				FROM facturas AS fa
+				JOIN pedidos AS pe ON pe.id_pedido=fa.id_pedido
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN folios_prefijo AS fp ON fa.id_sucursal=fp.id_sucursal AND fp.tipo_documento="F"
+				JOIN folios AS fo ON fa.id_factura=fo.id_documento AND fo.tipo_documento="F"
+				JOIN sucursales AS su ON fa.id_sucursal=su.id_sucursal
+				WHERE id_factura = ' . $id;
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->row_array();
+	}	
+	
 }

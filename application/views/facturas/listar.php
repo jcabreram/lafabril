@@ -50,7 +50,6 @@
 				   <th>Cliente</th>
 				   <th>Fecha</th>
 				   <th>Estatus</th>
-				   <th>Opciones</th>
 				</tr>
 			</thead>
 			
@@ -62,14 +61,11 @@
 			<tbody>
 			<?php foreach ($invoicesData as $invoiceData) : ?>
 				<tr>
-					<td><?php echo $invoiceData['prefijo'].str_pad($invoiceData['folio'], 9, "0", STR_PAD_LEFT); ?></td>
+					<td><a href="<?php echo site_url("facturas/detalles/{$invoiceData['id_factura']}"); ?>" ><?php echo $invoiceData['prefijo'].str_pad($invoiceData['folio'], 9, "0", STR_PAD_LEFT); ?></a></td>
 					<td><?php echo $invoiceData['nombre_sucursal']; ?></td>
 					<td><?php echo $invoiceData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($invoiceData['fecha_factura'])); ?></td>
 					<td><?php echo $invoiceData['estatus']; ?></td>
-					<td>
-						 <a href="<?php echo site_url("facturas/detalles/{$invoiceData['id_factura']}"); ?>" title="Ver detalles de la factura" />Detalles</a>
-					</td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>

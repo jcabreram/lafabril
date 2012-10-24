@@ -6,7 +6,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Datos generales del pedido</h3>
+		<h3>Datos generales de la factura</h3>
 	</div>
 	
 	<!-- Content Box Content -->			
@@ -22,9 +22,9 @@
 		
 		<fieldset class="column-left">
 
-			<p><b>Sucursal</b>: <?php echo $order['nombre_sucursal'] ?></p>
-			<p><b>Vendedor</b>: <?php echo $order['nombre_vendedor'] ?></p>  
-			<p><b>Cliente</b>: <?php echo $order['nombre_cliente'] ?></p>        
+			<p><b>Sucursal</b>: <?php echo $invoice['nombre_sucursal'] ?></p>
+			<p><b>Vendedor</b>: <?php echo $invoice['nombre_vendedor'] ?></p>  
+			<p><b>Cliente</b>: <?php echo $invoice['nombre_cliente'] ?></p>        
 
 		</fieldset>
 		
@@ -35,10 +35,10 @@
 			setlocale(LC_ALL, 'es_ES');
 			?>
 
-			<p><b>Fecha de pedido</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($order['fecha_pedido'])); ?></p>  
-			<p><b>Fecha de entrega</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($order['fecha_entrega'])); ?></p>   
-			<p><b>Estatus</b>: <?php if ($order['estatus'] == 'A') {
-				echo 'Abierto'; } else if ($order['estatus'] == 'C') { echo 'Cerrado'; } 
+			<p><b>Fecha de pedido</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($invoice['fecha_pedido'])); ?></p>  
+			<p><b>Fecha de entrega</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($invoice['fecha_entrega'])); ?></p>   
+			<p><b>Estatus</b>: <?php if ($invoice['estatus'] == 'A') {
+				echo 'Abierto'; } else if ($invoice['estatus'] == 'C') { echo 'Cerrado'; } 
 			?></p>  
 
 		</fieldset>
@@ -101,8 +101,8 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td style="text-align:right"><b>IVA (<?php echo $order['sucursal_iva']*100; ?>%)</b></td>
-				<td style="text-align:right">$<?php echo number_format($order['sucursal_iva']*$subtotal, 2, '.', ','); ?></td>
+				<td style="text-align:right"><b>IVA (<?php echo $invoice['sucursal_iva']*100; ?>%)</b></td>
+				<td style="text-align:right">$<?php echo number_format($invoice['sucursal_iva']*$subtotal, 2, '.', ','); ?></td>
 			</tr>
 			
 			<tr>
@@ -136,19 +136,11 @@
 						<table>
 							<thead>
 								<tr>
-									<?php if ($order['estatus'] != 'C') : ?>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/facturar/' . $order_id); ?>" <?php ?> target="_blank"><input class="button" type="button" value="Factura" /></a>
+										<a href="<?php echo site_url('pedidos/imprimir/' . $invoice_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
 									</th>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/crear_nota/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Nota de venta" /></a>
-									</th>
-									<?php endif; ?>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/imprimir/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
-									</th>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/cancelar/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
+										<a href="<?php echo site_url('pedidos/cancelar/' . $invoice_id); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
 									</th>
 								</tr>
 							</tbody>
