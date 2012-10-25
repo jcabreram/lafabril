@@ -57,6 +57,7 @@ class Invoices extends CI_Model
 					pe.id_cliente,
 					cl.nombre AS nombre_cliente,
 					cl.razon_social,
+					cl.rfc,
 					fp.prefijo, 
 					fo.folio, 
 					fa.fecha AS fecha_factura,

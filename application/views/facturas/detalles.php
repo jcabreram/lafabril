@@ -24,7 +24,8 @@
 
 			<p><b>Folio</b>: <?php echo $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT); ?></p> 
 			<p><b>Folio del pedido</b>: <a href="<?php echo site_url('pedidos/detalles/' . $invoice['id_pedido']); ?>"><?php echo $order['prefijo'].str_pad($order['folio'], 9, "0", STR_PAD_LEFT); ?></a></p>
-			<p><b>Cliente</b>: <?php echo $invoice['nombre_cliente'] ?></p>           
+			<p><b>Cliente</b>: <?php echo $invoice['nombre_cliente'] ?></p>     
+			<p><b>RFC</b>: <?php echo $invoice['rfc'] ?></p>        
 
 		</fieldset>
 		
