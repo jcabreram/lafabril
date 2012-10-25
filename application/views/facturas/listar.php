@@ -49,7 +49,7 @@
 				   <th>Sucursal</th>
 				   <th>Cliente</th>
 				   <th>Fecha</th>
-				   <th>Estatus</th>
+				   <th class="textAlign-center">Estatus</th>
 				</tr>
 			</thead>
 			
@@ -65,7 +65,7 @@
 					<td><?php echo $invoiceData['nombre_sucursal']; ?></td>
 					<td><?php echo $invoiceData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($invoiceData['fecha_factura'])); ?></td>
-					<td><?php echo $invoiceData['estatus']; ?></td>
+					<td class="textAlign-center"><?php echo $invoiceData['estatus']; ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>
