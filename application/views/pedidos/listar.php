@@ -50,7 +50,7 @@
 				   <th>Vendedor</th>
 				   <th>Cliente</th>
 				   <th>Fecha de pedido</th>
-				   <th>Estatus</th>
+				   <th class="textAlign-center">Estatus</th>
 				</tr>
 			</thead>
 			
@@ -67,7 +67,7 @@
 					<td><?php echo $orderData['nombre_vendedor']; ?></td>
 					<td><?php echo $orderData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($orderData['fecha_pedido'])); ?></td>
-					<td><?php echo $orderData['estatus']; ?></td>
+					<td class="textAlign-center"><?php echo $orderData['estatus']; ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>

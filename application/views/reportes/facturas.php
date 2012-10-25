@@ -15,28 +15,26 @@
 	</tr>
 </table>
 
-<?php if (count($orders) > 0) : ?>
+<?php if (count($invoices) > 0) : ?>
 <table class="catalog">
 	<thead>
 		<tr>
 		   <th>Folio</th>
 		   <th>Sucursal</th>
-		   <th>Vendedor</th>
 		   <th>Cliente</th>
-		   <th>Fecha de Pedido</th>
+		   <th>Fecha de Factura</th>
 		   <th class="textAlign-center">Estatus</th>
 		</tr>
 	</thead>
 
 	<tbody>
-	<?php foreach ($orders as $order) : ?>
+	<?php foreach ($invoices as $invoice) : ?>
 		<tr>
-			<td><?php echo $order['prefijo'] . str_pad($order['folio'], 9, '0', STR_PAD_LEFT); ?></td>
-			<td><?php echo $order['nombre_sucursal']; ?></td>
-			<td><?php echo $order['nombre_vendedor']; ?></td>
-			<td><?php echo $order['nombre_cliente']; ?></td>
-			<td><?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></td>
-			<td class="textAlign-center"><?php echo $order['estatus']; ?></td>
+			<td><?php echo $invoice['prefijo'] . str_pad($invoice['folio'], 9, '0', STR_PAD_LEFT); ?></td>
+			<td><?php echo $invoice['nombre_sucursal']; ?></td>
+			<td><?php echo $invoice['nombre_cliente']; ?></td>
+			<td><?php echo date('d/m/Y', strtotime($invoice['fecha_factura'])); ?></td>
+			<td class="textAlign-center"><?php echo $invoice['estatus']; ?></td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>

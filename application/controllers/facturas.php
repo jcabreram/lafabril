@@ -85,38 +85,6 @@ class Facturas extends CI_Controller
 		$this->load->view('facturas/filterForm', $data);
 		$this->load->view('footer', $data);
 	}
-	
-	public function detalles($id_factura)
-	{
-		// Load necessary models
-		$this->load->model('invoices');
-		$this->load->model('orders');
-
-
-		$data['title'] = "Detalles del pedido";
-		$data['user'] = $this->session->userdata('user');
-		$data['invoice'] = $this->invoices->getInvoice($id_factura);
-		$data['invoice_details'] = $this->invoices->getInvoiceDetail($id_factura);
-		$data['order'] = $this->orders->getOrder($data['invoice']['id_pedido']);
-		
-		// Declare the $subtotal as float so it gets it in the foreach
-		settype($subtotal, "float");
-		
-		// For every detail of the order, gather the sum of the product of the prices and quantities
-		foreach ($data['invoice_details'] as $line) {
-			$subtotal+=$line['cantidad']*$line['precio_producto'];
-		}
-		
-		$data['subtotal'] = $subtotal;
-		
-		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['invoice']['iva']; 
-		
-		// Display views
-		$this->load->view('header', $data);
-		$this->load->view('facturas/detalles', $data);
-		$this->load->view('footer', $data);
-	}
 
 	public function filtrar()
 	{
@@ -162,6 +130,134 @@ class Facturas extends CI_Controller
 
 		// WTH is the user doing here?
 		redirect();
+	}
+
+	public function detalles($id_factura)
+	{
+		// Load necessary models
+		$this->load->model('invoices');
+		$this->load->model('orders');
+
+
+		$data['title'] = "Detalles del pedido";
+		$data['user'] = $this->session->userdata('user');
+		$data['invoice'] = $this->invoices->getInvoice($id_factura);
+		$data['invoice_details'] = $this->invoices->getInvoiceDetail($id_factura);
+		$data['order'] = $this->orders->getOrder($data['invoice']['id_pedido']);
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($subtotal, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['invoice_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio_producto'];
+		}
+		
+		$data['subtotal'] = $subtotal;
+		
+		// The total is equal to the subtotal plus its tax
+		$data['total'] = $subtotal + $subtotal * $data['invoice']['iva']; 
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('facturas/detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
+	public function exportar()
+	{
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// To populate the filters data
+		$this->load->model('branches');
+		$this->load->model('clients');
+		
+		$invoices = $this->invoices->getAll($filters);
+
+		if (!isset($filters['branch'])) {
+			$branch = 'Todos';
+		} else {
+			$branch = $this->branches->getBranch($filters['branch']);
+			$branch = $branch['nombre'];
+		}
+
+		if (!isset($filters['client'])) {
+			$client = 'Todos';
+		} else {
+			$client = $this->clients->getBranch($filters['client']);
+			$client = $client['nombre'];
+		}
+
+		if (!isset($filters['status'])) {
+			$status = 'Todos';
+		} else {
+			switch ($filters['status']) {
+				case 'A':
+					$status = 'Abierto';
+					break;
+
+				case 'C':
+					$status = 'Cerrado';
+					break;
+
+				case 'X':
+					$status = 'Cancelado';
+					break;
+			}
+		}
+
+		$data['title'] = "Reporte de Pedidos";
+		$data['invoices'] = $invoices;
+		$data['branch'] = $branch;
+		$data['client'] = $client;
+		$data['status'] = $status;
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes/facturas', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
+		createPDF($html, 'reporte');
+	}
+	
+	public function detalles($id_factura)
+	{
+		// Load necessary models
+		$this->load->model('userBranches');
+		$this->load->model('salesmen');
+		$this->load->model('clients');
+		$this->load->model('branches');
+		$this->load->model('orders');
+		$this->load->model('products');
+		$this->load->model('invoices');
+
+
+		$data['title'] = "Detalles del pedido";
+		$data['user'] = $this->session->userdata('user');
+		$data['invoice'] = $this->invoices->getInvoice($id_factura);
+		$data['products'] = $this->products->getProducts();
+		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
+		$data['invoice_id'] = $id_factura;
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($subtotal, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['order_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio'];
+		}
+		
+		$data['subtotal'] = $subtotal;
+		
+		// The total is equal to the subtotal plus its tax
+		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('facturas/detalles', $data);
+		$this->load->view('footer', $data);
 	}
 
 	public function imprimir($id)
