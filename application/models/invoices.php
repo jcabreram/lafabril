@@ -62,7 +62,7 @@ class Invoices extends CI_Model
 					fa.estatus,
 					fa.iva,
 					fa.id_sucursal,
-					su.nombre
+					su.nombre AS nombre_sucursal
 				FROM facturas AS fa
 				JOIN pedidos AS pe ON pe.id_pedido=fa.id_pedido
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
@@ -75,6 +75,30 @@ class Invoices extends CI_Model
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->row_array();
+	}	
+	
+	public function getInvoiceDetail($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = 'SELECT 
+					fd.id_factura_detalle,
+					fd.id_producto,
+					fd.cantidad,
+					pr.nombre AS nombre_producto,
+					pr.udm AS udm_producto,
+					pd.precio AS precio_producto
+				FROM facturas AS fa
+				JOIN facturas_detalles AS fd ON fa.id_factura=fd.id_factura
+				JOIN productos AS pr ON fd.id_producto=pr.id_producto
+				JOIN pedidos AS pe ON fa.id_pedido=pe.id_pedido
+				JOIN pedidos_detalles AS pd ON fa.id_pedido=pd.id_pedido AND pd.id_producto=fd.id_producto
+				WHERE fa.id_factura = ' . $id;
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
 	}	
 	
 }

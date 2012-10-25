@@ -22,9 +22,9 @@
 		
 		<fieldset class="column-left">
 
-			<p><b>Sucursal</b>: <?php echo $invoice['nombre_sucursal'] ?></p>
-			<p><b>Vendedor</b>: <?php echo $invoice['nombre_vendedor'] ?></p>  
-			<p><b>Cliente</b>: <?php echo $invoice['nombre_cliente'] ?></p>        
+			<p><b>Folio</b>: <?php echo $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT); ?></p> 
+			<p><b>Folio del pedido</b>: <a href="<?php echo site_url('pedidos/detalles/' . $invoice['id_pedido']); ?>"><?php echo $order['prefijo'].str_pad($order['folio'], 9, "0", STR_PAD_LEFT); ?></a></p>
+			<p><b>Cliente</b>: <?php echo $invoice['nombre_cliente'] ?></p>           
 
 		</fieldset>
 		
@@ -35,10 +35,16 @@
 			setlocale(LC_ALL, 'es_ES');
 			?>
 
-			<p><b>Fecha de pedido</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($invoice['fecha_pedido'])); ?></p>  
-			<p><b>Fecha de entrega</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($invoice['fecha_entrega'])); ?></p>   
-			<p><b>Estatus</b>: <?php if ($invoice['estatus'] == 'A') {
-				echo 'Abierto'; } else if ($invoice['estatus'] == 'C') { echo 'Cerrado'; } 
+			<p><b>Sucursal</b>: <?php echo $invoice['nombre_sucursal'] ?></p>
+			<p><b>Fecha de factura</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($invoice['fecha_factura'])); ?></p>   
+			<p><b>Estatus</b>: 
+			<?php if ($invoice['estatus'] == 'A') {
+						echo 'Abierta';
+					} else if ($invoice['estatus'] == 'C') {
+						echo 'Cerrada';
+					} else if ($invoice['estatus'] == 'X') {
+						echo 'Cancelada';
+					}
 			?></p>  
 
 		</fieldset>
@@ -75,12 +81,12 @@
 			</thead>
 			
 			<tbody>
-			<?php foreach ($order_details as $orderData) : ?>
+			<?php foreach ($invoice_details as $detail) : ?>
 				<tr>
-					<td><?php echo $orderData['nombre']; ?></td>
-					<td><?php echo $orderData['cantidad'].' '.$orderData['udm']; ?></td>
-					<td style="text-align:right">$<?php echo number_format($orderData['precio'], 2, '.', ','); ?></td>
-					<td style="text-align:right">$<?php echo number_format($orderData['cantidad']*$orderData['precio'], 2, '.', ',');?></td>
+					<td><?php echo $detail['nombre_producto']; ?></td>
+					<td><?php echo $detail['cantidad'].' '.$detail['udm_producto']; ?></td>
+					<td style="text-align:right">$<?php echo number_format($detail['precio_producto'], 2, '.', ','); ?></td>
+					<td style="text-align:right">$<?php echo number_format($detail['cantidad']*$detail['precio_producto'], 2, '.', ',');?></td>
 				</tr>
 			<?php endforeach; ?>
 			
@@ -101,8 +107,8 @@
 			<tr>
 				<td></td>
 				<td></td>
-				<td style="text-align:right"><b>IVA (<?php echo $invoice['sucursal_iva']*100; ?>%)</b></td>
-				<td style="text-align:right">$<?php echo number_format($invoice['sucursal_iva']*$subtotal, 2, '.', ','); ?></td>
+				<td style="text-align:right"><b>IVA (<?php echo $invoice['iva']*100; ?>%)</b></td>
+				<td style="text-align:right">$<?php echo number_format($invoice['iva']*$subtotal, 2, '.', ','); ?></td>
 			</tr>
 			
 			<tr>
@@ -137,10 +143,10 @@
 							<thead>
 								<tr>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/imprimir/' . $invoice_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
+										<a href="<?php echo site_url('pedidos/imprimir/' . $invoice['id_factura']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
 									</th>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/cancelar/' . $invoice_id); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
+										<a href="<?php echo site_url('pedidos/cancelar/' . $invoice['id_factura']); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
 									</th>
 								</tr>
 							</tbody>

@@ -132,6 +132,38 @@ class Facturas extends CI_Controller
 		redirect();
 	}
 
+	public function detalles($id_factura)
+	{
+		// Load necessary models
+		$this->load->model('invoices');
+		$this->load->model('orders');
+
+
+		$data['title'] = "Detalles del pedido";
+		$data['user'] = $this->session->userdata('user');
+		$data['invoice'] = $this->invoices->getInvoice($id_factura);
+		$data['invoice_details'] = $this->invoices->getInvoiceDetail($id_factura);
+		$data['order'] = $this->orders->getOrder($data['invoice']['id_pedido']);
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($subtotal, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['invoice_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio_producto'];
+		}
+		
+		$data['subtotal'] = $subtotal;
+		
+		// The total is equal to the subtotal plus its tax
+		$data['total'] = $subtotal + $subtotal * $data['invoice']['iva']; 
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('facturas/detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
 	public function exportar()
 	{
 		$this->load->helper(array('dompdf', 'file'));
