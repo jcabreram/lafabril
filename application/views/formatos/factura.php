@@ -12,6 +12,13 @@
 		<th>Pedido</th>
 		<td><?php echo $orderFolio; ?></td>
 	</tr>
+
+	<tr>
+		<th>RFC</th>
+		<td><?php echo $invoice['rfc']; ?></td>
+		<th></th>
+		<td></td>
+	</tr>
 </table>
 
 <?php if (count($invoice['products']) > 0) : ?>
