@@ -37,9 +37,16 @@
 
 			<p><b>Fecha de pedido</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($order['fecha_pedido'])); ?></p>  
 			<p><b>Fecha de entrega</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($order['fecha_entrega'])); ?></p>   
-			<p><b>Estatus</b>: <?php if ($order['estatus'] == 'A') {
-				echo 'Abierto'; } else if ($order['estatus'] == 'C') { echo 'Cerrado'; } 
-			?></p>  
+			<p><b>Estatus</b>:
+			
+			<?php if ($order['estatus'] == 'A') {
+						echo 'Abierto';
+					} else if ($order['estatus'] == 'C') {
+						echo 'Cerrado';
+					} else if ($order['estatus'] == 'X') {
+						echo 'Cancelado';
+					}
+			?></p>
 
 		</fieldset>
 		
