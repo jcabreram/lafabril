@@ -89,34 +89,28 @@ class Facturas extends CI_Controller
 	public function detalles($id_factura)
 	{
 		// Load necessary models
-		$this->load->model('userBranches');
-		$this->load->model('salesmen');
-		$this->load->model('clients');
-		$this->load->model('branches');
-		$this->load->model('orders');
-		$this->load->model('products');
 		$this->load->model('invoices');
+		$this->load->model('orders');
 
 
 		$data['title'] = "Detalles del pedido";
 		$data['user'] = $this->session->userdata('user');
 		$data['invoice'] = $this->invoices->getInvoice($id_factura);
-		$data['products'] = $this->products->getProducts();
-		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
-		$data['invoice_id'] = $id_factura;
+		$data['invoice_details'] = $this->invoices->getInvoiceDetail($id_factura);
+		$data['order'] = $this->orders->getOrder($data['invoice']['id_pedido']);
 		
 		// Declare the $subtotal as float so it gets it in the foreach
 		settype($subtotal, "float");
 		
 		// For every detail of the order, gather the sum of the product of the prices and quantities
-		foreach ($data['order_details'] as $line) {
-			$subtotal+=$line['cantidad']*$line['precio'];
+		foreach ($data['invoice_details'] as $line) {
+			$subtotal+=$line['cantidad']*$line['precio_producto'];
 		}
 		
 		$data['subtotal'] = $subtotal;
 		
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
+		$data['total'] = $subtotal + $subtotal * $data['invoice']['iva']; 
 		
 		// Display views
 		$this->load->view('header', $data);
