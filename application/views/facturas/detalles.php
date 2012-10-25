@@ -143,10 +143,10 @@
 							<thead>
 								<tr>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/imprimir/' . $invoice['id_factura']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
+										<a href="<?php echo site_url('facturas/imprimir/' . $invoice['id_factura']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
 									</th>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/cancelar/' . $invoice['id_factura']); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
+										<a href="<?php echo site_url('facturas/cancelar/' . $invoice['id_factura']); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
 									</th>
 								</tr>
 							</tbody>

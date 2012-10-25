@@ -56,13 +56,15 @@ class Invoices extends CI_Model
 					fa.id_pedido, 
 					pe.id_cliente,
 					cl.nombre AS nombre_cliente,
+					cl.razon_social,
 					fp.prefijo, 
 					fo.folio, 
 					fa.fecha AS fecha_factura,
 					fa.estatus,
 					fa.iva,
 					fa.id_sucursal,
-					su.nombre AS nombre_sucursal
+					su.nombre AS nombre_sucursal,
+					su.iva AS sucursal_iva
 				FROM facturas AS fa
 				JOIN pedidos AS pe ON pe.id_pedido=fa.id_pedido
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
@@ -76,6 +78,11 @@ class Invoices extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->row_array();
 	}	
+
+	public function getInvoiceProducts($id)
+	{
+		return $this->getInvoiceDetail($id);
+	}
 	
 	public function getInvoiceDetail($id)
 	{

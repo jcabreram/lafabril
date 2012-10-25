@@ -221,50 +221,12 @@ class Facturas extends CI_Controller
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
-	
-	public function detalles($id_factura)
-	{
-		// Load necessary models
-		$this->load->model('userBranches');
-		$this->load->model('salesmen');
-		$this->load->model('clients');
-		$this->load->model('branches');
-		$this->load->model('orders');
-		$this->load->model('products');
-		$this->load->model('invoices');
-
-
-		$data['title'] = "Detalles del pedido";
-		$data['user'] = $this->session->userdata('user');
-		$data['invoice'] = $this->invoices->getInvoice($id_factura);
-		$data['products'] = $this->products->getProducts();
-		$data['order_details'] = $this->orders->getOrderDetail($id_pedido);
-		$data['invoice_id'] = $id_factura;
-		
-		// Declare the $subtotal as float so it gets it in the foreach
-		settype($subtotal, "float");
-		
-		// For every detail of the order, gather the sum of the product of the prices and quantities
-		foreach ($data['order_details'] as $line) {
-			$subtotal+=$line['cantidad']*$line['precio'];
-		}
-		
-		$data['subtotal'] = $subtotal;
-		
-		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
-		
-		// Display views
-		$this->load->view('header', $data);
-		$this->load->view('facturas/detalles', $data);
-		$this->load->view('footer', $data);
-	}
 
 	public function imprimir($id)
 	{
-		$invoice = $this->orders->getInvoice($id);
+		$invoice = $this->invoices->getInvoice($id);
 
-		if (count($order) === 0) {
+		if (count($invoice) === 0) {
 			// We kill the script because usually the PDF is opened in a different tab.
 			exit('Factura no encontrada.');
 		}
@@ -274,30 +236,35 @@ class Facturas extends CI_Controller
 		
 		$this->load->model('branches'); // This is mandatory to create the PDF header
 		$this->load->model('clients'); // This model is necessary because the format has the client address
+		$this->load->model('orders'); // To get the order folio
 
-		$order['products'] = $this->orders->getOrderProducts($id);
-		$data = $this->branches->getBranch($order['id_sucursal']);
-		$clientAddress = $this->clients->getClientAddress($order['id_cliente']);
+		$invoice['products'] = $this->invoices->getInvoiceProducts($id);
+		$branch = $this->branches->getBranch($invoice['id_sucursal']);
+		$clientAddress = $this->clients->getClientAddress($invoice['id_cliente']);
+		$orderFolio = $this->orders->getOrder($invoice['id_pedido']);
+		$orderFolio = $orderFolio['prefijo'] . str_pad($orderFolio['folio'], 9, '0', STR_PAD_LEFT);
 
 		$subtotal = 0;
 
-		foreach ($order['products'] as $product) {
-			$subtotal += $product['cantidad'] * $product['precio'];
+		foreach ($invoice['products'] as $product) {
+			$subtotal += $product['cantidad'] * $product['precio_producto'];
 		}
 
-		$iva = $subtotal * $order['sucursal_iva'];
+		$iva = $subtotal * $invoice['sucursal_iva'];
 		$total = $subtotal + $iva;
 
-		$data['title'] = 'Pedido';
+		$data['title'] = 'Factura';
 		$data['branch'] = $branch;
-		$data['order'] = $order;
+		$data['folio'] = $invoice['prefijo'] . str_pad($invoice['folio'], 9, '0', STR_PAD_LEFT);
 		$data['clientAddress'] = $clientAddress;
+		$data['orderFolio'] = $orderFolio;
+		$data['invoice'] = $invoice;
 		$data['subtotal'] = $subtotal;
 		$data['iva'] = $iva;
 		$data['total'] = $total;
 
 		$html = $this->load->view('formatos/header', $data, true);
-		$html .= $this->load->view('formatos/pedido', $data, true);
+		$html .= $this->load->view('formatos/factura', $data, true);
 		$html .= $this->load->view('formatos/footer', $data, true);
 
 		createPDF($html, 'formato');
