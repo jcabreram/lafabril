@@ -221,6 +221,64 @@ class Pedidos extends CI_Controller
 		// WTH is the user doing here?
 		redirect();
 	}
+
+	public function exportar()
+	{
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// To populate the filters data
+		$this->load->model('branches');
+		$this->load->model('clients');
+		
+		$orders = $this->orders->getAll($filters);
+
+		if (!isset($filters['branch'])) {
+			$branch = 'Todos';
+		} else {
+			$branch = $this->branches->getBranch($filters['branch']);
+			$branch = $branch['nombre'];
+		}
+
+		if (!isset($filters['client'])) {
+			$client = 'Todos';
+		} else {
+			$client = $this->clients->getBranch($filters['client']);
+			$client = $client['nombre'];
+		}
+
+		if (!isset($filters['status'])) {
+			$status = 'Todos';
+		} else {
+			switch ($filters['status']) {
+				case 'A':
+					$status = 'Abierto';
+					break;
+
+				case 'C':
+					$status = 'Cerrado';
+					break;
+
+				case 'X':
+					$status = 'Cancelado';
+					break;
+			}
+		}
+
+		$data['title'] = "Reporte de Pedidos";
+		$data['orders'] = $orders;
+		$data['branch'] = $branch;
+		$data['client'] = $client;
+		$data['status'] = $status;
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes/pedidos', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
+		createPDF($html, 'reporte');
+	}
 	
 	public function registrar_detalles($id_pedido)
 	{
@@ -535,7 +593,7 @@ class Pedidos extends CI_Controller
 		$this->load->model('clients'); // This model is necessary because the format has the client address
 
 		$order['products'] = $this->orders->getOrderProducts($id);
-		$data = $this->branches->getBranch($order['id_sucursal']);
+		$branch = $this->branches->getBranch($order['id_sucursal']);
 		$clientAddress = $this->clients->getClientAddress($order['id_cliente']);
 
 		$subtotal = 0;
@@ -549,6 +607,7 @@ class Pedidos extends CI_Controller
 
 		$data['title'] = 'Pedido';
 		$data['branch'] = $branch;
+		$data['folio'] = $order['prefijo'] . str_pad($order['folio'], 9, '0', STR_PAD_LEFT);
 		$data['order'] = $order;
 		$data['clientAddress'] = $clientAddress;
 		$data['subtotal'] = $subtotal;
