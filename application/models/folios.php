@@ -1,8 +1,7 @@
 <?php
 
 class Folios extends CI_Model
-{
-	
+{	
 	public function getLastFolio($id_sucursal, $tipo_documento)
 	{
 		$id_sucursal = $this->db->escape(intval($id_sucursal));
