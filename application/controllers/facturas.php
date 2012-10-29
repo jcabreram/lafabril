@@ -269,4 +269,17 @@ class Facturas extends CI_Controller
 
 		createPDF($html, 'formato');
 	}
+	
+	
+	public function cancelar($id_factura)
+	{	
+		if($this->invoices->cancelar($id_factura)) {
+				$this->session->set_flashdata('message', 'La factura ha sido cancelada.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar cancelar la factura, intenta de nuevo.');
+			}
+		redirect("facturas");
+		
+	}
+	
 }
