@@ -9,6 +9,8 @@
 		
 		<title>La Fabril - <?php echo $title; ?></title>
 		
+		<link rel="icon" href="<?=base_url()?>resources/images/favicon.png" type="image/png">
+		
 		<!-- CSS -->
 	  
 		<!-- Reset Stylesheet -->
