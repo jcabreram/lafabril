@@ -63,7 +63,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Detalle de pedido</h3>
+		<h3>Detalle de la factura</h3>
 	</div>
 	
 	<!-- Content Box Content -->			

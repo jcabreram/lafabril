@@ -231,6 +231,10 @@ class Orders extends CI_Model
 			$sql = "INSERT INTO facturas_detalles (id_factura_detalle, id_factura, id_producto, cantidad)
 					VALUES (NULL, $invoiceId, $productId, {$productInformation['amount']})";
 			$this->db->query($sql);
+			
+			$sql = "INSERT INTO movimientos_inventario (id_documento, concepto, id_producto, cantidad, id_sucursal, fecha_mov, tipo_movimiento)
+					VALUES ($invoiceId, 'F', $productId, {$productInformation['amount']}, {$order['id_sucursal']}, '$date', 'S')";
+			$this->db->query($sql);
 
 			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = cantidad_surtida + {$productInformation['amount']} WHERE id_pedido = {$order['id_pedido']} AND id_producto = $productId";
 			$this->db->query($sql);
@@ -283,8 +287,8 @@ class Orders extends CI_Model
 
 
 		/*** REGISTER INVOICE IN ACCOUNTS RECEIVABLE ***/
-		$sql = "INSERT INTO movimientos (id_movimiento, id_cliente, id_documento, importe, fecha_documento, fecha_vencimiento, saldo, id_sucursal)
-				VALUES (NULL, {$order['id_cliente']}, $invoiceId, $total, '$date', '$dueDate', $total, {$order['id_sucursal']})";
+		$sql = "INSERT INTO movimientos (id_movimiento, id_cliente, id_documento, importe, fecha_documento, fecha_vencimiento, saldo, id_sucursal, estatus)
+				VALUES (NULL, {$order['id_cliente']}, $invoiceId, $total, '$date', '$dueDate', $total, {$order['id_sucursal']}, 'A')";
 		$this->db->query($sql);
 		/*** REGISTER INVOICE IN ACCOUNTS RECEIVABLE ***/
 

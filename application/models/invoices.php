@@ -109,4 +109,50 @@ class Invoices extends CI_Model
 		return $query->result_array();
 	}	
 	
+	public function cancelar($id_factura)
+	{	
+		$factura = $this->getInvoice($id_factura);
+		$id_pedido = $factura['id_pedido'];
+		$id_sucursal = $factura['id_sucursal'];
+	
+		$id_factura = $this->db->escape(intval($id_factura));
+		$id_pedido = $this->db->escape(intval($id_pedido));
+		$id_sucursal = $this->db->escape(intval($id_sucursal));
+		
+		$this->db->trans_start();
+		
+		$sql = "SELECT * FROM facturas_detalles WHERE id_factura = $id_factura";
+		$query = $this->db->query($sql);
+		$detalles = $query->result_array();
+		
+		foreach ($detalles as $detalle) {
+			$sql = "UPDATE pedidos_detalles
+					SET cantidad_surtida = cantidad_surtida - {$detalle['cantidad']}
+					WHERE id_producto = {$detalle['id_producto']} AND id_pedido = $id_pedido";
+			$query = $this->db->query($sql);
+			
+			$sql = "INSERT INTO movimientos_inventario (id_documento, concepto, id_producto, cantidad, id_sucursal, fecha_mov, tipo_movimiento) VALUES ($id_factura, 'F', {$detalle['id_producto']}, {$detalle['cantidad']}, $id_sucursal, NOW(), 'E')";
+			$query = $this->db->query($sql);
+		}
+		
+		$sql = "UPDATE movimientos
+				SET estatus = 'X'
+				WHERE id_documento = $id_factura";
+		$query = $this->db->query($sql);
+		
+		$sql = "UPDATE facturas
+				SET estatus = 'X'
+				WHERE id_factura = $id_factura";
+		$query = $this->db->query($sql);
+		
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
+		
+	}
+	
 }
