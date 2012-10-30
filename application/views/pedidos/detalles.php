@@ -145,17 +145,17 @@
 								<tr>
 									<?php if ($order['estatus'] != 'C') : ?>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/facturar/' . $order_id); ?>" <?php ?> target="_blank"><input class="button" type="button" value="Factura" /></a>
+										<a href="<?php echo site_url('pedidos/facturar/' . $order_id); ?>"><input class="button" type="button" value="Factura" /></a>
 									</th>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/crear_nota/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Nota de venta" /></a>
+										<a href="<?php echo site_url('pedidos/crear_nota_venta/' . $order_id); ?>"><input class="button" type="button" value="Nota de venta" /></a>
 									</th>
 									<?php endif; ?>
 									<th style="text-align:center">
 										<a href="<?php echo site_url('pedidos/imprimir/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
 									</th>
 									<th style="text-align:center">
-										<a href="<?php echo site_url('pedidos/cancelar/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
+										<a href="<?php echo site_url('pedidos/cancelar/' . $order_id); ?>"><input class="button" type="button" value="Cancelar" /></a>
 									</th>
 								</tr>
 							</tbody>

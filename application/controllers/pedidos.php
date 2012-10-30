@@ -409,11 +409,14 @@ class Pedidos extends CI_Controller
 		
 	}
 
-	public function facturar($orderId)
+	public function facturar()
 	{
-		/** IMPORTANT
-		 * Checkout what happen if $orderId is not supplied. (CRASH)
-		 */
+		$orderId = $this->uri->segment(3);
+
+		if ($orderId === false) {
+			// Send error
+			redirect();
+		}
 		
 		/*** GET ORDER AND IT'S PRODUCTS ***/
 		$order = $this->orders->getOrder($orderId);
@@ -556,25 +559,63 @@ class Pedidos extends CI_Controller
 			$data['errors']['date'] = $errors['date'][0];
 		}
 
-
-		/*** TRANSLATE ORDER STATUS ***/
-		$data['status'] = '';
-
-		switch ($order['estatus']) {
-			case 'A':
-				$data['status'] = 'Abierto';
-				break;
-
-			case 'C':
-				$data['status'] = 'Cerrado';
-				break;
-		}
-		/*** TRANSLATE ORDER STATUS ***/
-
-
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/facturar', $data);
 		$this->load->view('footer', $data);
+	}
+
+	public function crear_nota_venta()
+	{
+		/*** FETCH ORDER ID ***/
+		$orderId = $this->uri->segment(3);
+
+		if ($orderId === false) {
+			// Error: You need to give me an order id
+			redirect();
+		}
+		/*** FETCH ORDER ID ***/
+
+
+		/*** GET ORDER AND IT'S PRODUCTS ***/
+		$order = $this->orders->getOrder($orderId);
+
+		if (count($order) === 0) {
+			// Error: This order doesn't exist
+			redirect();
+		}
+
+		$order['products'] = $this->orders->getOrderProducts($orderId);
+		/*** GET ORDER AND IT'S PRODUCTS ***/
+
+		// Do stuff
+
+		/*** CALCULATE SUBTOTAL, TAX & TOTAL ***/
+		$subtotal = 0.0;
+		$taxes = 0.0;
+		$total = 0.0;
+
+		if (count($order['products']) > 0) {
+			foreach ($order['products'] as $product) {
+				$subtotal = $product['cantidad'] * $product['precio'];
+			}
+
+			$taxes = $subtotal * $order['sucursal_iva'];
+			$total = $subtotal + $taxes;
+		}
+		/*** CALCULATE SUBTOTAL, TAX & TOTAL ***/
+
+
+		$data['title'] = ' Crear Nota de Venta';
+		$data['user'] = $this->session->userdata('user');
+		$data['order'] = $order;
+		$data['subtotal'] = $subtotal;
+		$data['taxes'] = $taxes;
+		$data['total'] = $total;
+
+		$this->load->view('header', $data);
+		$this->load->view('pedidos/crear_nota_venta', $data);
+		$this->load->view('pedidos/cardForm', $data);
+		$this->load->view('footer', $data);	
 	}
 
 	public function imprimir($id)

@@ -30,7 +30,7 @@
 			<fieldset class="column-right">
 
 				<p><strong>Fecha del Pedido</strong>: <?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></p>
-				<p><strong>Estatus del Pedido</strong>: <?php echo $status; ?></p>
+				<p><strong>Estatus del Pedido</strong>: <?php echo getOrderStatusName($order['estatus']); ?></p>
 				<?php if ($order['estatus'] === 'A') : ?>
 				<p><strong>Fecha de la Factura</strong>: <input type="text" name="invoiceDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" />
 					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?></p>
@@ -51,12 +51,12 @@
 				<thead>
 					<tr>
 						<th>Producto</th>
-						<th class="textAlign-right">Precio</th>
 						<th>Cantidad Ordenada</th>
 						<th>Cantidad Surtida</th>
 						<?php if ($order['estatus'] === 'A') : ?>
 						<th>Cantidad Deseada</th>
 						<?php endif; ?>
+						<th class="textAlign-right">Precio</th>
 					</tr>
 				</thead>
 
@@ -64,17 +64,17 @@
 				<?php foreach ($order['products'] as $product) : ?>
 					<tr>
 						<td><?php echo $product['nombre']; ?></td>
-						<td class="textAlign-right productPrice">$<?php echo number_format($product['precio'], 2, '.', ','); ?></td>
-						<td class="maximumAmount"><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?></td>
-						<td><?php echo $product['cantidad_surtida']; ?> <?php echo $product['udm']; ?></td>
+						<td><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?><input type="hidden" value="<?php echo $product['cantidad']; ?>" class="amountOrdered" /></td>
+						<td><?php echo $product['cantidad_surtida']; ?> <?php echo $product['udm']; ?><input type="hidden" value="<?php echo $product['cantidad_surtida']; ?>" class="amountDelivered" /></td>
 						<?php if ($order['estatus'] === 'A') : ?>
-						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input small-input amountOrdered" value="<?php echo isset($_POST['products'][$product['id_producto']]) ? $_POST['products'][$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
+						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input fixed-small-input userAmount" value="<?php echo isset($_POST['products'][$product['id_producto']]) ? $_POST['products'][$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
 							<?php echo $product['udm']; ?>
 							<?php if (isset($errors['products'][$product['id_producto']])) : ?>
 							<span class="input-notification error png_bg"><?php echo $errors['products'][$product['id_producto']]; ?></span>
 							<?php endif; ?>
 						</td>
 						<?php endif; ?>
+						<td class="textAlign-right">$<?php echo getMoneyFormat($product['precio']); ?><input type="hidden" value="<?php echo $product['precio']; ?>" class="productPrice" /></td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
@@ -86,15 +86,15 @@
 						<td></td>
 						<td></td>
 						<td class="textAlign-right"><strong>Subtotal</strong>:</td>
-						<td id="invoiceSubtotal"></td>
+						<td class="textAlign-right invoiceSubtotal"></td>
 					</tr>
 
 					<tr>
 						<td></td>
 						<td></td>
 						<td></td>
-						<td class="textAlign-right"><strong>IVA (<?php echo $order['sucursal_iva'] * 100; ?>%)</strong>:</td>
-						<td id="invoiceTax"></td>
+						<td class="textAlign-right"><input type="hidden" value="<?php echo $order['sucursal_iva']; ?>" class="invoiceVAT" /><strong>IVA (<?php echo $order['sucursal_iva'] * 100; ?>%)</strong>:</td>
+						<td class="textAlign-right invoiceTax"></td>
 					</tr>
 
 					<tr>
@@ -102,7 +102,7 @@
 						<td></td>
 						<td></td>
 						<td class="textAlign-right"><strong>Total</strong>:</td>
-						<td id="invoiceTotal"></td>
+						<td class="textAlign-right invoiceTotal"></td>
 					</tr>
 				</tfoot>
 				<?php endif; ?>
