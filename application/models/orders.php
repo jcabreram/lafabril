@@ -236,7 +236,7 @@ class Orders extends CI_Model
 					VALUES ($invoiceId, 'F', $productId, {$productInformation['amount']}, {$order['id_sucursal']}, '$date', 'S')";
 			$this->db->query($sql);
 
-			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = {$productInformation['amount']} WHERE id_pedido = {$order['id_pedido']} AND id_producto = $productId";
+			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = cantidad_surtida + {$productInformation['amount']} WHERE id_pedido = {$order['id_pedido']} AND id_producto = $productId";
 			$this->db->query($sql);
 
 			$total += $productInformation['amount'] * $productInformation['price'];

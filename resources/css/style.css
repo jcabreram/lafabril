@@ -500,6 +500,11 @@ form .wysiwyg {
                 border: 1px solid #d5d5d5;
 				color: #333;
                 }
+
+form .fixed-small-input {
+                width: 60px !important;
+                text-align: right;
+                }
             
 form .small-input {
                 width: 25% !important;
