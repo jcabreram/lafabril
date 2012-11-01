@@ -136,7 +136,7 @@ class Invoices extends CI_Model
 		}
 		
 		$sql = "UPDATE movimientos
-				SET estatus = 'X'
+				SET estatus = 'X', saldo = 0
 				WHERE id_documento = $id_factura";
 		$query = $this->db->query($sql);
 		

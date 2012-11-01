@@ -75,7 +75,8 @@
 			<thead>
 				<tr>
 				   <th>Producto</th>
-				   <th>Cantidad</th>
+				   <th>Cantidad pedida</th>
+				   <th>Cantidad surtida</th>
 				   <th style="text-align:right">Precio unitario</th>
 				   <th style="text-align:right">Importe</th>
 				</tr>
@@ -86,6 +87,7 @@
 				<tr>
 					<td><?php echo $orderData['nombre']; ?></td>
 					<td><?php echo $orderData['cantidad'].' '.$orderData['udm']; ?></td>
+					<td><?php echo $orderData['cantidad_surtida'].' '.$orderData['udm']; ?></td>
 					<td style="text-align:right">$<?php echo number_format($orderData['precio'], 2, '.', ','); ?></td>
 					<td style="text-align:right">$<?php echo number_format($orderData['cantidad']*$orderData['precio'], 2, '.', ',');?></td>
 				</tr>
@@ -96,9 +98,11 @@
 				<td></td>
 				<td></td>
 				<td></td>
+				<td></td>
 			</tr>
 			
 			<tr>
+				<td></td>
 				<td></td>
 				<td></td>
 				<td style="text-align:right"><b>Subtotal:</b></td>
@@ -108,12 +112,14 @@
 			<tr>
 				<td></td>
 				<td></td>
+				<td></td>
 				<td style="text-align:right"><b>IVA (<?php echo $order['sucursal_iva']*100; ?>%)</b></td>
 				<td style="text-align:right">$<?php echo number_format($order['sucursal_iva']*$subtotal, 2, '.', ','); ?></td>
 			</tr>
 			
 			<tr>
 				<td></td>
+				<td></td>	
 				<td></td>
 				<td style="text-align:right"><b>Total:</b></td>
 				<td style="text-align:right">$<?php echo number_format($total, 2, '.', ','); ?></td>
