@@ -18,6 +18,9 @@
 	  
 		<!-- Main Stylesheet -->
 		<link rel="stylesheet" href="<?php echo base_url();?>resources/css/style.css" type="text/css" media="screen" />
+
+		<!-- Facebox Stylesheet -->
+		<link rel="stylesheet" href="<?php echo base_url();?>resources/css/facebox.css" type="text/css" media="screen" />
 		
 		<!-- Invalid Stylesheet. This makes stuff look pretty. Remove it if you want the CSS completely valid -->
 		<link rel="stylesheet" href="<?php echo base_url();?>resources/css/invalid.css" type="text/css" media="screen" />	
@@ -44,6 +47,9 @@
   
 		<!-- jQuery -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery-1.8.1.min.js"></script>
+
+		<!-- jQuery UI -->
+		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery-ui-1.9.0.custom.js"></script>	
 		
 		<!-- jQuery Configuration -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/simpla.jquery.configuration.js"></script>
@@ -54,14 +60,11 @@
 		<!-- jQuery WYSIWYG Plugin -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery.wysiwyg.js"></script>
 
+		<!-- Custom Functions -->
+		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/functions.js"></script>
+
 		<!-- Custom Scripts -->
 		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/functionality.js"></script>
-		
-		<!-- jQuery UI -->
-		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/jquery-ui-1.9.0.custom.js"></script>
-
-		<!-- Custom behavior -->
-		<script type="text/javascript" src="<?php echo base_url();?>resources/scripts/controller.js"></script>		
 		
 		
 		<!-- Internet Explorer .png-fix -->
