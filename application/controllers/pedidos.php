@@ -414,7 +414,7 @@ class Pedidos extends CI_Controller
 		$orderId = $this->uri->segment(3);
 
 		if ($orderId === false) {
-			// Send error
+			// We don't have an order id
 			redirect();
 		}
 		
@@ -422,12 +422,18 @@ class Pedidos extends CI_Controller
 		$order = $this->orders->getOrder($orderId);
 
 		if (count($order) === 0) {
-			// What were you doing here?
+			// The order doesn't exist
 			redirect();
 		}
 
 		$order['products'] = $this->orders->getOrderProducts($orderId);
 		/*** GET ORDER AND IT'S PRODUCTS ***/
+
+
+		// If the order is not open...
+		if ($order['estatus'] !== 'A') {
+			redirect();
+		}
 
 		
 		/*** VALIDATION ***/
@@ -566,6 +572,7 @@ class Pedidos extends CI_Controller
 
 	public function crear_nota_venta()
 	{
+		if($_POST){exit(var_dump($_POST));}
 		/*** FETCH ORDER ID ***/
 		$orderId = $this->uri->segment(3);
 
@@ -615,6 +622,7 @@ class Pedidos extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/crear_nota_venta', $data);
 		$this->load->view('pedidos/cardForm', $data);
+		$this->load->view('pedidos/checkForm', $data);
 		$this->load->view('footer', $data);	
 	}
 

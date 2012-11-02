@@ -1,12 +1,12 @@
-<div id="ingresar_tarjeta" style="display: none">
+<div id="ingresar_cheque" style="display: none">
 
-	<h3>Información de la Tarjeta</h3>
+	<h3>Información del Cheque</h3>
 
 	<form action="<?php echo site_url('pedidos/crear_nota_venta/' . $order['id_pedido']); ?>" method="post">
 
 		<p>
 			<label>Banco *</label>
-			<select name="cardBank">
+			<select name="checkBank">
 				<option value="">Escoge una opción</option>
 				<option value="banamex">Banamex</option>
 				<option value="bbv">BBV</option>
@@ -17,18 +17,18 @@
 		</p>
 
 		<p>
-			<label>Número de Tarjeta *</label>
-			<input type="text" name="cardNumber" class="text-input medium-input" />
+			<label>Número de Cheque *</label>
+			<input type="text" name="checkNumber" class="text-input medium-input" />
 		</p>
 
 		<p>
 			<label>Cantidad *</label>
-			<input type="text" name="cardPaymentAmount" class="text-input medium-input" />
+			<input type="text" name="checkPaymentAmount" class="text-input medium-input" />
 		</p>
 
 		<p>
-			<input class="button addCard" type="button" value="Agregar" />
+			<input class="button addCheck" type="button" value="Agregar" />
 		</p>
 	</form>
 
-</div> <!-- End #ingresar_tarjeta -->
+</div> <!-- End #ingresar_cheque -->

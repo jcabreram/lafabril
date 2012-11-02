@@ -88,7 +88,7 @@
 						<td></td>
 						<td></td>
 						<td class="textAlign-right"><strong>Total</strong>:</td>
-						<td class="textAlign-right">$<?php echo getMoneyFormat($total); ?></td>
+						<td class="textAlign-right"><input type="hidden" name="billTotal" value="<?php echo $total; ?>" />$<?php echo getMoneyFormat($total); ?></td>
 					</tr>
 
 					<tr>
@@ -98,18 +98,31 @@
 						<td class="textAlign-right">$ <input type="text" name="cash" class="text-input fixed-small-input" /></td>
 					</tr>
 
+					<tr class="paymentMethod">
+						<td></td>
+						<td></td>
+						<td class="textAlign-right"><strong>Otro Método</strong>:</td>
+						<td class="textAlign-right">
+							<select name="paymentMethod">
+								<option value="">Escoge una opción</option>
+								<option value="card">Tarjeta</option>
+								<option value="check">Cheque</option>
+							</select>
+						</td>
+					</tr>
+
 					<tr>
 						<td></td>
 						<td></td>
-						<td class="textAlign-right"><strong>Tarjeta</strong>:</td>
-						<td class="textAlign-right"><a href="#ingresar_tarjeta" rel="modal" title="Pagar con tarjeta">Agregar tarjeta</a></td>
+						<td class="textAlign-right"><strong>Saldo</strong>:</td>
+						<td class="textAlign-right billBalance"></td>
 					</tr>
 
 					<tr>
 						<td></td>
 						<td></td>
 						<td class="textAlign-right"><strong>Cambio</strong>:</td>
-						<td class="textAlign-right">$0</td>
+						<td class="textAlign-right billChange"></td>
 					</tr>
 				</tfoot>
 				<?php endif; ?>
