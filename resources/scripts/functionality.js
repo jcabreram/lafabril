@@ -1,5 +1,5 @@
 $(function() {
-	getMoneyFormat(1234.1);
+	deletePayment();
 
 	$("#fecha, #fecha2").datepicker({
 		dateFormat:'yy-mm-dd'
@@ -154,8 +154,15 @@ $(function() {
 		tr.append('<td></td>');
 		tr.append('<td></td>');
 		tr.append('<td class="textAlign-right"><strong>Tarjeta ' + bankName + ' ***' + cardLast4Digits + '</strong>:</td>');
-		tr.append('<td class="textAlign-right"><input type="hidden" name="cards['+bank.val()+']['+cardNumberVal+']" value="'+cardPaymentAmount.val()+'" /> $ '+getMoneyFormat(parseFloat(cardPaymentAmount.val()))+'</td>');
+		tr.append('<td class="textAlign-right"></td>');
+		var lastTd = tr.find('td').last();
+		lastTd.append('<a href="#" title="Eliminar Tarjeta">Eliminar</a>');
+		lastTd.append('<input type="hidden" name="cards['+bank.val()+']['+cardNumberVal+']" value="'+cardPaymentAmount.val()+'" />');
+		lastTd.append(' $' + getMoneyFormat(parseFloat(cardPaymentAmount.val())));
 		$('.paymentMethod').last().before(tr);
+
+		// Add click event to delete link
+		lastTd.find('a').first().click(deletePayment);
 
 		// We deactivate the cash input
 		$('input[name="cash"]').attr('readonly', 'readonly');
@@ -227,8 +234,15 @@ $(function() {
 		tr.append('<td></td>');
 		tr.append('<td></td>');
 		tr.append('<td class="textAlign-right"><strong>Cheque ' + bankName + ' ***' + checkLast4Digits + '</strong>:</td>');
-		tr.append('<td class="textAlign-right"><input type="hidden" name="checks['+bank.val()+']['+checkNumberVal+']" value="'+checkPaymentAmount.val()+'" /> $ '+getMoneyFormat(parseFloat(checkPaymentAmount.val()))+'</td>');
+		tr.append('<td class="textAlign-right"></td>');
+		var lastTd = tr.find('td').last();
+		lastTd.append('<a href="#" title="Eliminar Cheque">Eliminar</a>');
+		lastTd.append('<input type="hidden" name="checks['+bank.val()+']['+checkNumberVal+']" value="'+checkPaymentAmount.val()+'" />');
+		lastTd.append(' $' + getMoneyFormat(parseFloat(checkPaymentAmount.val())));
 		$('.paymentMethod').last().before(tr);
+
+		// Add click event to delete link
+		lastTd.find('a').first().click(deletePayment);
 
 		// We deactivate the cash input
 		$('input[name="cash"]').attr('readonly', 'readonly');
@@ -253,57 +267,5 @@ $(function() {
 
 	// We watch the input for a change
 	$('input[name="cash"]').bind('input', calculateBillBalance);
-
-	function calculateBillBalance()
-	{
-		var total = parseFloat($('input[name="billTotal"]').val()),
-			cash = $('input[name="cash"]').val(),
-			cash = isNaN(cash) || cash === '' ? 0 : parseFloat(cash);
-
-		if (cash < 0) {
-			cash = 0;
-		}
-
-
-		/*** PAID WITH CARDS ***/
-		var paidWithCards = 0.0,
-			cards = $('input[name^="cards"]');
-
-		cards.each(function(){
-			paidWithCards += parseFloat($(this).val()); 
-		})
-		/*** PAID WITH CARDS ***/
-
-
-		/*** PAID WITH CHECKS ***/
-		var paidWithChecks = 0.0,
-			cards = $('input[name^="checks"]');
-
-		cards.each(function(){
-			paidWithChecks += parseFloat($(this).val()); 
-		})
-		/*** PAID WITH CHECKS ***/
-
-
-		var paid = cash + paidWithCards + paidWithChecks,
-			balance = total - paid,
-			change = 0.0;
-
-		if (balance < 0) {
-			change = balance * -1;
-			balance = 0;
-		}
-
-		var billBalance = $('.billBalance'),
-			billChange = $('.billChange');
-
-		billBalance.first().empty()
-		.append('<input type="hidden" name="billBalance" value="'+balance+'" />')
-		.append('$' + getMoneyFormat(balance));
-
-		billChange.first().empty()
-		.append('<input type="hidden" name="billChange" value="'+change+'" />')
-		.append('$' + getMoneyFormat(change));
-	}
 	/*** CALCULATE BILL BALANCE ***/
 });
