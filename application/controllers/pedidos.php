@@ -571,8 +571,7 @@ class Pedidos extends CI_Controller
 	}
 
 	public function crear_nota_venta()
-	{
-		if($_POST){exit(var_dump($_POST));}
+	{ if($_POST) { exit(var_dump($_POST)); }
 		/*** FETCH ORDER ID ***/
 		$orderId = $this->uri->segment(3);
 
@@ -594,7 +593,12 @@ class Pedidos extends CI_Controller
 		$order['products'] = $this->orders->getOrderProducts($orderId);
 		/*** GET ORDER AND IT'S PRODUCTS ***/
 
-		// Do stuff
+
+		// If the order is not open...
+		if ($order['estatus'] !== 'A') {
+			redirect();
+		}
+
 
 		/*** CALCULATE SUBTOTAL, TAX & TOTAL ***/
 		$subtotal = 0.0;
@@ -610,6 +614,87 @@ class Pedidos extends CI_Controller
 			$total = $subtotal + $taxes;
 		}
 		/*** CALCULATE SUBTOTAL, TAX & TOTAL ***/
+
+
+		/*** VALIDATE PAYMENT ***/
+		if ($_POST) {
+			$errors = array();
+			$billDate = isset($_POST['billDate']) ? $_POST['billDate'] : false;
+			$cash = isset($_POST['cash']) ? $_POST['cash'] : false;
+			$cards = isset($_POST['cards']) && is_array($_POST['cards']) ? $_POST['cards'] : array();
+			$checks = isset($_POST['checks']) && is_array($_POST['checks']) ? $_POST['checks'] : array();
+
+			/*** TEMPORARY SOLUTION ***/
+			$payments = array('cash' => $cash, 'cards' => $cards, 'checks' => $checks);
+			/*** TEMPORARY SOLUTION ***/
+
+			// Bill date or cash don't exist?
+			if ($billDate === false || $cash === false) {
+				exit('Bill date and cash are default inputs.');
+				redirect();
+			}
+
+
+			/*** VALIDATE BILL DATE ***/
+			if (count(explode('/', $billDate)) === 3) {
+				// Change date to a more managable format
+				$billDate = explode('/', $billDate);
+				$billDate = $billDate['1'] . '/' . $billDate['0'] . '/' . $billDate['2'];
+
+				$timestamp = strtotime($billDate);
+				$day = date('d', $timestamp);
+				$month = date('m', $timestamp);
+				$year = date('Y', $timestamp);
+				
+				if (!checkdate($month, $day, $year)) {
+					$errors['date'][] = 'Fecha inválida.';
+				}
+
+				if ($timestamp < strtotime($order['fecha_pedido'])) {
+					$errors['date'][] = 'La fecha de la factura debe ser posterior a la del pedido.';
+				}
+
+				// If everything goes ok
+				$billDate = date('Y-m-d', $timestamp);
+			} else {
+				// Is there no date?
+				exit('Invalid date?');
+				redirect();
+			}
+			/*** VALIDATE BILL DATE ***/
+
+
+			/*** VALIDATE CASH ***/
+			/*** VALIDATE CASH ***/
+
+
+			/*** VALIDATE CARDS ***/
+			/*** VALIDATE CARDS ***/
+
+
+			/*** VALIDATE CHECKS ***/
+			/*** VALIDATE CHECKS ***/
+
+
+			/*** VALIDATE OVERALL PAYMENT ***/
+			/*** VALIDATE OVERALL PAYMENT ***/
+		}
+		/*** VALIDATE PAYMENT ***/
+
+
+		/*** SAVE BILL ***/
+		if ($_POST && count($errors) === 0) {
+			// We need his data for damage control
+			$user = $this->session->userdata('user');
+
+			if ($this->bills->register($order, $billDate, $payments, $user['id'])) {
+				$this->session->set_flashdata('message', 'El pedido ha sido facturado.');
+				redirect('pedidos');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar facturar el pedido, intenta de nuevo.');
+			}
+		}
+		/*** SAVE BILL ***/
 
 
 		$data['title'] = ' Crear Nota de Venta';
