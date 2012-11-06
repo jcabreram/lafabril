@@ -114,9 +114,9 @@ class Bills extends CI_Model
 		$bank = '';
 
 		if (count($checks) > 0) {
-			foreach ($cheks as $checkBank => $checkInformation) {
+			foreach ($checks as $checkBank => $checkInformation) {
 				foreach ($checkInformation as $checkNumber => $paymentAmount) {
-					$sql = "INSERT INTO pagos_nota (id, nota_id, pago_tipo, cantidad)
+					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
 							VALUES (NULL, $billId, 2, $paymentAmount)";
 					$this->db->query($sql);
 

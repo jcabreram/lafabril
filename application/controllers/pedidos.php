@@ -690,10 +690,10 @@ class Pedidos extends CI_Controller
 			$user = $this->session->userdata('user');
 
 			if ($this->bills->register($order, $billDate, $payments, $user['id'])) {
-				$this->session->set_flashdata('message', 'El pedido ha sido facturado.');
+				$this->session->set_flashdata('message', 'La nota ha sido creada.');
 				redirect('pedidos');
 			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar facturar el pedido, intenta de nuevo.');
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar crear la nota, intenta de nuevo.');
 			}
 		}
 		/*** SAVE BILL ***/

@@ -70,7 +70,7 @@ class Facturas extends CI_Controller
 		$this->load->model('branches');
 		$this->load->model('clients');
 
-		// Get the array with the clients in the database
+		// Get the array with the invoices in the database
 		$data['invoicesData'] = $this->invoices->getAll($filters);
 
 		$data['title'] = "Facturas";
