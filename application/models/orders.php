@@ -53,15 +53,39 @@ class Orders extends CI_Model
 		}
 	}
 	
-	public function addLine ($id_pedido, $id_producto, $id_cantidad, $precio) {
+	public function addLine ($id_pedido, $id_producto, $cantidad, $precio) {
 		$id_pedido = $this->db->escape(intval($id_pedido));
 		$id_producto = $this->db->escape(intval($id_producto));
 		$precio = $this->db->escape($precio);
 		
-		$sql = "INSERT INTO pedidos_detalles (id_pedido_detalle, id_pedido, id_producto, cantidad, precio, cantidad_surtida)
-				VALUES (NULL, $id_pedido, $id_producto, $id_cantidad, $precio, 0)";
+		$this->db->trans_start();
 		
-		return $this->db->query($sql);
+		$sql = "SELECT * FROM pedidos_detalles WHERE id_pedido = $id_pedido AND id_producto = $id_producto";
+		$query = $this->db->query($sql);
+		
+		if ($query->num_rows() > 0) {
+			$sql = "UPDATE pedidos_detalles SET cantidad = cantidad + $cantidad WHERE id_pedido = $id_pedido AND id_producto = $id_producto";
+			$this->db->query($sql);	
+			
+		} else {
+			$sql = "INSERT INTO pedidos_detalles (id_pedido_detalle, id_pedido, id_producto, cantidad, precio, cantidad_surtida)
+				VALUES (NULL, $id_pedido, $id_producto, $cantidad, $precio, 0)";
+			$this->db->query($sql);	
+		}
+		
+		$sql = "UPDATE pedidos SET estatus = 'A' WHERE id_pedido = $id_pedido";
+		$this->db->query($sql);	
+		
+		/*** TRANSACTION FINISHES ***/
+		$this->db->trans_complete();
+		/*** TRANSACTION FINISHES ***/
+
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
 	}
 	
 	public function getAll($filters = false)
