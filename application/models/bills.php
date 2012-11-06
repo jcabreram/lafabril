@@ -2,8 +2,9 @@
 
 class Bills extends CI_Model
 {
-	public function register($order, $date, $payment, $userId)
+	public function register($order, $date, $payments, $userId)
 	{
+		$this->load->model('orders');
 		$this->load->model('folios');
 		$this->load->model('clients');
 
@@ -64,7 +65,7 @@ class Bills extends CI_Model
 
 		/*** CLOSE ORDER IF NECESSARY ***/
 		$closeOrder = true;
-		$orderProducts = $this->getOrderProducts($order['id_pedido']);
+		$orderProducts = $this->orders->getOrderProducts($order['id_pedido']);
 
 		foreach ($orderProducts as $product) {
 			if ($product['cantidad'] !== $product['cantidad_surtida']) {
@@ -84,7 +85,7 @@ class Bills extends CI_Model
 		$cash = $payments['cash'] === '' ? 0 : $payments['cash'];
 
 		if ($cash > 0) {
-			$sql = "INSERT INTO pagos_nota (id, nota_id, pago_tipo, cantidad)
+			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
 					VALUES (NULL, $billId, 1, $cash)";
 			$this->db->query($sql);
 		}
@@ -95,7 +96,7 @@ class Bills extends CI_Model
 		if (count($cards) > 0) {
 			foreach ($cards as $cardBank => $cardInformation) {
 				foreach ($cardInformation as $cardNumber => $paymentAmount) {
-					$sql = "INSERT INTO pagos_nota (id, nota_id, pago_tipo, cantidad)
+					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
 							VALUES (NULL, $billId, 2, $paymentAmount)";
 					$this->db->query($sql);
 

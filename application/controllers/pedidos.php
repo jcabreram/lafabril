@@ -571,7 +571,7 @@ class Pedidos extends CI_Controller
 	}
 
 	public function crear_nota_venta()
-	{ if($_POST) { exit(var_dump($_POST)); }
+	{
 		/*** FETCH ORDER ID ***/
 		$orderId = $this->uri->segment(3);
 
@@ -684,6 +684,8 @@ class Pedidos extends CI_Controller
 
 		/*** SAVE BILL ***/
 		if ($_POST && count($errors) === 0) {
+			$this->load->model('bills');
+
 			// We need his data for damage control
 			$user = $this->session->userdata('user');
 
