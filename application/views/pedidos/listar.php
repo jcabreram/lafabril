@@ -61,6 +61,7 @@
 			
 			<tbody>
 			<?php foreach ($ordersData as $orderData) : ?>
+				<?php if ($orderData['estatus'] != 'P'): ?>
 				<tr>
 					<td><a href="<?php echo site_url("pedidos/detalles/{$orderData['id_pedido']}"); ?>" ><?php echo $orderData['prefijo'].str_pad($orderData['folio'], 9, "0", STR_PAD_LEFT); ?></a></td>
 					<td><?php echo $orderData['nombre_sucursal']; ?></td>
@@ -69,6 +70,7 @@
 					<td><?php echo strftime('%d/%b/%Y',strtotime($orderData['fecha_pedido'])); ?></td>
 					<td class="textAlign-center"><?php echo $orderData['estatus']; ?></td>
 				</tr>
+				<?php endif; ?>
 			<?php endforeach; ?>
 			</tbody>
 
