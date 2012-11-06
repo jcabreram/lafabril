@@ -85,7 +85,7 @@
 						<td></td>
 						<td></td>
 						<td class="textAlign-right"><strong>Total</strong>:</td>
-						<td class="textAlign-right"><input type="hidden" name="billTotal" value="<?php echo $total; ?>" />$<?php echo getMoneyFormat($total); ?></td>
+						<td class="textAlign-right"><input type="hidden" name="billTotal" value="<?php echo round($total, 2); ?>" />$<?php echo getMoneyFormat($total); ?></td>
 					</tr>
 
 					<tr>

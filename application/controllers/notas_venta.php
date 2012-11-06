@@ -32,21 +32,28 @@ class Notas_venta extends CI_Controller
 		// We need it to populate the filter form
 		$this->load->helper('form');
 
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
 		// To populate the filter form
 		$this->load->model('branches');
 		$this->load->model('clients');
 		
-		$data['billsData'] = $this->bills->getAll();
+		// Get the array with the bills in the database
+		$data['billsData'] = $this->bills->getAll($filters);
 
 		$data['title'] = "Notas de venta";
 		$data['user'] = $this->session->userdata('user');
 		$data['branches'] = $this->branches->getAll(array('status' => '1')); // Active branches
 		$data['clients'] = $this->clients->getAll(array('status' => '1')); // Active clients
+		$data['filters'] = $filters;
 		
 
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('notas_venta/listar', $data);
+		$this->load->view('facturas/filterForm', $data);
 		$this->load->view('footer', $data);
 	}
 	
