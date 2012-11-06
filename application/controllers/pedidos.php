@@ -74,7 +74,7 @@ class Pedidos extends CI_Controller
 		if ($this->form_validation->run()) {
 			$usuario = $this->session->userdata('user');
 			$usuario_captura = $usuario['id'];
-			if($id_pedido = $this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], 'A', $usuario_captura)) {
+			if($id_pedido = $this->orders->register($_POST['branch'], $_POST['salesman'], $_POST['client'], $_POST['fecha_pedido'], $_POST['fecha_entrega'], 'P', $usuario_captura)) {
 				redirect("pedidos/registrar_detalles/$id_pedido");
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pedido, intenta de nuevo.');
