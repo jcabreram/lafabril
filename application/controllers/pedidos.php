@@ -624,6 +624,10 @@ class Pedidos extends CI_Controller
 			$cards = isset($_POST['cards']) && is_array($_POST['cards']) ? $_POST['cards'] : array();
 			$checks = isset($_POST['checks']) && is_array($_POST['checks']) ? $_POST['checks'] : array();
 
+			/*** TEMPORARY SOLUTION ***/
+			$payments = array('cash' => $cash, 'cards' => $cards, 'checks' => $checks);
+			/*** TEMPORARY SOLUTION ***/
+
 			// Bill date or cash don't exist?
 			if ($billDate === false || $cash === false) {
 				exit('Bill date and cash are default inputs.');
@@ -649,6 +653,9 @@ class Pedidos extends CI_Controller
 				if ($timestamp < strtotime($order['fecha_pedido'])) {
 					$errors['date'][] = 'La fecha de la factura debe ser posterior a la del pedido.';
 				}
+
+				// If everything goes ok
+				$billDate = date('Y-m-d', $timestamp);
 			} else {
 				// Is there no date?
 				exit('Invalid date?');
@@ -677,7 +684,15 @@ class Pedidos extends CI_Controller
 
 		/*** SAVE BILL ***/
 		if ($_POST && count($errors) === 0) {
-			if ($this->)
+			// We need his data for damage control
+			$user = $this->session->userdata('user');
+
+			if ($this->bills->register($order, $billDate, $payments, $user['id'])) {
+				$this->session->set_flashdata('message', 'El pedido ha sido facturado.');
+				redirect('pedidos');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar facturar el pedido, intenta de nuevo.');
+			}
 		}
 		/*** SAVE BILL ***/
 

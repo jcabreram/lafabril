@@ -2,6 +2,145 @@
 
 class Bills extends CI_Model
 {
+	public function register($order, $date, $payment, $userId)
+	{
+		$this->load->model('folios');
+		$this->load->model('clients');
+
+
+		/*** TRANSACTION STARTS ***/
+		$this->db->trans_start();
+		/*** TRANSACTION STARTS ***/
+
+
+		/*** INSERT BILL HEADER ***/
+		$sql = "INSERT INTO notas_venta (id_nota_venta, id_pedido, fecha, estatus, iva, id_sucursal, fecha_captura, usuario_captura)
+				VALUES (NULL, {$order['id_pedido']}, '$date', 'A', {$order['sucursal_iva']}, {$order['id_sucursal']}, NOW(), $userId)";
+		$this->db->query($sql);
+		/*** INSERT BILL HEADER ***/
+
+
+		$billId = $this->db->insert_id();
+
+
+		/*** INSERT BILL PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
+		$total = 0.0;
+
+		foreach ($order['products'] as $product) {
+			$sql = "INSERT INTO notas_venta_detalles (id_nota_venta_detalle, id_nota_venta, id_producto, cantidad)
+					VALUES (NULL, $billId, {$product['id_producto']}, {$product['cantidad']})";
+			$this->db->query($sql);
+			
+			$sql = "INSERT INTO movimientos_inventario (id_documento, concepto, id_producto, cantidad, id_sucursal, fecha_mov, tipo_movimiento)
+					VALUES ($billId, 'N', {$product['id_producto']}, {$product['cantidad']}, {$order['id_sucursal']}, '$date', 'S')";
+			$this->db->query($sql);
+
+			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = cantidad_surtida + {$product['cantidad']} WHERE id_pedido = {$order['id_pedido']} AND id_producto = {$product['id_producto']}";
+			$this->db->query($sql);
+
+			$total += $product['cantidad'] * $product['precio'];
+		}
+		/*** INSERT BILL PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
+
+
+		/*** GET LAST FOLIO NUMBER ***/
+		$folioInformation = $this->folios->getLastFolio($order['id_sucursal'], 'N');
+		$currentFolio = intval($folioInformation['ultimo_folio']) + 1;
+		/*** GET LAST FOLIO NUMBER ***/
+
+
+		/*** INSERT NEW FOLIO FOR INVOICE ***/
+		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+				VALUES (NULL, $billId, {$order['id_sucursal']}, 'N', $currentFolio)";
+		$this->db->query($sql);
+		/*** INSERT NEW FOLIO FOR INVOICE ***/
+
+
+		/*** UPDATE LAST FOLIO INFORMATION ***/
+		$sql = "UPDATE folios_prefijo SET ultimo_folio = $currentFolio WHERE tipo_documento = 'N' AND id_sucursal = {$order['id_sucursal']}";
+		$this->db->query($sql);
+		/*** UPDATE LAST FOLIO INFORMATION ***/
+
+
+		/*** CLOSE ORDER IF NECESSARY ***/
+		$closeOrder = true;
+		$orderProducts = $this->getOrderProducts($order['id_pedido']);
+
+		foreach ($orderProducts as $product) {
+			if ($product['cantidad'] !== $product['cantidad_surtida']) {
+				$closeOrder = false;
+				break;
+			}
+		}
+
+		if ($closeOrder === true) {
+			$sql = 'UPDATE pedidos SET estatus = "C" WHERE id_pedido = ' . $order['id_pedido'];
+			$this->db->query($sql);
+		}
+		/*** CLOSE ORDER IF NECESSARY ***/
+
+
+		/*** REGISTER PAYMENTS ***/
+		$cash = $payments['cash'] === '' ? 0 : $payments['cash'];
+
+		if ($cash > 0) {
+			$sql = "INSERT INTO pagos_nota (id, nota_id, pago_tipo, cantidad)
+					VALUES (NULL, $billId, 1, $cash)";
+			$this->db->query($sql);
+		}
+
+		$cards = $payments['cards'];
+		$bank = '';
+
+		if (count($cards) > 0) {
+			foreach ($cards as $cardBank => $cardInformation) {
+				foreach ($cardInformation as $cardNumber => $paymentAmount) {
+					$sql = "INSERT INTO pagos_nota (id, nota_id, pago_tipo, cantidad)
+							VALUES (NULL, $billId, 2, $paymentAmount)";
+					$this->db->query($sql);
+
+					$paymentId = $this->db->insert_id();
+					$cardNumberLast4Digits = substr($cardNumber, strlen($cardNumber) - 4, 4);
+
+					$sql = "INSERT INTO pagos_tarjeta (id, tipo_documento, id_pago, banco, numero_tarjeta)
+							VALUES (NULL, 'N', $paymentId, '$cardBank', '$cardNumberLast4Digits')";
+					$this->db->query($sql);
+				}
+			}
+		}
+
+		$checks = $payments['checks'];
+		$bank = '';
+
+		if (count($checks) > 0) {
+			foreach ($cheks as $checkBank => $checkInformation) {
+				foreach ($checkInformation as $checkNumber => $paymentAmount) {
+					$sql = "INSERT INTO pagos_nota (id, nota_id, pago_tipo, cantidad)
+							VALUES (NULL, $billId, 2, $paymentAmount)";
+					$this->db->query($sql);
+
+					$paymentId = $this->db->insert_id();
+
+					$sql = "INSERT INTO pagos_tarjeta (id, tipo_documento, id_pago, banco, numero_tarjeta)
+							VALUES (NULL, 'N', $paymentId, '$checkBank', '$checkNumber')";
+					$this->db->query($sql);
+				}
+			}
+		}
+		/*** REGISTER PAYMENTS ***/
+
+
+		/*** TRANSACTION FINISHES ***/
+		$this->db->trans_complete();
+		/*** TRANSACTION FINISHES ***/
+
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
+	}
 	
 	public function getAll()
 	{
