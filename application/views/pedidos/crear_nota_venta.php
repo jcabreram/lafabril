@@ -17,7 +17,7 @@
 		</div>
 		<?php endif; ?>
 
-		<form action="<?php echo site_url('pedidos/crear_nota_venta/' . $order['id_pedido']); ?>" method="post">
+		<form action="<?php echo site_url('pedidos/crear_nota_venta/' . $order['id_pedido']); ?>" method="post" id="payBill">
 
 			<fieldset class="column-left">
 
@@ -31,10 +31,8 @@
 
 				<p><strong>Fecha del Pedido</strong>: <?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></p>
 				<p><strong>Estatus del Pedido</strong>: <?php echo getOrderStatusName($order['estatus']); ?></p>
-				<?php if ($order['estatus'] === 'A') : ?>
 				<p><strong>Fecha de la Nota</strong>: <input type="text" name="billDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" />
 					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?></p>
-				<?php endif; ?>		
 
 			</fieldset>
 
@@ -68,7 +66,6 @@
 				<?php endforeach; ?>
 				</tbody>
 
-				<?php if ($order['estatus'] === 'A') : ?>
 				<tfoot>
 					<tr>
 						<td></td>
@@ -125,16 +122,13 @@
 						<td class="textAlign-right billChange"></td>
 					</tr>
 				</tfoot>
-				<?php endif; ?>
 			</table>
 			<?php else : ?>
 				<p>Este pedido no contiene productos.</p>
 			<?php endif; ?>
 
-			<?php if ($order['estatus'] === 'A') : ?>
 			<br />
 			<p><input class="button" type="submit" value="Pagar" /></p>
-			<?php endif; ?>
 
 		</form>
 

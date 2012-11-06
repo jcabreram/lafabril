@@ -268,4 +268,15 @@ $(function() {
 	// We watch the input for a change
 	$('input[name="cash"]').bind('input', calculateBillBalance);
 	/*** CALCULATE BILL BALANCE ***/
+
+
+	// Check on submit if bill balance is 0
+	$('#payBill').submit(function() {
+		var billBalance = parseFloat($('input[name="billBalance"]').val());
+
+		if (billBalance !== 0.0) {
+			alert('Queda un saldo de $' + getMoneyFormat(billBalance));
+			return false;
+		}
+	});
 });
