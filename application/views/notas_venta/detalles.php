@@ -23,8 +23,8 @@
 		<fieldset class="column-left">
 
 			<p><b>Folio</b>: <?php echo $bill['prefijo'].str_pad($bill['folio'], 9, "0", STR_PAD_LEFT); ?></p> 
-			<p><b>Folio del pedido</b>: <a href="<?php echo site_url('pedidos/detalles/' . $bill['id_pedido']); ?>"><?php echo $order['prefijo'].str_pad($bill['folio'], 9, "0", STR_PAD_LEFT); ?></a></p>
-			<p><b>Cliente</b>: <?php echo $$bill['nombre_cliente'] ?></p>     
+			<p><b>Folio del pedido</b>: <a href="<?php echo site_url('pedidos/detalles/' . $bill['id_pedido']); ?>"><?php echo $order['prefijo'].str_pad($order['folio'], 9, "0", STR_PAD_LEFT); ?></a></p>
+			<p><b>Cliente</b>: <?php echo $bill['nombre_cliente'] ?></p>     
 			<p><b>RFC</b>: <?php echo $bill['rfc'] ?></p>        
 
 		</fieldset>
@@ -37,7 +37,7 @@
 			?>
 
 			<p><b>Sucursal</b>: <?php echo $bill['nombre_sucursal'] ?></p>
-			<p><b>Fecha de factura</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($bill['fecha_factura'])); ?></p>   
+			<p><b>Fecha de nota de venta</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($bill['fecha_nota_venta'])); ?></p>   
 			<p><b>Estatus</b>: 
 			<?php if ($bill['estatus'] == 'A') {
 						echo 'Abierta';
@@ -63,7 +63,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Detalle de la factura</h3>
+		<h3>Detalle de la nota de venta</h3>
 	</div>
 	
 	<!-- Content Box Content -->			
@@ -109,7 +109,7 @@
 				<td></td>
 				<td></td>
 				<td style="text-align:right"><b>IVA (<?php echo $bill['iva']*100; ?>%)</b></td>
-				<td style="text-align:right">$<?php echo number_format($bill['iva']*$bill, 2, '.', ','); ?></td>
+				<td style="text-align:right">$<?php echo number_format($bill['iva']*$subtotal, 2, '.', ','); ?></td>
 			</tr>
 			
 			<tr>
@@ -118,6 +118,24 @@
 				<td style="text-align:right"><b>Total:</b></td>
 				<td style="text-align:right">$<?php echo number_format($total, 2, '.', ','); ?></td>
 			</tr>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			
+			<?php foreach ($bill_payment as $pay) : ?>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:right"><b><?php echo $pay['tipo_pago']; ?>:</b></td>
+				<td style="text-align:right">$<?php echo number_format($pay['cantidad'], 2, '.', ','); ?></td>
+			</tr>
+			
+			<?php endforeach; ?>
 			
 			</tbody>
 
