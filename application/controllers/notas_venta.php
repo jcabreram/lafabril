@@ -68,10 +68,9 @@ class Notas_venta extends CI_Controller
 		$data['title'] = "Detalles de la nota de venta";
 		$data['user'] = $this->session->userdata('user');
 		$data['bill'] = $this->bills->getBill($id_nota_venta);
-		$data['bill_details'] = $this->bills->getBillDetails($id_nota_venta);
+		$data['bill_details'] = $this->bills->getBillDetail($id_nota_venta);
+		$data['bill_payment'] = $this->bills->getBillPayment($id_nota_venta);
 		$data['order'] = $this->orders->getOrder($data['bill']['id_pedido']);
-		
-		/*
 		
 		// Declare the $subtotal as float so it gets it in the foreach
 		settype($subtotal, "float");
@@ -84,9 +83,7 @@ class Notas_venta extends CI_Controller
 		$data['subtotal'] = $subtotal;
 		
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['invoice']['iva']; 
-		
-		*/
+		$data['total'] = $subtotal + $subtotal * $data['bill']['iva']; 
 		
 		// Display views
 		$this->load->view('header', $data);

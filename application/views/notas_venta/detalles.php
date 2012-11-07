@@ -37,7 +37,7 @@
 			?>
 
 			<p><b>Sucursal</b>: <?php echo $bill['nombre_sucursal'] ?></p>
-			<p><b>Fecha de factura</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($bill['fecha_factura'])); ?></p>   
+			<p><b>Fecha de nota de venta</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($bill['fecha_nota_venta'])); ?></p>   
 			<p><b>Estatus</b>: 
 			<?php if ($bill['estatus'] == 'A') {
 						echo 'Abierta';
@@ -118,6 +118,24 @@
 				<td style="text-align:right"><b>Total:</b></td>
 				<td style="text-align:right">$<?php echo number_format($total, 2, '.', ','); ?></td>
 			</tr>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			
+			<?php foreach ($bill_payment as $pay) : ?>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:right"><b><?php echo $pay['tipo_pago']; ?>:</b></td>
+				<td style="text-align:right">$<?php echo number_format($pay['cantidad'], 2, '.', ','); ?></td>
+			</tr>
+			
+			<?php endforeach; ?>
 			
 			</tbody>
 
