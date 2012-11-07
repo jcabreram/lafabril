@@ -3,7 +3,7 @@
 		<th>Razón Social</th>
 		<td><?php echo $bill['razon_social']; ?></td>
 		<th>Fecha Nota Venta</th>
-		<td><?php echo date('d/m/Y', strtotime($bill['fecha_factura'])); ?></td>
+		<td><?php echo date('d/m/Y', strtotime($bill['fecha_nota_venta'])); ?></td>
 	</tr>
 
 	<tr>
@@ -54,7 +54,7 @@
 		<tr>
 			<td></td>
 			<td></td>
-			<th class="textAlign-right">IVA (<?php echo $invoice['sucursal_iva'] * 100; ?>%)</th>
+			<th class="textAlign-right">IVA (<?php echo $bill['sucursal_iva'] * 100; ?>%)</th>
 			<td class="textAlign-right">$<?php echo number_format($iva, 2, '.', ','); ?></td>
 		</tr>
 
@@ -67,5 +67,5 @@
 	</tfoot>
 </table>
 <?php else : ?>
-<p>Esta factura no contiene productos.</p>
+<p>Esta nota de venta no contiene productos.</p>
 <?php endif; ?>
