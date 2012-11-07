@@ -238,4 +238,52 @@ class Notas_venta extends CI_Controller
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
+
+	public function imprimir($id)
+	{
+		$bill = $this->bills->getBill($id);
+
+		if (count($bill) === 0) {
+			// We kill the script because usually the PDF is opened in a different tab.
+			exit('Nota de venta no encontrada.');
+		}
+
+		// Necessary to create a PDF
+		$this->load->helper(array('dompdf', 'file'));
+		
+		$this->load->model('branches'); // This is mandatory to create the PDF header
+		$this->load->model('clients'); // This model is necessary because the format has the client address
+		$this->load->model('orders'); // To get the order folio
+
+		$bill['products'] = $this->bills->getBillProducts($id);
+		$branch = $this->branches->getBranch($bill['id_sucursal']);
+		$clientAddress = $this->clients->getClientAddress($bill['id_cliente']);
+		$orderFolio = $this->orders->getOrder($bill['id_pedido']);
+		$orderFolio = $orderFolio['prefijo'] . str_pad($orderFolio['folio'], 9, '0', STR_PAD_LEFT);
+
+		$subtotal = 0;
+
+		foreach ($bill['products'] as $product) {
+			$subtotal += $product['cantidad'] * $product['precio_producto'];
+		}
+
+		$iva = $subtotal * $bill['sucursal_iva'];
+		$total = $subtotal + $iva;
+
+		$data['title'] = 'Nota de Venta';
+		$data['branch'] = $branch;
+		$data['folio'] = $bill['prefijo'] . str_pad($bill['folio'], 9, '0', STR_PAD_LEFT);
+		$data['clientAddress'] = $clientAddress;
+		$data['orderFolio'] = $orderFolio;
+		$data['bill'] = $bill;
+		$data['subtotal'] = $subtotal;
+		$data['iva'] = $iva;
+		$data['total'] = $total;
+
+		$html = $this->load->view('formatos/header', $data, true);
+		$html .= $this->load->view('formatos/nota_venta', $data, true);
+		$html .= $this->load->view('formatos/footer', $data, true);
+
+		createPDF($html, 'formato');
+	}
 }

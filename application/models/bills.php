@@ -117,7 +117,7 @@ class Bills extends CI_Model
 			foreach ($checks as $checkBank => $checkInformation) {
 				foreach ($checkInformation as $checkNumber => $paymentAmount) {
 					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
-							VALUES (NULL, $billId, 2, $paymentAmount)";
+							VALUES (NULL, $billId, 3, $paymentAmount)";
 					$this->db->query($sql);
 
 					$paymentId = $this->db->insert_id();
