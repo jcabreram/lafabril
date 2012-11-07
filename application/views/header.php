@@ -105,7 +105,7 @@
 				</li>
 
 				<li>
-					<a href="#" class="nav-top-item<?php if (controllerName() == 'pedidos' || controllerName() == 'facturas') { echo ' current'; } ?>">
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'pedidos' || controllerName() == 'facturas' || controllerName() == 'notas_venta') { echo ' current'; } ?>">
 						Ventas
 					</a>
 					<ul>
