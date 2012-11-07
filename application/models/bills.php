@@ -117,7 +117,7 @@ class Bills extends CI_Model
 			foreach ($checks as $checkBank => $checkInformation) {
 				foreach ($checkInformation as $checkNumber => $paymentAmount) {
 					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
-							VALUES (NULL, $billId, 2, $paymentAmount)";
+							VALUES (NULL, $billId, 3, $paymentAmount)";
 					$this->db->query($sql);
 
 					$paymentId = $this->db->insert_id();
@@ -181,10 +181,10 @@ class Bills extends CI_Model
 					cl.rfc,
 					fp.prefijo, 
 					fo.folio, 
-					fa.fecha AS fecha_factura,
-					fa.estatus,
-					fa.iva,
-					fa.id_sucursal,
+					nv.fecha AS fecha_nota_venta,
+					nv.estatus,
+					nv.iva,
+					nv.id_sucursal,
 					su.nombre AS nombre_sucursal,
 					su.iva AS sucursal_iva
 				FROM notas_venta AS nv
@@ -200,37 +200,54 @@ class Bills extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->row_array();
 	}	
-	
-	/*
 
-	public function getInvoiceProducts($id)
+	public function getBillProducts($id)
 	{
-		return $this->getInvoiceDetail($id);
+		return $this->getBillDetail($id);
 	}
 	
-	public function getInvoiceDetail($id)
+	public function getBillDetail($id)
 	{
 		$id = $this->db->escape(intval($id));
 
 		$sql = 'SELECT 
-					fd.id_factura_detalle,
-					fd.id_producto,
-					fd.cantidad,
+					nd.id_nota_venta_detalle,
+					nd.id_producto,
+					nd.cantidad,
 					pr.nombre AS nombre_producto,
 					pr.udm AS udm_producto,
 					pd.precio AS precio_producto
-				FROM facturas AS fa
-				JOIN facturas_detalles AS fd ON fa.id_factura=fd.id_factura
-				JOIN productos AS pr ON fd.id_producto=pr.id_producto
-				JOIN pedidos AS pe ON fa.id_pedido=pe.id_pedido
-				JOIN pedidos_detalles AS pd ON fa.id_pedido=pd.id_pedido AND pd.id_producto=fd.id_producto
-				WHERE fa.id_factura = ' . $id;
+				FROM notas_venta AS nv
+				JOIN notas_venta_detalles AS nd ON nv.id_nota_venta=nd.id_nota_venta
+				JOIN productos AS pr ON nd.id_producto=pr.id_producto
+				JOIN pedidos AS pe ON nv.id_pedido=pe.id_pedido
+				JOIN pedidos_detalles AS pd ON nv.id_pedido=pd.id_pedido AND pd.id_producto=nd.id_producto
+				WHERE nv.id_nota_venta = ' . $id;
 
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();
 	}	
+	
+	public function getBillPayment($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = 'SELECT 
+					pt.nombre AS tipo_pago,
+					pn.cantidad
+				FROM pagos_notas AS pn
+				JOIN pagos_tipo AS pt ON pn.pago_tipo = pt.id_pago_tipo
+				WHERE pn.nota_id = ' . $id;
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}
+	
+	/*
 	
 	public function cancelar($id_factura)
 	{	

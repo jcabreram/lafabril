@@ -57,41 +57,41 @@ class Notas_venta extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 	
-	/*
 
-	public function detalles($id_factura)
+	public function detalles($id_nota_venta)
 	{
 		// Load necessary models
-		$this->load->model('invoices');
+		$this->load->model('bills');
 		$this->load->model('orders');
 
 
-		$data['title'] = "Detalles de la factura";
+		$data['title'] = "Detalles de la nota de venta";
 		$data['user'] = $this->session->userdata('user');
-		$data['invoice'] = $this->invoices->getInvoice($id_factura);
-		$data['invoice_details'] = $this->invoices->getInvoiceDetail($id_factura);
-		$data['order'] = $this->orders->getOrder($data['invoice']['id_pedido']);
+		$data['bill'] = $this->bills->getBill($id_nota_venta);
+		$data['bill_details'] = $this->bills->getBillDetail($id_nota_venta);
+		$data['bill_payment'] = $this->bills->getBillPayment($id_nota_venta);
+		$data['order'] = $this->orders->getOrder($data['bill']['id_pedido']);
 		
 		// Declare the $subtotal as float so it gets it in the foreach
 		settype($subtotal, "float");
 		
 		// For every detail of the order, gather the sum of the product of the prices and quantities
-		foreach ($data['invoice_details'] as $line) {
+		foreach ($data['bill_details'] as $line) {
 			$subtotal+=$line['cantidad']*$line['precio_producto'];
 		}
 		
 		$data['subtotal'] = $subtotal;
 		
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['invoice']['iva']; 
+		$data['total'] = $subtotal + $subtotal * $data['bill']['iva']; 
 		
 		// Display views
 		$this->load->view('header', $data);
-		$this->load->view('facturas/detalles', $data);
+		$this->load->view('notas_venta/detalles', $data);
 		$this->load->view('footer', $data);
 	}
 	
-	
+	/*
 	public function cancelar($id_factura)
 	{	
 		if($this->invoices->cancelar($id_factura)) {
