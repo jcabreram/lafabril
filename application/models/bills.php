@@ -143,8 +143,27 @@ class Bills extends CI_Model
 		return false;
 	}
 	
-	public function getAll()
+	public function getAll($filters = false)
 	{
+		/*** PREPARE FILTERS ***/
+		$branch = isset($filters['branch']) ? $filters['branch'] : false;
+		$client = isset($filters['client']) ? $filters['client'] : false;
+		$status = isset($filters['status']) ? $filters['status'] : false;
+		/*** PREPARE FILTERS ***/
+
+		$where = '';
+
+		if ($branch !== false) {
+			$where .= 'WHERE nv.id_sucursal = ' . $this->db->escape(intval($branch));
+		}
+
+		if ($client !== false) {
+			$where .= ' AND pe.id_cliente = ' . $this->db->escape(intval($client));
+		}
+
+		if ($status !== false) {
+			$where .= ' AND nv.estatus = ' . $this->db->escape($status);
+		}
 
 		$sql = 'SELECT 
 					nv.id_nota_venta, 
@@ -160,6 +179,7 @@ class Bills extends CI_Model
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
 				JOIN folios AS fo ON nv.id_nota_venta=fo.id_documento AND fo.tipo_documento="N"
 				JOIN folios_prefijo AS fp ON nv.id_sucursal=fp.id_sucursal AND fp.tipo_documento="N"
+				' . $where . '
 				ORDER BY fecha_nota_venta ASC';
 				
 		$query = $this->db->query($sql);
