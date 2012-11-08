@@ -282,4 +282,53 @@ class Facturas extends CI_Controller
 		
 	}
 	
+	public function crearReporte()
+	{
+		// Load necessary models
+		$this->load->model('userBranches');
+		$this->load->model('clients');
+		
+		// Load form validation library
+		$this->load->library('form_validation');
+
+		// Setting error delimiters
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		// Define validation rules
+		$config = array(
+			array(
+				'field' => 'branch', 
+				'label' => 'sucursal', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'fecha_inicio', 
+				'label' => 'fecha de inicio', 
+				'rules' => 'required|exact_length[10]|alpha_dash'
+			),
+			array(
+				'field' => 'fecha_final', 
+				'label' => 'fecha final', 
+				'rules' => 'required|exact_length[10]|alpha_dash|callback_end_date_check'
+			)
+		);
+
+		$this->form_validation->set_rules($config);
+
+		// If validation was successful
+		if ($this->form_validation->run()) {
+			$this->invoices->getReportData($_POST['branch'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['client']);
+		}
+
+		$data['title'] = "Crear reporte de facturas";
+		$data['user'] = $this->session->userdata('user');
+		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
+		$data['clients'] = $this->clients->getActiveClients();
+
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('facturas/crear_reporte', $data);
+		$this->load->view('footer', $data);
+	}
+	
 }

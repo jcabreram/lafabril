@@ -155,4 +155,37 @@ class Invoices extends CI_Model
 		
 	}
 	
+	public function getReportData($branch, $ini_date, $fin_date, $client)
+	{
+		$branch = $this->db->escape(intval($branch));
+		$ini_date = $this->db->escape($ini_date);
+		$fin_date = $this->db->escape($fin_date);
+		$client = $this->db->escape(intval($client));
+
+		$sql = "SELECT 
+					cl.nombre AS nombre_cliente,
+					fp.prefijo, 
+					fo.folio, 
+					fa.fecha AS fecha_factura,
+					fa.estatus,
+					mo.importe
+				FROM facturas AS fa
+				JOIN pedidos AS pe ON pe.id_pedido=fa.id_pedido
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN folios_prefijo AS fp ON fa.id_sucursal=fp.id_sucursal AND fp.tipo_documento='F'
+				JOIN folios AS fo ON fa.id_factura=fo.id_documento AND fo.tipo_documento='F'
+				JOIN sucursales AS su ON fa.id_sucursal=su.id_sucursal
+				JOIN movimientos AS mo ON mo.id_documento = fa.id_factura AND mo.id_documento
+				WHERE fa.id_sucursal = $branch AND fa.fecha BETWEEN $ini_date AND $fin_date";
+		
+		if ($client != '0') {
+			$sql .= "AND pe.id_cliente = $client";
+		}
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}	
+	
 }
