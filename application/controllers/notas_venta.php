@@ -83,7 +83,7 @@ class Notas_venta extends CI_Controller
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('notas_venta/listar', $data);
-		$this->load->view('facturas/filterForm', $data);
+		$this->load->view('notas_venta/filterForm', $data);
 		$this->load->view('footer', $data);
 	}
 
