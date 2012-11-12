@@ -316,4 +316,63 @@ class Bills extends CI_Model
 	}
 	*/
 	
+	public function getReportData($branch, $ini_date, $fin_date, $client)
+	{
+		$branch = $this->db->escape(intval($branch));
+		$ini_date = $this->db->escape($ini_date);
+		$fin_date = $this->db->escape($fin_date);
+		$client = $this->db->escape(intval($client));
+
+		$sql = "SELECT 
+					cl.nombre AS nombre_cliente,
+					fp.prefijo, 
+					fo.folio, 
+					nv.fecha AS fecha_nota_venta,
+					nv.estatus,
+					mo.importe
+				FROM notas_venta AS nv
+				JOIN pedidos AS pe ON pe.id_pedido=nv.id_pedido
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN folios_prefijo AS fp ON nv.id_sucursal=fp.id_sucursal AND fp.tipo_documento='N'
+				JOIN folios AS fo ON nv.id_nota_venta=fo.id_documento AND fo.tipo_documento='N'
+				JOIN sucursales AS su ON nv.id_sucursal=su.id_sucursal
+				JOIN movimientos AS mo ON mo.id_documento = nv.id_nota_venta AND mo.id_documento
+				WHERE nv.id_sucursal = $branch AND nv.fecha BETWEEN $ini_date AND $fin_date";
+		
+		if ($client != '0') {
+			$sql .= "AND pe.id_cliente = $client";
+		}
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}	
+	
+	public function getPaymentData($branch, $ini_date, $fin_date, $client)
+	{
+		$branch = $this->db->escape(intval($branch));
+		$ini_date = $this->db->escape($ini_date);
+		$fin_date = $this->db->escape($fin_date);
+		$client = $this->db->escape(intval($client));
+
+		$sql = "SELECT 
+					pt.nombre,
+					pn.cantidad
+				FROM notas_venta AS nv
+				JOIN pedidos AS pe ON pe.id_pedido=nv.id_pedido
+				JOIN pagos_notas AS pn ON pn.nota_id = nv.id_nota_venta
+				JOIN pagos_tipo AS pt ON pn.pago_tipo = pt.id_pago_tipo
+				WHERE nv.id_sucursal = $branch AND nv.fecha BETWEEN $ini_date AND $fin_date";
+		
+		if ($client != '0') {
+			$sql .= "AND pe.id_cliente = $client";
+		}
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}	
+	
 }
