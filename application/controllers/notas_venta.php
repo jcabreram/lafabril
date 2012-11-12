@@ -223,6 +223,17 @@ class Notas_venta extends CI_Controller
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
+	
+	public function cancelar($id_nota_venta)
+	{	
+		if($this->bills->cancelar($id_nota_venta)) {
+				$this->session->set_flashdata('message', 'La nota de venta ha sido cancelada.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar cancelar la nota de venta, intenta de nuevo.');
+			}
+		redirect("notas_venta");
+		
+	}
 
 	public function imprimir($id)
 	{

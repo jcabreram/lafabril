@@ -267,21 +267,20 @@ class Bills extends CI_Model
 		return $query->result_array();
 	}
 	
-	/*
 	
-	public function cancelar($id_factura)
+	public function cancelar($id_nota_venta)
 	{	
-		$factura = $this->getInvoice($id_factura);
-		$id_pedido = $factura['id_pedido'];
-		$id_sucursal = $factura['id_sucursal'];
+		$nota_venta = $this->getBill($id_nota_venta);
+		$id_pedido = $nota_venta['id_pedido'];
+		$id_sucursal = $nota_venta['id_sucursal'];
 	
-		$id_factura = $this->db->escape(intval($id_factura));
+		$id_nota_venta = $this->db->escape(intval($id_nota_venta));
 		$id_pedido = $this->db->escape(intval($id_pedido));
 		$id_sucursal = $this->db->escape(intval($id_sucursal));
 		
 		$this->db->trans_start();
 		
-		$sql = "SELECT * FROM facturas_detalles WHERE id_factura = $id_factura";
+		$sql = "SELECT * FROM notas_venta_detalles WHERE id_nota_venta = $id_nota_venta";
 		$query = $this->db->query($sql);
 		$detalles = $query->result_array();
 		
@@ -291,18 +290,13 @@ class Bills extends CI_Model
 					WHERE id_producto = {$detalle['id_producto']} AND id_pedido = $id_pedido";
 			$query = $this->db->query($sql);
 			
-			$sql = "INSERT INTO movimientos_inventario (id_documento, concepto, id_producto, cantidad, id_sucursal, fecha_mov, tipo_movimiento) VALUES ($id_factura, 'F', {$detalle['id_producto']}, {$detalle['cantidad']}, $id_sucursal, NOW(), 'E')";
+			$sql = "INSERT INTO movimientos_inventario (id_documento, concepto, id_producto, cantidad, id_sucursal, fecha_mov, tipo_movimiento) VALUES ($id_nota_venta, 'N', {$detalle['id_producto']}, {$detalle['cantidad']}, $id_sucursal, NOW(), 'E')";
 			$query = $this->db->query($sql);
 		}
 		
-		$sql = "UPDATE movimientos
-				SET estatus = 'X', saldo = 0
-				WHERE id_documento = $id_factura";
-		$query = $this->db->query($sql);
-		
-		$sql = "UPDATE facturas
+		$sql = "UPDATE notas_venta
 				SET estatus = 'X'
-				WHERE id_factura = $id_factura";
+				WHERE id_nota_venta = $id_nota_venta";
 		$query = $this->db->query($sql);
 		
 		$this->db->trans_complete();
@@ -314,7 +308,6 @@ class Bills extends CI_Model
 		return false;
 		
 	}
-	*/
 	
 	public function getReportData($branch, $ini_date, $fin_date, $client)
 	{
