@@ -17,7 +17,7 @@
 		</div>
 		<?php endif; ?>
 
-		<form action="<?php echo site_url('facturas/crearReporte'); ?>" method="post">
+		<form action="<?php echo site_url('facturas/crear_reporte'); ?>" method="post">
 		
 		<fieldset class="column-left">
 

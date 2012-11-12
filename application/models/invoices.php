@@ -155,7 +155,7 @@ class Invoices extends CI_Model
 		
 	}
 	
-	public function getReportData($branch, $ini_date, $fin_date, $client)
+	public function getReportData($branch, $client, $ini_date, $fin_date)
 	{
 		$branch = $this->db->escape(intval($branch));
 		$ini_date = $this->db->escape($ini_date);
