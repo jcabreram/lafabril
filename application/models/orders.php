@@ -220,9 +220,7 @@ class Orders extends CI_Model
 		// Removes all the items in pedidos that have no corresponding id on pedidos_detalles and that have more than 2 hours of having been created
 		$sql = "DELETE pedidos
 				FROM pedidos
-				LEFT JOIN pedidos_detalles
-				ON pedidos.id_pedido=pedidos_detalles.id_pedido
-				WHERE pedidos_detalles.id_pedido IS NULL AND (now() - pedidos.fecha_captura) > (120*60);";
+				WHERE pedidos.estatus = 'P' AND (now() - pedidos.fecha_captura) > (120*60);";
 				
 		return $this->db->query($sql);
 	}

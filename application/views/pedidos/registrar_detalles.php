@@ -195,7 +195,6 @@
 				<td>
 					<p>
 						<a href="<?php echo site_url('pedidos'); ?>"><input class="button" type="button" value="Finalizar" /></a>
-						<a href="<?php echo site_url('pedidos/imprimir/' . $order_id); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
 					</p>
 				</td>
 			</tr>
