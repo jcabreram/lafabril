@@ -223,6 +223,17 @@ class Notas_venta extends CI_Controller
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
+	
+	public function cancelar($id_nota_venta)
+	{	
+		if($this->bills->cancelar($id_nota_venta)) {
+				$this->session->set_flashdata('message', 'La nota de venta ha sido cancelada.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar cancelar la nota de venta, intenta de nuevo.');
+			}
+		redirect("notas_venta");
+		
+	}
 
 	public function imprimir($id)
 	{
@@ -270,5 +281,56 @@ class Notas_venta extends CI_Controller
 		$html .= $this->load->view('formatos/footer', $data, true);
 
 		createPDF($html, 'formato');
+	}
+	
+	public function crearReporte()
+	{
+		// Load necessary models
+		$this->load->model('userBranches');
+		$this->load->model('clients');
+		
+		// Load form validation library
+		$this->load->library('form_validation');
+
+		// Setting error delimiters
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		// Define validation rules
+		$config = array(
+			array(
+				'field' => 'branch', 
+				'label' => 'sucursal', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'fecha_inicio', 
+				'label' => 'fecha de inicio', 
+				'rules' => 'required|exact_length[10]|alpha_dash'
+			),
+			array(
+				'field' => 'fecha_final', 
+				'label' => 'fecha final', 
+				'rules' => 'required|exact_length[10]|alpha_dash|callback_end_date_check'
+			)
+		);
+
+		$this->form_validation->set_rules($config);
+
+		// If validation was successful
+		if ($this->form_validation->run()) {
+			// These two return the arrays with the data from the reports and the data of the type and amount of payments
+			$this->bills->getReportData($_POST['branch'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['client']);
+			$this->bills->getPaymentData($_POST['branch'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['client']);
+		}
+
+		$data['title'] = "Crear reporte de notas de venta";
+		$data['user'] = $this->session->userdata('user');
+		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
+		$data['clients'] = $this->clients->getActiveClients();
+
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('notas_venta/crear_reporte', $data);
+		$this->load->view('footer', $data);
 	}
 }

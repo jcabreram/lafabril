@@ -247,14 +247,14 @@ class Sucursales extends CI_Controller
 	public function activar($id)
 	{
 		$this->branches->setStatus($id, 1);
-		$this->session->set_flashdata('message', 'La sucursal ha sido desactivada.');
+		$this->session->set_flashdata('message', 'La sucursal ha sido activada.');
 		redirect('sucursales');
 	}
 
 	public function desactivar($id)
 	{
 		$this->branches->setStatus($id, 0);
-		$this->session->set_flashdata('message', 'La sucursal ha sido activada.');
+		$this->session->set_flashdata('message', 'La sucursal ha sido desactivada.');
 		redirect('sucursales');		
 	}
 }
