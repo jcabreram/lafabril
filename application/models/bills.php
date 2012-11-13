@@ -85,7 +85,7 @@ class Bills extends CI_Model
 		$cash = $payments['cash'] === '' ? 0 : $payments['cash'];
 
 		if ($cash > 0) {
-			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
+			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
 					VALUES (NULL, $billId, 1, $cash)";
 			$this->db->query($sql);
 		}
@@ -96,7 +96,7 @@ class Bills extends CI_Model
 		if (count($cards) > 0) {
 			foreach ($cards as $cardBank => $cardInformation) {
 				foreach ($cardInformation as $cardNumber => $paymentAmount) {
-					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
+					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
 							VALUES (NULL, $billId, 2, $paymentAmount)";
 					$this->db->query($sql);
 
@@ -116,7 +116,7 @@ class Bills extends CI_Model
 		if (count($checks) > 0) {
 			foreach ($checks as $checkBank => $checkInformation) {
 				foreach ($checkInformation as $checkNumber => $paymentAmount) {
-					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
+					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
 							VALUES (NULL, $billId, 3, $paymentAmount)";
 					$this->db->query($sql);
 
@@ -256,7 +256,7 @@ class Bills extends CI_Model
 
 		$sql = 'SELECT 
 					pt.nombre AS tipo_pago,
-					pn.cantidad
+					pn.importe
 				FROM pagos_notas AS pn
 				JOIN pagos_tipo AS pt ON pn.pago_tipo = pt.id_pago_tipo
 				WHERE pn.nota_id = ' . $id;
@@ -317,24 +317,27 @@ class Bills extends CI_Model
 		$client = $this->db->escape(intval($client));
 
 		$sql = "SELECT 
+					nv.id_nota_venta,
 					cl.nombre AS nombre_cliente,
 					fp.prefijo, 
 					fo.folio, 
 					nv.fecha AS fecha_nota_venta,
 					nv.estatus,
-					mo.importe
+					SUM(pn.importe)
 				FROM notas_venta AS nv
 				JOIN pedidos AS pe ON pe.id_pedido=nv.id_pedido
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
 				JOIN folios_prefijo AS fp ON nv.id_sucursal=fp.id_sucursal AND fp.tipo_documento='N'
 				JOIN folios AS fo ON nv.id_nota_venta=fo.id_documento AND fo.tipo_documento='N'
 				JOIN sucursales AS su ON nv.id_sucursal=su.id_sucursal
-				JOIN movimientos AS mo ON mo.id_documento = nv.id_nota_venta AND mo.id_documento
-				WHERE nv.id_sucursal = $branch AND nv.fecha BETWEEN $ini_date AND $fin_date";
+				JOIN pagos_notas AS pn ON pn.nota_id = nv.id_nota_venta
+				WHERE nv.id_sucursal = $branch AND nv.fecha BETWEEN $ini_date AND $fin_date ";
 		
 		if ($client != '0') {
-			$sql .= "AND pe.id_cliente = $client";
+			$sql .= "AND pe.id_cliente = $client ";
 		}
+		
+		$sql.= "GROUP BY nv.id_nota_venta ";
 
 		$query = $this->db->query($sql);
 
@@ -351,7 +354,7 @@ class Bills extends CI_Model
 
 		$sql = "SELECT 
 					pt.nombre,
-					pn.cantidad
+					pn.importe
 				FROM notas_venta AS nv
 				JOIN pedidos AS pe ON pe.id_pedido=nv.id_pedido
 				JOIN pagos_notas AS pn ON pn.nota_id = nv.id_nota_venta
@@ -367,5 +370,7 @@ class Bills extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();
 	}	
+	
+	
 	
 }
