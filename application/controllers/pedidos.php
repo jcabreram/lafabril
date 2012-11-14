@@ -572,145 +572,194 @@ class Pedidos extends CI_Controller
 
 	public function crear_nota_venta()
 	{
-		/*** FETCH ORDER ID ***/
 		$orderId = $this->uri->segment(3);
 
+		// If the order id was not supplied...
 		if ($orderId === false) {
-			// Error: You need to give me an order id
-			redirect();
+			$this->session->set_flashdata('error', 'Dirección inválida.');
+			redirect('pedidos');
 		}
-		/*** FETCH ORDER ID ***/
 
-
-		/*** GET ORDER AND IT'S PRODUCTS ***/
 		$order = $this->orders->getOrder($orderId);
 
+		// If the order doesn't exist...
 		if (count($order) === 0) {
-			// Error: This order doesn't exist
-			redirect();
+			$this->session->set_flashdata('error', 'Pedido inexistente.');
+			redirect('pedidos');
+		}
+		
+		// If the order is not open...
+		if ($order['estatus'] !== 'A') {
+			$this->session->set_flashdata('error', 'Pedido no abierto.');
+			redirect('pedidos');
 		}
 
 		$order['products'] = $this->orders->getOrderProducts($orderId);
-		/*** GET ORDER AND IT'S PRODUCTS ***/
 
-
-		// If the order is not open...
-		if ($order['estatus'] !== 'A') {
-			redirect();
-		}
-
-
-		/*** CALCULATE SUBTOTAL, TAX & TOTAL ***/
 		$subtotal = 0.0;
 		$taxes = 0.0;
 		$total = 0.0;
-
-		if (count($order['products']) > 0) {
-			foreach ($order['products'] as $product) {
-				$subtotal = $product['cantidad'] * $product['precio'];
-			}
-
-			$taxes = $subtotal * $order['sucursal_iva'];
-			$total = $subtotal + $taxes;
+		
+		foreach ($order['products'] as $product) {
+			$subtotal += $product['cantidad'] * $product['precio'];
 		}
-		/*** CALCULATE SUBTOTAL, TAX & TOTAL ***/
 
+		$taxes = $subtotal * $order['sucursal_iva'];
+		$total = $subtotal + $taxes;
+		
+		$errors = array();
 
-		/*** VALIDATE PAYMENT ***/
 		if ($_POST) {
-			$errors = array();
-			$billDate = isset($_POST['billDate']) ? $_POST['billDate'] : false;
-			$cash = isset($_POST['cash']) ? $_POST['cash'] : false;
-			$cards = isset($_POST['cards']) && is_array($_POST['cards']) ? $_POST['cards'] : array();
-			$checks = isset($_POST['checks']) && is_array($_POST['checks']) ? $_POST['checks'] : array();
-
-			/*** TEMPORARY SOLUTION ***/
-			$payments = array('cash' => $cash, 'cards' => $cards, 'checks' => $checks);
-			/*** TEMPORARY SOLUTION ***/
-
-			// Bill date or cash don't exist?
-			if ($billDate === false || $cash === false) {
-				exit('Bill date and cash are default inputs.');
-				redirect();
+			$errors = $this->_validateBillPayment($_POST, $order['fecha_pedido'], $total);
+			
+			$totalErrors = 0;
+			foreach ($errors as $error) {
+				$totalErrors += count($errors[$error]);
 			}
-
-
-			/*** VALIDATE BILL DATE ***/
-			if (count(explode('/', $billDate)) === 3) {
-				// Change date to a more managable format
-				$billDate = explode('/', $billDate);
-				$billDate = $billDate['1'] . '/' . $billDate['0'] . '/' . $billDate['2'];
-
-				$timestamp = strtotime($billDate);
-				$day = date('d', $timestamp);
-				$month = date('m', $timestamp);
-				$year = date('Y', $timestamp);
-				
-				if (!checkdate($month, $day, $year)) {
-					$errors['date'][] = 'Fecha inválida.';
-				}
-
-				if ($timestamp < strtotime($order['fecha_pedido'])) {
-					$errors['date'][] = 'La fecha de la factura debe ser posterior a la del pedido.';
-				}
-
-				// If everything goes ok
-				$billDate = date('Y-m-d', $timestamp);
-			} else {
-				// Is there no date?
-				exit('Invalid date?');
-				redirect();
-			}
-			/*** VALIDATE BILL DATE ***/
-
-
-			/*** VALIDATE CASH ***/
-			/*** VALIDATE CASH ***/
-
-
-			/*** VALIDATE CARDS ***/
-			/*** VALIDATE CARDS ***/
-
-
-			/*** VALIDATE CHECKS ***/
-			/*** VALIDATE CHECKS ***/
-
-
-			/*** VALIDATE OVERALL PAYMENT ***/
-			/*** VALIDATE OVERALL PAYMENT ***/
 		}
-		/*** VALIDATE PAYMENT ***/
 
+		$user = $this->session->userdata('user');
 
-		/*** SAVE BILL ***/
-		if ($_POST && count($errors) === 0) {
+		if ($_POST && $totalErrors === 0) {
 			$this->load->model('bills');
+			
+			$cash = !isset($_POST['cash']) || $_POST['cash'] === '' ? 0 : floatval($_POST['cash']);
+			$cards = !isset($_POST['cards']) || $_POST['cards'] === '' || !is_array($_POST['cards']) ? array() : $_POST['cards'];
+			$cards = !isset($_POST['cards']) || $_POST['cards'] === '' || !is_array($_POST['cards']) ? array() : $_POST['cards'];
+			
+			$payments = array(
+				'cash' => $cash,
+				'cards' => $cards,
+				'checks' => $checks
+			);
 
-			// We need his data for damage control
-			$user = $this->session->userdata('user');
-
-			if ($this->bills->register($order, $billDate, $payments, $user['id'])) {
-				$this->session->set_flashdata('message', 'La nota ha sido creada.');
+			if (($billId = $this->bills->register($order, $_POST['billDate'], $payments, $user['id'])) !== false) {
+				$message = '<a href="'.site_url('notas_venta/detalles/'.$billId).'" title="Ver nota de venta">Nota de venta creada</a>.';
+				$this->session->set_flashdata('message', $message);
 				redirect('pedidos');
 			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar crear la nota, intenta de nuevo.');
+				$message = 'Tuvimos un problema al intentar crear la nota, intenta de nuevo en 10 minutos.';
+				$this->session->set_flashdata('error', $message);
 			}
 		}
-		/*** SAVE BILL ***/
 
-
-		$data['title'] = ' Crear Nota de Venta';
-		$data['user'] = $this->session->userdata('user');
+		$data['title'] = 'Crear Nota de Venta';
+		$data['user'] = $user;
 		$data['order'] = $order;
 		$data['subtotal'] = $subtotal;
 		$data['taxes'] = $taxes;
 		$data['total'] = $total;
+		$data['errors'] = $errors;
 
 		$this->load->view('header', $data);
 		$this->load->view('pedidos/crear_nota_venta', $data);
 		$this->load->view('pedidos/cardForm', $data);
 		$this->load->view('pedidos/checkForm', $data);
 		$this->load->view('footer', $data);	
+	}
+	
+	private function _validateBillPayment($data, $orderDate, $total)
+	{
+		$errors = array(
+			'billDate' => array(),
+			'cash' => array(),
+			'cards' => array(),
+			'checks' => array(),
+			'overall' => array()
+		);
+		
+		$billDate = !isset($data['billDate']) ? '' : $data['billDate'];
+		$cash = !isset($data['cash']) ? '' : $data['cash'];
+		$cards = !isset($data['cards']) ? '' : $data['cards'];
+		$checks = !isset($data['checks']) ? '' : $data['cards'];
+		
+		$cash = $cash === '' ? '0' : $cash;
+		$cards = $cards === '' || !is_array($cards) ? array() : $cards;
+		$checks = $checks === '' || !is_array($checks) ? array() : $checks;
+		
+		$billDateParts = explode('/', $billDate);
+		
+		if ($billDate === '') {
+			$errors['billDate'][] = 'La fecha de la nota es obligatoria';
+		} elseif (count($billDateParts) !== 3 || !checkdate($billDateParts[1], $billDateParts[0], $billDateParts[2])) {
+			$errors['billDate'][] = 'Fecha inválida';
+		} elseif (strtotime(convertToComputerDate($billDate)) < strtotime($orderDate)) {
+			$errors['billDate'][] = 'La fecha de la nota debe ser posterior a la del pedido';
+		}
+		
+		if (!is_numeric($cash)) {
+			$cash = 0;
+			$errors['cash'][] = 'Escribe una cantidad válida';	
+		} elseif (($cash = floatval($cash)) < 0) {
+			$cash = 0;
+			$errors['cash'][] = 'Escribe una cantidad positiva';
+		}
+		
+		$maxCardNumLength = 19;
+		$minCardNumLength = 14;
+		$paidWithCards = 0;
+		
+		foreach ($cards as $cardInformation => $paymentAmount) {
+			$cardInformation = explode('|', $cardInformation);
+			
+			if (count($cardInformation) !== 2) {
+				$errors['cards'][] = 'Error al procesar las tarjetas';
+				break;
+			}
+			
+			$cardBank = $cardInformation[0];
+			$cardNumber = $cardInformation[1];
+			$cardNumLength = strlen($cardNumber);
+				
+			if (!ctype_digit($cardNumber) || $cardNumLength < $minCardNumLength || $cardNumLength > $maxCardNumLength) {
+				$errors['cards'][] = 'Error procesando la información de las tarjetas';
+				break;
+			}
+				
+			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0) {
+				$errors['cards'][] = 'Error procesando la información de las tarjetas';
+			}
+			
+			$paidWithCards += floatval($paymentAmount);
+		}
+		
+		$maxCheckNumLength = 45;
+		$minCheckNumLength = 4;
+		$paidWithChecks = 0;
+		
+		foreach ($checks as $checkInformation => $paymentAmount) {
+			$checkInformation = explode('|', $checkInformation);
+			
+			if (count($checkInformation) !== 2) {
+				$errors['cards'][] = 'Error al procesar los cheques';
+				break;
+			}
+			
+			$checkBank = $checkInformation[0];
+			$checkNumber = $checkInformation[1];
+			$checkNumLength = strlen($checkNumber);
+				
+			if (!ctype_digit($checkNumber) || $checkNumLength < $minCheckNumLength || $checkNumLength > $maxCheckNumLength) {
+				$errors['cards'][] = 'Error procesando la información de los cheques';
+				break;
+			}
+				
+			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0) {
+				$errors['cards'][] = 'Error procesando la información de los cheques';
+			}
+			
+			$paidWithChecks += floatval($paymentAmount);
+		}
+		
+		$totalPaid = $cash + $paidWithCards + $paidWithChecks;
+
+		if ($totalPaid < $total) {
+			$errors['overall'][] = 'Has pagado menos del total';
+		} elseif (($paidWithCards + $paidWithChecks) > ($total - $cash)) {
+			$errors['overall'][] = 'No puedes pagar de más del total con las tarjetas y/o cheques';
+		}
+		
+		return $errors;
 	}
 
 	public function imprimir($id)

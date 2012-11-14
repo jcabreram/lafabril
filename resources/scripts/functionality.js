@@ -1,15 +1,11 @@
 $(function() {
-	deletePayment();
-
 	$("#fecha, #fecha2").datepicker({
 		dateFormat:'yy-mm-dd'
 	}).attr('readonly', 'readonly');
 
-	/*** All text inputs with .date class are going to have datepicker ***/
 	$('input[type="text"].date').datepicker({
 		dateFormat:'dd/mm/yy'
 	}).attr('readonly', 'readonly');
-
 
 	/*** CALCULATE INVOICE TOTAL ***/
 	calculateInvoiceTotal();
@@ -57,7 +53,6 @@ $(function() {
 	}
 	/*** CALCULATE INVOICE TOTAL ***/
 
-
 	/*** SHOW PAYMENT METHOD FORM ***/
 	$('select[name="paymentMethod"]').change(function() {
 		var select = $(this);
@@ -84,7 +79,6 @@ $(function() {
 		select.val('');
 	});
 	/*** SHOW PAYMENT METHOD FORM ***/
-
 
 	/*** BIND FACEBOX EVENTS ***/
 	$(document).bind('reveal.facebox', function() {
@@ -157,7 +151,7 @@ $(function() {
 		tr.append('<td class="textAlign-right"></td>');
 		var lastTd = tr.find('td').last();
 		lastTd.append('<a href="#" title="Eliminar Tarjeta">Eliminar</a>');
-		lastTd.append('<input type="hidden" name="cards['+bank.val()+']['+cardNumberVal+']" value="'+cardPaymentAmount.val()+'" />');
+		lastTd.append('<input type="hidden" name="cards['+bank.val()+'|'+cardNumberVal+']" value="'+cardPaymentAmount.val()+'" />');
 		lastTd.append(' $' + getMoneyFormat(parseFloat(cardPaymentAmount.val())));
 		$('.paymentMethod').last().before(tr);
 

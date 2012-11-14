@@ -8,11 +8,7 @@ class Bills extends CI_Model
 		$this->load->model('folios');
 		$this->load->model('clients');
 
-
-		/*** TRANSACTION STARTS ***/
 		$this->db->trans_start();
-		/*** TRANSACTION STARTS ***/
-
 
 		/*** INSERT BILL HEADER ***/
 		$sql = "INSERT INTO notas_venta (id_nota_venta, id_pedido, fecha, estatus, iva, id_sucursal, fecha_captura, usuario_captura)
@@ -20,9 +16,7 @@ class Bills extends CI_Model
 		$this->db->query($sql);
 		/*** INSERT BILL HEADER ***/
 
-
 		$billId = $this->db->insert_id();
-
 
 		/*** INSERT BILL PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
 		$total = 0.0;
@@ -43,12 +37,10 @@ class Bills extends CI_Model
 		}
 		/*** INSERT BILL PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
 
-
 		/*** GET LAST FOLIO NUMBER ***/
 		$folioInformation = $this->folios->getLastFolio($order['id_sucursal'], 'N');
 		$currentFolio = intval($folioInformation['ultimo_folio']) + 1;
 		/*** GET LAST FOLIO NUMBER ***/
-
 
 		/*** INSERT NEW FOLIO FOR INVOICE ***/
 		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
@@ -56,12 +48,10 @@ class Bills extends CI_Model
 		$this->db->query($sql);
 		/*** INSERT NEW FOLIO FOR INVOICE ***/
 
-
 		/*** UPDATE LAST FOLIO INFORMATION ***/
 		$sql = "UPDATE folios_prefijo SET ultimo_folio = $currentFolio WHERE tipo_documento = 'N' AND id_sucursal = {$order['id_sucursal']}";
 		$this->db->query($sql);
 		/*** UPDATE LAST FOLIO INFORMATION ***/
-
 
 		/*** CLOSE ORDER IF NECESSARY ***/
 		$closeOrder = true;
@@ -80,64 +70,51 @@ class Bills extends CI_Model
 		}
 		/*** CLOSE ORDER IF NECESSARY ***/
 
-
 		/*** REGISTER PAYMENTS ***/
-		$cash = $payments['cash'] === '' ? 0 : $payments['cash'];
-
-		if ($cash > 0) {
+		if ($payments['cash'] > 0) {
 			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
 					VALUES (NULL, $billId, 1, $cash)";
 			$this->db->query($sql);
 		}
+		
+		foreach ($payments['cards'] as $cardInformation => $paymentAmount) {
+			$cardInformation = explode('|', $cardInformation);
+			$bank = $cardInformation[0];
+			$cardNumber = $cardInformation[1];
+			
+			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
+					VALUES (NULL, $billId, 2, $paymentAmount)";
+			$this->db->query($sql);
 
-		$cards = $payments['cards'];
-		$bank = '';
+			$paymentId = $this->db->insert_id();
+			$cardNumberLast4Digits = substr($cardNumber, strlen($cardNumber) - 4, 4);
 
-		if (count($cards) > 0) {
-			foreach ($cards as $cardBank => $cardInformation) {
-				foreach ($cardInformation as $cardNumber => $paymentAmount) {
-					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
-							VALUES (NULL, $billId, 2, $paymentAmount)";
-					$this->db->query($sql);
-
-					$paymentId = $this->db->insert_id();
-					$cardNumberLast4Digits = substr($cardNumber, strlen($cardNumber) - 4, 4);
-
-					$sql = "INSERT INTO pagos_tarjeta (id, tipo_documento, id_pago, banco, numero_tarjeta)
-							VALUES (NULL, 'N', $paymentId, '$cardBank', '$cardNumberLast4Digits')";
-					$this->db->query($sql);
-				}
-			}
+			$sql = "INSERT INTO pagos_tarjeta (id, tipo_documento, id_pago, banco, numero_tarjeta)
+					VALUES (NULL, 'N', $paymentId, '$bank', '$cardNumberLast4Digits')";
+			$this->db->query($sql);
 		}
 
-		$checks = $payments['checks'];
-		$bank = '';
+		foreach ($checks as $checkInformation => $paymentAmount) {
+			$checkInformation = explode('|', $checkInformation);
+			$bank = $checkInformation[0];
+			$checkNumber = $checkInformation[1];
+				
+			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
+					VALUES (NULL, $billId, 3, $paymentAmount)";
+			$this->db->query($sql);
 
-		if (count($checks) > 0) {
-			foreach ($checks as $checkBank => $checkInformation) {
-				foreach ($checkInformation as $checkNumber => $paymentAmount) {
-					$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
-							VALUES (NULL, $billId, 3, $paymentAmount)";
-					$this->db->query($sql);
+			$paymentId = $this->db->insert_id();
 
-					$paymentId = $this->db->insert_id();
-
-					$sql = "INSERT INTO pagos_tarjeta (id, tipo_documento, id_pago, banco, numero_tarjeta)
-							VALUES (NULL, 'N', $paymentId, '$checkBank', '$checkNumber')";
-					$this->db->query($sql);
-				}
-			}
+			$sql = "INSERT INTO pagos_tarjeta (id, tipo_documento, id_pago, banco, numero_tarjeta)
+					VALUES (NULL, 'N', $paymentId, '$bank', '$checkNumber')";
+			$this->db->query($sql);
 		}
 		/*** REGISTER PAYMENTS ***/
 
-
-		/*** TRANSACTION FINISHES ***/
 		$this->db->trans_complete();
-		/*** TRANSACTION FINISHES ***/
-
 
 		if ($this->db->trans_status() === true) {
-		    return true;
+		    return $billId;
 		}
 
 		return false;
@@ -309,7 +286,7 @@ class Bills extends CI_Model
 		
 	}
 	
-	public function getReportData($branch, $ini_date, $fin_date, $client)
+	public function getReportData($branch, $client, $ini_date, $fin_date)
 	{
 		$branch = $this->db->escape(intval($branch));
 		$ini_date = $this->db->escape($ini_date);
@@ -345,7 +322,7 @@ class Bills extends CI_Model
 		return $query->result_array();
 	}	
 	
-	public function getPaymentData($branch, $ini_date, $fin_date, $client)
+	public function getPaymentData($branch, $client, $ini_date, $fin_date)
 	{
 		$branch = $this->db->escape(intval($branch));
 		$ini_date = $this->db->escape($ini_date);
