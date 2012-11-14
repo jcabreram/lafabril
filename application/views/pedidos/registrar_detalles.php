@@ -6,7 +6,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Datos generales del pedido <?php //echo $order['prefijo'].str_pad($order['folio'], 9, "0", STR_PAD_LEFT); ?></h3>
+		<h3>Datos generales del pedido</h3>
 	</div>
 	
 	<!-- Content Box Content -->			

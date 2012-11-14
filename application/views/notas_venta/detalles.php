@@ -126,13 +126,27 @@
 				<td></td>
 			</tr>
 			
+			<tr>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:center">Pagó con...</td>
+				<td></td>
+			</tr>
+			
 			<?php foreach ($bill_payment as $pay) : ?>
 			
 			<tr>
 				<td></td>
 				<td></td>
 				<td style="text-align:right"><b><?php echo $pay['tipo_pago']; ?>:</b></td>
-				<td style="text-align:right">$<?php echo number_format($pay['cantidad'], 2, '.', ','); ?></td>
+				<td style="text-align:right">$<?php echo number_format($pay['importe'], 2, '.', ','); ?></td>
 			</tr>
 			
 			<?php endforeach; ?>
