@@ -282,7 +282,7 @@ class Facturas extends CI_Controller
 		
 	}
 	
-	public function crearReporte()
+	public function crear_reporte()
 	{
 		// Load necessary models
 		$this->load->model('userBranches');
@@ -317,7 +317,14 @@ class Facturas extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			$this->invoices->getReportData($_POST['branch'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['client']);
+			$filters = array(
+				'branch' => $_POST['branch'],
+				'client' => $_POST['client'],
+				'since' => $_POST['fecha_inicio'],
+				'until' => $_POST['fecha_final']
+			);
+			
+			$this->_makeReport($filters);
 		}
 
 		$data['title'] = "Crear reporte de facturas";
@@ -331,4 +338,49 @@ class Facturas extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 	
+	private function _makeReport($filters)
+	{
+		$this->load->helper(array('dompdf', 'file'));
+		$this->load->model('branches');
+		$this->load->model('clients');
+		
+		$invoices = $this->invoices->getReportData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
+		
+		if (count($invoices) === 0) {
+			exit('No existen facturas con esas especificaciones.');
+		}
+		
+		// Get branch name
+		$branch = $this->branches->getBranch($filters['branch']);
+		$branch = $branch['nombre'];
+
+		if ($filters['client'] === '0') {
+			$client = 'Todos';
+		} else {
+			// Get client name
+			$client = $this->clients->getBranch($filters['client']);
+			$client = $client['nombre'];
+		}
+		
+		$since = convertToHumanDate($filters['since']);
+		$until = convertToHumanDate($filters['until']);
+		
+		$total = 0;
+		foreach ($invoices as $invoice) {
+			$total += $invoice['importe'];
+		}
+
+		$data['title'] = 'Reporte Financiero de Facturas';
+		$data['invoices'] = $invoices;
+		$data['branch'] = $branch;
+		$data['client'] = $client;
+		$data['since'] = $since;
+		$data['until'] = $until;
+		$data['total'] = $total;
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes_financieros/facturas', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
+		createPDF($html, 'reporte');
+	}
 }

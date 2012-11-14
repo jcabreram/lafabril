@@ -283,7 +283,7 @@ class Notas_venta extends CI_Controller
 		createPDF($html, 'formato');
 	}
 	
-	public function crearReporte()
+	public function crear_reporte()
 	{
 		// Load necessary models
 		$this->load->model('userBranches');
@@ -318,9 +318,14 @@ class Notas_venta extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			// These two return the arrays with the data from the reports and the data of the type and amount of payments
-			$this->bills->getReportData($_POST['branch'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['client']);
-			$this->bills->getPaymentData($_POST['branch'], $_POST['fecha_inicio'], $_POST['fecha_final'], $_POST['client']);
+			$filters = array(
+				'branch' => $_POST['branch'],
+				'client' => $_POST['client'],
+				'since' => $_POST['fecha_inicio'],
+				'until' => $_POST['fecha_final']
+			);
+			
+			$this->_makeReport($filters);
 		}
 
 		$data['title'] = "Crear reporte de notas de venta";
@@ -332,5 +337,52 @@ class Notas_venta extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('notas_venta/crear_reporte', $data);
 		$this->load->view('footer', $data);
+	}
+	
+	private function _makeReport($filters)
+	{
+		$this->load->helper(array('dompdf', 'file'));
+		$this->load->model('branches');
+		$this->load->model('clients');
+		
+		$bills = $this->bills->getReportData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
+		$payments = $this->bills->getPaymentsData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
+		
+		if (count($bills) === 0) {
+			exit('No existen notas de venta con esas especificaciones.');
+		}
+		
+		// Get branch name
+		$branch = $this->branches->getBranch($filters['branch']);
+		$branch = $branch['nombre'];
+
+		if ($filters['client'] === '0') {
+			$client = 'Todos';
+		} else {
+			// Get client name
+			$client = $this->clients->getBranch($filters['client']);
+			$client = $client['nombre'];
+		}
+		
+		$since = convertToHumanDate($filters['since']);
+		$until = convertToHumanDate($filters['until']);
+		
+		$total = 0;
+		foreach ($bills as $bill) {
+			$total += $bill['importe'];
+		}
+
+		$data['title'] = 'Reporte Financiero de Facturas';
+		$data['invoices'] = $invoices;
+		$data['branch'] = $branch;
+		$data['client'] = $client;
+		$data['since'] = $since;
+		$data['until'] = $until;
+		$data['total'] = $total;
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes_financieros/facturas', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
+		createPDF($html, 'reporte');
 	}
 }

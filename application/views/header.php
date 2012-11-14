@@ -113,8 +113,8 @@
 						<li><a href="<?php echo site_url('pedidos/registrar'); ?>"<?php if ((methodName() == 'pedidos/registrar') || (methodName() == 'pedidos/registrar_detalles')) { echo ' class="current"'; } ?>>Agregar Pedido</a></li>
 						<li><a href="<?php echo site_url('notas_venta'); ?>"<?php if ((methodName() == 'notas_venta/index') || (methodName() == 'notas_venta/listar')) { echo ' class="current"'; } ?>>Administrar Notas de Venta</a></li>
 						<li><a href="<?php echo site_url('facturas'); ?>"<?php if ((methodName() == 'facturas/index') || (methodName() == 'facturas/listar')) { echo ' class="current"'; } ?>>Administrar Facturas</a></li>
-						<li><a href="<?php echo site_url('facturas/crearReporte'); ?>"<?php if (methodName() == 'facturas/crearReporte') { echo ' class="current"'; } ?>>Reporte de Facturas</a></li>
-						<li><a href="<?php echo site_url('notas_venta/crearReporte'); ?>"<?php if (methodName() == 'notas_venta/crearReporte') { echo ' class="current"'; } ?>>Reporte de Notas de Venta</a></li>
+						<li><a href="<?php echo site_url('facturas/crear_reporte'); ?>"<?php if (methodName() == 'facturas/crear_reporte') { echo ' class="current"'; } ?>>Reporte de Facturas</a></li>
+						<li><a href="<?php echo site_url('notas_venta/crear_reporte'); ?>"<?php if (methodName() == 'notas_venta/crearReporte') { echo ' class="current"'; } ?>>Reporte de Notas de Venta</a></li>
 					</ul>
 				</li>
 				

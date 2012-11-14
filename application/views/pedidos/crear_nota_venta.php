@@ -30,7 +30,7 @@
 			<fieldset class="column-right">
 
 				<p><strong>Fecha del Pedido</strong>: <?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></p>
-				<p><strong>Estatus del Pedido</strong>: <?php echo getOrderStatusName($order['estatus']); ?></p>
+				<p><strong>Estatus del Pedido</strong>: <?php echo getStatusName($order['estatus']); ?></p>
 				<p><strong>Fecha de la Nota</strong>: <input type="text" name="billDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" />
 					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?></p>
 
