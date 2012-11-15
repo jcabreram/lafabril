@@ -281,5 +281,14 @@ class Pagos extends CI_Controller
 		$html .= $this->load->view('formatos/footer', $data, true);
 
 		createPDF($html, 'formato');
-	}	
+	}
+	
+	public function not_default($str) {
+		if ($str == 'escoge') {
+			$this->form_validation->set_message('not_default', 'Escoge una opción');
+			return FALSE;
+		} else {
+	    	return TRUE;
+	    }
+	}
 }

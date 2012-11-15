@@ -340,6 +340,15 @@ class Notas_venta extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 	
+	public function not_default($str) {
+		if ($str == 'escoge') {
+			$this->form_validation->set_message('not_default', 'Escoge una opción');
+			return FALSE;
+		} else {
+	    	return TRUE;
+	    }
+	}
+	
 	private function _makeReport($filters)
 	{
 		$this->load->helper(array('dompdf', 'file'));

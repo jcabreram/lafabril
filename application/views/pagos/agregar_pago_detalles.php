@@ -75,7 +75,7 @@
 				<select name="invoice" class="large-input">
 					<option value="escoge">Escoge una opción</option>
 					<?php foreach ($invoices as $invoice) : ?>
-					<option value="<?php echo $invoice['id_factura']; ?>"><?php echo $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT).' - Importe: $'.number_format($invoice['importe'], 2, '.', ',').' - Saldo: $'.number_format($invoice['saldo'], 2, '.', ',').' - Fecha: '.strftime('%d/%b/%Y',strtotime($invoice['fecha_factura'])); ?></option>
+					<option value="<?php echo $invoice['id_factura']; ?>"><?php echo $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT).' - Importe: $'.number_format($invoice['importe'], 2, '.', ',').' - Saldo: $'.number_format(isset($invoice['saldo']), 2, '.', ',').' - Fecha: '.strftime('%d/%b/%Y',strtotime($invoice['fecha_factura'])); ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('invoice'); ?>
