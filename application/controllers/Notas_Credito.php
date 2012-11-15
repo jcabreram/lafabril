@@ -107,6 +107,85 @@ class Notas_Credito extends CI_Controller
 	
 	public function registrar_detalles($id)
 	{
+		$this->load->model('invoices');
 		
+		$creditNote = $this->credit_notes->getCreditNote($id);
+		$invoices = $this->invoices->getAllActive($creditNote['id_sucursal'], $creditNote['id_cliente']);
+		
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		$config = array(
+			array(
+				'field' => 'invoice', 
+				'label' => 'factura', 
+				'rules' => 'required'
+			),
+			array(
+				'field' => 'amount', 
+				'label' => 'importe', 
+				'rules' => 'required|numeric|callback_valid_amount'
+			)
+		);
+
+		$this->form_validation->set_rules($config);
+		
+		$user = $this->session->userdata('user');
+		
+		if ($this->form_validation->run()) {
+			if($this->credit_notes->addLine($id, $_POST['invoice'], $_POST['amount'])) {
+				$this->session->set_flashdata('message', 'El detalle ha sido registrado.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el detalle, intenta de nuevo.');
+			}
+		}
+
+		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
+		
+		$creditNoteType = '';
+		
+		switch ($creditNote['tipo']) {
+			case 'B':
+			$creditNoteType = 'Bonificación';
+			break;
+			
+			case 'D':
+			$creditNoteType = 'Devolución';
+			break;
+			
+			case 'C':
+			$creditNoteType = 'Cancelación';
+			break;
+		}
+		
+		$data['title'] = 'Registrar Nota de Crédito';
+		$data['user'] = $this->session->userdata('user');
+		$data['creditNote'] = $creditNote;
+		$data['creditNoteDetails'] = $creditNoteDetails;
+		$data['creditNoteType'] = $creditNoteType;
+		$data['invoices'] = $invoices;
+		
+		$this->load->view('header', $data);
+		$this->load->view('notas_credito/registrar_detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
+	public function valid_amount($payment)
+	{
+		$invoice = $this->invoices->getInvoice($_POST['invoice']);
+		
+		if ($payment > $invoice['saldo']) {
+			$this->form_validation->set_message("valid_amount", "La nota de crédito debe ser menor o igual al saldo.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public function eliminar($creditNoteId, $creditNoteDetailId)
+	{	
+		$this->credit_notes->eliminar($creditNoteDetailId);
+		redirect("notas_credito/registrar_detalles/$creditNoteId");
 	}
 }
