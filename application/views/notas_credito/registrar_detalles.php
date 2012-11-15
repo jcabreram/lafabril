@@ -125,6 +125,17 @@
 			<?php endforeach; ?>
 			</tbody>
 
+			<tfoot>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="textAlign-right"><strong>Total</strong></td>
+					<td class="textAlign-right">$<?php echo getMoneyFormat($total); ?></td>
+					<td></td>
+				</tr>
+			</tfoot>
+
 		</table>
 	
 	<p>

@@ -28,17 +28,21 @@ class Credit_Notes extends CI_Model
 	{
 		$sql = 'SELECT 
 				nc.id_nota_credito AS id,
+				fo.folio,
+				fp.prefijo,
 				nc.id_sucursal,
 				su.nombre AS nombre_sucursal,
 				nc.id_cliente,
 				cl.nombre AS nombre_cliente,
-				nc.fecha AS fecha,
+				nc.fecha,
 				nc.estatus,
 				nc.observaciones,
 				nc.tipo,
 				nc.usuario_captura,
 				nc.fecha_captura
 				FROM notas_credito AS nc
+				JOIN folios AS fo ON nc.id_nota_credito = fo.id_documento AND tipo_documento = "B"
+				JOIN folios_prefijo AS fp ON nc.id_sucursal = fp.id_sucursal AND fp.tipo_documento="B"
 				JOIN sucursales AS su ON nc.id_sucursal = su.id_sucursal
 				JOIN clientes AS cl ON nc.id_cliente = cl.id_cliente
 				WHERE id_nota_credito = ' . $id;

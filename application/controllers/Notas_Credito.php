@@ -59,11 +59,21 @@ class Notas_Credito extends CI_Controller
 	
 	public function detalles($noteCreditId)
 	{
+		$creditNote = $this->credit_notes->getCreditNote($noteCreditId);
+		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($noteCreditId);
+
+		$total = 0.0;
+
+		foreach ($creditNoteDetails as $detail) {
+			$total += $detail['importe_nota_credito'];
+		}
+
 		$data['title'] = "Detalle de la Nota de Crédito";
 		$data['user'] = $this->session->userdata('user');
-		$data['creditNote'] = $this->credit_notes->getCreditNote($noteCreditId);
+		$data['creditNote'] = $creditNote;
+		$data['creditNoteDetails'] = $creditNoteDetails;
 		$data['creditNoteType'] = $this->_getCreditNoteType($data['creditNote']['tipo']);
-		$data['creditNoteDetails'] = $this->credit_notes->getCreditNoteDetails($noteCreditId);
+		$data['total'] = $total;
 		
 		// Display views
 		$this->load->view('header', $data);
@@ -179,6 +189,12 @@ class Notas_Credito extends CI_Controller
 
 		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
 		$invoices = $this->invoices->getAllActive($creditNote['id_sucursal'], $creditNote['id_cliente']);
+
+		$total = 0.0;
+
+		foreach ($creditNoteDetails as $detail) {
+			$total += $detail['importe_nota_credito'];
+		}
 		
 		$data['title'] = 'Registrar Nota de Crédito';
 		$data['user'] = $this->session->userdata('user');
@@ -186,6 +202,7 @@ class Notas_Credito extends CI_Controller
 		$data['creditNoteDetails'] = $creditNoteDetails;
 		$data['creditNoteType'] = $this->_getCreditNoteType($creditNote['tipo']);
 		$data['invoices'] = $invoices;
+		$data['total'] = $total;
 		
 		$this->load->view('header', $data);
 		$this->load->view('notas_credito/registrar_detalles', $data);
@@ -240,5 +257,47 @@ class Notas_Credito extends CI_Controller
 			}
 		redirect("notas_credito");
 		
+	}
+
+	public function imprimir($id)
+	{
+		$creditNote = $this->credit_notes->getCreditNote($id);
+
+		if (count($creditNote) === 0) {
+			// We kill the script because usually the PDF is opened in a different tab.
+			exit('Nota de crédito no encontrada.');
+		}
+
+		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
+
+		$total = 0.0;
+
+		foreach ($creditNoteDetails as $detail) {
+			$total += $detail['importe_nota_credito'];
+		}
+
+		// Necessary to create a PDF
+		$this->load->helper(array('dompdf', 'file'));
+		
+		$this->load->model('branches'); // This is mandatory to create the PDF header
+		$this->load->model('clients'); // This model is necessary because the format has the client address
+
+		$branch = $this->branches->getBranch($creditNote['id_sucursal']);
+		$clientAddress = $this->clients->getClientAddress($creditNote['id_cliente']);
+
+		$data['title'] = 'Nota de Crédito';
+		$data['branch'] = $branch;
+		$data['folio'] = getFolio($creditNote['prefijo'], $creditNote['folio']);
+		$data['clientAddress'] = $clientAddress;
+		$data['creditNote'] = $creditNote;
+		$data['creditNoteDetails'] = $creditNoteDetails;
+		$data['creditNoteType'] = $this->_getCreditNoteType($data['creditNote']['tipo']);
+		$data['total'] = $total;
+
+		$html = $this->load->view('formatos/header', $data, true);
+		$html .= $this->load->view('formatos/nota_credito', $data, true);
+		$html .= $this->load->view('formatos/footer', $data, true);
+
+		createPDF($html, 'formato');
 	}
 }
