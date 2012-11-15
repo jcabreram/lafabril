@@ -241,6 +241,47 @@ class Pagos extends CI_Controller
 		redirect("pagos");
 		
 	}
+
+	public function imprimir($id)
+	{
+		$payment = $this->payments->getPayment($id);
+
+		if (count($payment) === 0) {
+			// We kill the script because usually the PDF is opened in a different tab.
+			exit('Pago no encontrado.');
+		}
+
+		$paymentDetails = $this->payments->getPaymentDetails($id);
+
+		$total = 0.0;
+
+		foreach ($paymentDetails as $detail) {
+			$total += $detail['importe_pago'];
+		}
+
+		// Necessary to create a PDF
+		$this->load->helper(array('dompdf', 'file'));
+		
+		$this->load->model('branches'); // This is mandatory to create the PDF header
+		$this->load->model('clients'); // This model is necessary because the format has the client address
+
+		$branch = $this->branches->getBranch($payment['id_sucursal']);
+		$clientAddress = $this->clients->getClientAddress($payment['id_cliente']);
+
+		$data['title'] = 'Formato de Pago';
+		$data['branch'] = $branch;
+		$data['folio'] = getFolio($payment['prefijo'], $payment['folio']);
+		$data['clientAddress'] = $clientAddress;
+		$data['payment'] = $payment;
+		$data['paymentDetails'] = $paymentDetails;
+		$data['total'] = $total;
+
+		$html = $this->load->view('formatos/header', $data, true);
+		$html .= $this->load->view('formatos/pago', $data, true);
+		$html .= $this->load->view('formatos/footer', $data, true);
+
+		createPDF($html, 'formato');
+	}
 	
 	public function not_default($str) {
 		if ($str == 'escoge') {
@@ -250,5 +291,4 @@ class Pagos extends CI_Controller
 	    	return TRUE;
 	    }
 	}
-	
 }

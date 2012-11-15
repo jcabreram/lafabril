@@ -161,33 +161,20 @@
 </div>
 <!-- End Content Box -->
 
-<div class="content-box column-left"><!-- Start Content Box -->
+<div class="content-box"><!-- Start Content Box -->
 				
-				<div class="content-box-header">
-					
-					<h3>Opciones...</h3>
-					
-				</div> <!-- End .content-box-header -->
-				
-				<div class="content-box-content">
-					
-					<div class="tab-content default-tab">
-						<table>
-							<thead>
-								<tr>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('notas_venta/imprimir/' . $bill['id_nota_venta']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
-									</th>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('notas_venta/cancelar/' . $bill['id_nota_venta']); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
-									</th>
-								</tr>
-							</tbody>
-						</table>
-					</div> <!-- End #tab3 -->        
-					
-				</div> <!-- End .content-box-content -->
-				
-			</div> <!-- End .content-box -->
-			
-			<div class="clear"></div>
+	<div class="content-box-header">
+		
+		<h3>Opciones</h3>
+		
+	</div> <!-- End .content-box-header -->
+
+	<div class="content-box-content">
+		<p>
+			<a style="margin-right: 50px; display: inline-block;" href="<?php echo site_url('notas_venta/imprimir/' . $bill['id_nota_venta']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
+			<a href="<?php echo site_url('notas_venta/cancelar/' . $bill['id_nota_venta']); ?>"><input class="button" type="button" value="Cancelar" /></a>   
+		</p>
+		
+	</div> <!-- End .content-box-content -->
+
+</div> <!-- End .content-box -->

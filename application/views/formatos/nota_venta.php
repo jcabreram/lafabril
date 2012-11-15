@@ -12,13 +12,6 @@
 		<th>Pedido</th>
 		<td><?php echo $orderFolio; ?></td>
 	</tr>
-
-	<tr>
-		<th>RFC</th>
-		<td><?php echo $bill['rfc']; ?></td>
-		<th></th>
-		<td></td>
-	</tr>
 </table>
 
 <?php if (count($bill['products']) > 0) : ?>
@@ -75,7 +68,7 @@
 		<tr>
 			<td></td>
 			<td></td>
-			<th class="textAlign-right">Pago</th>
+			<th class="textAlign-right">Pagado</th>
 			<td></td>
 		</tr>
 			
@@ -83,8 +76,8 @@
 		<tr>
 			<td></td>
 			<td></td>
-			<td class="textAlign-right"><b><?php echo $payment['tipo_pago']; ?>:</b></td>
-			<td class="textAlign-right">$<?php echo number_format($payment['importe'], 2, '.', ','); ?></td>
+			<td class="textAlign-right"><strong><?php echo $payment['tipo_pago']; ?>:</strong></td>
+			<td class="textAlign-right">$<?php echo getMoneyFormat($payment['importe']); ?></td>
 		</tr>	
 		<?php endforeach; ?>
 	</tfoot>

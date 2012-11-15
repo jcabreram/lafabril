@@ -23,8 +23,8 @@ class Credit_Notes extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();	
 	}
-	
-	public function getCreditNote($id)
+
+	public function getPreCreditNote($id)
 	{
 		$sql = 'SELECT 
 				nc.id_nota_credito AS id,
@@ -32,7 +32,7 @@ class Credit_Notes extends CI_Model
 				su.nombre AS nombre_sucursal,
 				nc.id_cliente,
 				cl.nombre AS nombre_cliente,
-				nc.fecha AS fecha,
+				nc.fecha,
 				nc.estatus,
 				nc.observaciones,
 				nc.tipo,
@@ -48,12 +48,42 @@ class Credit_Notes extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->row_array();
 	}
+	
+	public function getCreditNote($id)
+	{
+		$sql = 'SELECT 
+				nc.id_nota_credito AS id,
+				fo.folio,
+				fp.prefijo,
+				nc.id_sucursal,
+				su.nombre AS nombre_sucursal,
+				nc.id_cliente,
+				cl.nombre AS nombre_cliente,
+				nc.fecha,
+				nc.estatus,
+				nc.observaciones,
+				nc.tipo,
+				nc.usuario_captura,
+				nc.fecha_captura
+				FROM notas_credito AS nc
+				JOIN folios AS fo ON nc.id_nota_credito = fo.id_documento AND tipo_documento = "B"
+				JOIN folios_prefijo AS fp ON nc.id_sucursal = fp.id_sucursal AND fp.tipo_documento="B"
+				JOIN sucursales AS su ON nc.id_sucursal = su.id_sucursal
+				JOIN clientes AS cl ON nc.id_cliente = cl.id_cliente
+				WHERE id_nota_credito = ' . $id;
+				
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->row_array();
+	}
 
 	public function getCreditNoteDetails($id)
 	{
 		$id = $this->db->escape(intval($id));
 
 		$sql = 'SELECT 	ncd.id_nota_credito_detalle,
+						fa.id_factura,
 						fp.prefijo, 
 						fo.folio, 
 						fa.fecha,
@@ -75,8 +105,6 @@ class Credit_Notes extends CI_Model
 	
 	public function register($branch, $client, $date, $type, $observations, $user)
 	{
-		$this->load->model('folios');
-
 		$branch = $this->db->escape(intval($branch));
 		$client = $this->db->escape(intval($client));
 		$date = $this->db->escape(convertToComputerDate($date));
@@ -91,19 +119,6 @@ class Credit_Notes extends CI_Model
 		$this->db->query($sql);
 
 		$creditNoteId = $this->db->insert_id();
-
-		// We get the last folio of the orders in that branch
-		$ultimo_folio = $this->folios->getLastFolio($branch, 'B');
-		$folio_actual = $ultimo_folio['ultimo_folio'] + 1;
-
-		// Insert the next folio for the document in the folios table
-		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
-					VALUES (NULL, $creditNoteId, $branch, 'B', $folio_actual)";		
-		$this->db->query($sql);
-		
-		// Update the value of the last folio
-		$sql = "UPDATE folios_prefijo SET ultimo_folio=$folio_actual WHERE tipo_documento = 'B' AND id_sucursal = $branch";
-		$this->db->query($sql);
 			
 		$this->db->trans_complete();
 		
@@ -112,6 +127,48 @@ class Credit_Notes extends CI_Model
 		}
 
 		return false;
+	}
+
+	public function finalize($id)
+	{
+		$this->load->model('folios');
+
+		$id = $this->db->escape(intval($id));
+
+		$this->db->trans_start();
+
+		$creditNote = $this->getPreCreditNote($id);
+		$creditNoteDetails = $this->getCreditNoteDetails($id);
+		$branch = $creditNote['id_sucursal'];
+
+		// We get the last folio of the orders in that branch
+		$lastFolio = $this->folios->getLastFolio($branch, 'B');
+		$nextFolio = $lastFolio['ultimo_folio'] + 1;
+
+		// Insert the next folio for the document in the folios table
+		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+					VALUES (NULL, $id, $branch, 'B', $nextFolio)";		
+		$this->db->query($sql);
+		
+		// Update the value of the last folio
+		$sql = "UPDATE folios_prefijo SET ultimo_folio=$nextFolio WHERE tipo_documento = 'B' AND id_sucursal = $branch";
+		$this->db->query($sql);
+
+		$sql = "UPDATE notas_credito SET estatus = 'A' WHERE id_nota_credito = $id";
+		$this->db->query($sql);	
+
+		foreach ($creditNoteDetails as $detail) {
+			$sql = "UPDATE movimientos SET saldo = saldo-{$detail['importe_nota_credito']} WHERE id_documento = {$detail['id_factura']}";
+			$this->db->query($sql);
+		}
+
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;		
 	}
 
 	public function addLine ($creditNoteId, $invoiceId, $amount) {
@@ -133,12 +190,6 @@ class Credit_Notes extends CI_Model
 				VALUES (NULL, $creditNoteId, $invoiceId, $amount)";
 			$this->db->query($sql);	
 		}
-		
-		$sql = "UPDATE notas_credito SET estatus = 'A' WHERE id_nota_credito = $creditNoteId";
-		$this->db->query($sql);	
-		
-		$sql = "UPDATE movimientos SET saldo = saldo-$amount WHERE id_documento = $invoiceId";
-		$this->db->query($sql);
 		
 		$this->db->trans_complete();
 
