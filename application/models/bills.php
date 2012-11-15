@@ -30,7 +30,7 @@ class Bills extends CI_Model
 					VALUES ($billId, 'N', {$product['id_producto']}, {$product['cantidad']}, {$order['id_sucursal']}, '$date', 'S')";
 			$this->db->query($sql);
 
-			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = cantidad_surtida + {$product['cantidad']} WHERE id_pedido = {$order['id_pedido']} AND id_producto = {$product['id_producto']}";
+			$sql = "UPDATE pedidos_detalles SET cantidad_surtida = cantidad WHERE id_pedido = {$order['id_pedido']} AND id_producto = {$product['id_producto']}";
 			$this->db->query($sql);
 
 			$total += $product['cantidad'] * $product['precio'];
@@ -73,16 +73,16 @@ class Bills extends CI_Model
 		/*** REGISTER PAYMENTS ***/
 		if ($payments['cash'] > 0) {
 			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
-					VALUES (NULL, $billId, 1, $cash)";
+					VALUES (NULL, $billId, 1, {$payments['cash']})";
 			$this->db->query($sql);
 		}
 		
 		foreach ($payments['cards'] as $cardInformation => $paymentAmount) {
-			$cardInformation = explode('|', $cardInformation);
+			$cardInformation = explode('-', $cardInformation);
 			$bank = $cardInformation[0];
 			$cardNumber = $cardInformation[1];
 			
-			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, cantidad)
+			$sql = "INSERT INTO pagos_notas (id, nota_id, pago_tipo, importe)
 					VALUES (NULL, $billId, 2, $paymentAmount)";
 			$this->db->query($sql);
 
@@ -94,8 +94,8 @@ class Bills extends CI_Model
 			$this->db->query($sql);
 		}
 
-		foreach ($checks as $checkInformation => $paymentAmount) {
-			$checkInformation = explode('|', $checkInformation);
+		foreach ($payments['checks'] as $checkInformation => $paymentAmount) {
+			$checkInformation = explode('-', $checkInformation);
 			$bank = $checkInformation[0];
 			$checkNumber = $checkInformation[1];
 				
@@ -300,7 +300,7 @@ class Bills extends CI_Model
 					fo.folio, 
 					nv.fecha AS fecha_nota_venta,
 					nv.estatus,
-					SUM(pn.importe)
+					SUM(pn.importe) AS importe
 				FROM notas_venta AS nv
 				JOIN pedidos AS pe ON pe.id_pedido=nv.id_pedido
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
@@ -331,12 +331,13 @@ class Bills extends CI_Model
 
 		$sql = "SELECT 
 					pt.nombre,
-					pn.importe
+					SUM(pn.importe) AS total
 				FROM notas_venta AS nv
 				JOIN pedidos AS pe ON pe.id_pedido=nv.id_pedido
 				JOIN pagos_notas AS pn ON pn.nota_id = nv.id_nota_venta
 				JOIN pagos_tipo AS pt ON pn.pago_tipo = pt.id_pago_tipo
-				WHERE nv.id_sucursal = $branch AND nv.fecha BETWEEN $ini_date AND $fin_date";
+				WHERE nv.id_sucursal = $branch AND nv.fecha BETWEEN $ini_date AND $fin_date
+				GROUP BY nombre";
 		
 		if ($client != '0') {
 			$sql .= "AND pe.id_cliente = $client";

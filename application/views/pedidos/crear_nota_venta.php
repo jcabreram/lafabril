@@ -16,6 +16,14 @@
 			<div><?php echo $this->session->flashdata('error'); ?></div>
 		</div>
 		<?php endif; ?>
+		
+		<?php foreach ($errors as $error) : ?>
+		<!-- Notification -->
+		<div class="notification error png_bg">
+			<!-- Message -->
+			<div><?php echo $error; ?></div>
+		</div>
+		<?php endforeach; ?>
 
 		<form action="<?php echo site_url('pedidos/crear_nota_venta/' . $order['id_pedido']); ?>" method="post" id="payBill">
 
@@ -31,8 +39,7 @@
 
 				<p><strong>Fecha del Pedido</strong>: <?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></p>
 				<p><strong>Estatus del Pedido</strong>: <?php echo getStatusName($order['estatus']); ?></p>
-				<p><strong>Fecha de la Nota</strong>: <input type="text" name="billDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" />
-					<?php if (isset($errors['date'])) { echo '<span class="input-notification error png_bg">' . $errors['date'] . '</span>'; } ?></p>
+				<p><strong>Fecha de la Nota</strong>: <input type="text" name="billDate" class="text-input small-input date" value="<?php echo isset($_POST['invoiceDate']) ? $_POST['invoiceDate'] : date('d/m/Y'); ?>" /></p>
 
 			</fieldset>
 
@@ -85,7 +92,7 @@
 						<td></td>
 						<td></td>
 						<td class="textAlign-right"><strong>Total</strong>:</td>
-						<td class="textAlign-right"><input type="hidden" name="billTotal" value="<?php echo round($total, 2); ?>" />$<?php echo getMoneyFormat($total); ?></td>
+						<td class="textAlign-right"><input type="hidden" name="billTotal" value="<?php echo $total; ?>" />$<?php echo getMoneyFormat($total); ?></td>
 					</tr>
 
 					<tr>

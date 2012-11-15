@@ -119,7 +119,7 @@
 </div>
 <!-- End Content Box -->
 
-<div class="content-box column-left"><!-- Start Content Box -->
+<div class="content-box"><!-- Start Content Box -->
 				
 				<div class="content-box-header">
 					
@@ -133,9 +133,6 @@
 						<table>
 							<thead>
 								<tr>
-									<th style="text-align:center">
-										<a href="<?php echo site_url('pagos/imprimir/' . $payment['id_pago_factura']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
-									</th>
 									<th style="text-align:center">
 										<a href="<?php echo site_url('pagos/cancelar/' . $payment['id_pago_factura']); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
 									</th>

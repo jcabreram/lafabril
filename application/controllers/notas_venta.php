@@ -272,6 +272,7 @@ class Notas_venta extends CI_Controller
 		$data['clientAddress'] = $clientAddress;
 		$data['orderFolio'] = $orderFolio;
 		$data['bill'] = $bill;
+		$data['payments'] = $this->bills->getBillPayment($id);
 		$data['subtotal'] = $subtotal;
 		$data['iva'] = $iva;
 		$data['total'] = $total;
@@ -346,8 +347,8 @@ class Notas_venta extends CI_Controller
 		$this->load->model('clients');
 		
 		$bills = $this->bills->getReportData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
-		$payments = $this->bills->getPaymentsData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
-		
+		$payments = $this->bills->getPaymentData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
+
 		if (count($bills) === 0) {
 			exit('No existen notas de venta con esas especificaciones.');
 		}
@@ -372,8 +373,9 @@ class Notas_venta extends CI_Controller
 			$total += $bill['importe'];
 		}
 
-		$data['title'] = 'Reporte Financiero de Facturas';
-		$data['invoices'] = $invoices;
+		$data['title'] = 'Reporte Financiero de Notas de Venta';
+		$data['bills'] = $bills;
+		$data['payments'] = $payments;
 		$data['branch'] = $branch;
 		$data['client'] = $client;
 		$data['since'] = $since;
@@ -381,7 +383,7 @@ class Notas_venta extends CI_Controller
 		$data['total'] = $total;
 
 		$html = $this->load->view('reportes/header', $data, true);
-		$html .= $this->load->view('reportes_financieros/facturas', $data, true);
+		$html .= $this->load->view('reportes_financieros/notas_venta', $data, true);
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}

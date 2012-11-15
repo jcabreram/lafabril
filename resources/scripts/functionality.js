@@ -57,11 +57,6 @@ $(function() {
 	$('select[name="paymentMethod"]').change(function() {
 		var select = $(this);
 
-		if (parseFloat($('input[name="billBalance"]').val()) === 0.0) {
-			select.val('');
-			return;
-		}
-
 		var divId = '';
 
 		switch (select.val()) {
@@ -87,8 +82,8 @@ $(function() {
 		var checkPaymentAmount = $('input[name="checkPaymentAmount"]').last();
 		
 		// Bill balance as default to the payment amount
-		cardPaymentAmount.val(billBalance.val());
-		checkPaymentAmount.val(billBalance.val());
+		cardPaymentAmount.val(parseFloat(billBalance.val()).toFixed(2));
+		checkPaymentAmount.val(parseFloat(billBalance.val()).toFixed(2));
 
 		$('.addCard').last().click(addCard);
 		$('.addCheck').last().click(addCheck);
@@ -135,7 +130,7 @@ $(function() {
 			return false;
 		}
 		
-		if (parseFloat(cardPaymentAmount.val()) > parseFloat(billBalance.val())) {
+		if (parseFloat(cardPaymentAmount.val()) - .001 > parseFloat(billBalance.val())) {
 			alert('No puedes pagar con la tarjeta más del saldo.');
 			return false;
 		}
@@ -151,7 +146,7 @@ $(function() {
 		tr.append('<td class="textAlign-right"></td>');
 		var lastTd = tr.find('td').last();
 		lastTd.append('<a href="#" title="Eliminar Tarjeta">Eliminar</a>');
-		lastTd.append('<input type="hidden" name="cards['+bank.val()+'|'+cardNumberVal+']" value="'+cardPaymentAmount.val()+'" />');
+		lastTd.append('<input type="hidden" name="cards['+bank.val()+'-'+cardNumberVal+']" value="'+cardPaymentAmount.val()+'" />');
 		lastTd.append(' $' + getMoneyFormat(parseFloat(cardPaymentAmount.val())));
 		$('.paymentMethod').last().before(tr);
 
@@ -215,7 +210,7 @@ $(function() {
 			return false;
 		}
 		
-		if (parseFloat(checkPaymentAmount.val()) > parseFloat(billBalance.val())) {
+		if (parseFloat(checkPaymentAmount.val()) - .001 > parseFloat(billBalance.val())) {
 			alert('No puedes pagar con el cheque más del saldo.');
 			return false;
 		}
@@ -231,7 +226,7 @@ $(function() {
 		tr.append('<td class="textAlign-right"></td>');
 		var lastTd = tr.find('td').last();
 		lastTd.append('<a href="#" title="Eliminar Cheque">Eliminar</a>');
-		lastTd.append('<input type="hidden" name="checks['+bank.val()+']['+checkNumberVal+']" value="'+checkPaymentAmount.val()+'" />');
+		lastTd.append('<input type="hidden" name="checks['+bank.val()+'-'+checkNumberVal+']" value="'+checkPaymentAmount.val()+'" />');
 		lastTd.append(' $' + getMoneyFormat(parseFloat(checkPaymentAmount.val())));
 		$('.paymentMethod').last().before(tr);
 

@@ -595,6 +595,13 @@ class Pedidos extends CI_Controller
 		}
 
 		$order['products'] = $this->orders->getOrderProducts($orderId);
+		
+		foreach ($order['products'] as $product) {
+			if (floatval($product['cantidad_surtida']) !== 0.0) {
+				$this->session->set_flashdata('error', 'El pedido ya ha empezado a ser facturado');
+				redirect('pedidos');
+			}
+		}
 
 		$subtotal = 0.0;
 		$taxes = 0.0;
@@ -605,27 +612,21 @@ class Pedidos extends CI_Controller
 		}
 
 		$taxes = $subtotal * $order['sucursal_iva'];
-		$total = $subtotal + $taxes;
+		$total = round($subtotal + $taxes, 2);
 		
+		$user = $this->session->userdata('user');
 		$errors = array();
 
-		if ($_POST) {
-			$errors = $this->_validateBillPayment($_POST, $order['fecha_pedido'], $total);
-			
-			$totalErrors = 0;
-			foreach ($errors as $error) {
-				$totalErrors += count($errors[$error]);
-			}
-		}
-
-		$user = $this->session->userdata('user');
-
-		if ($_POST && $totalErrors === 0) {
+		if ($_POST && count($errors = $this->_validateBillPayment($_POST, $order['fecha_pedido'], $total)) === 0) {
 			$this->load->model('bills');
 			
 			$cash = !isset($_POST['cash']) || $_POST['cash'] === '' ? 0 : floatval($_POST['cash']);
 			$cards = !isset($_POST['cards']) || $_POST['cards'] === '' || !is_array($_POST['cards']) ? array() : $_POST['cards'];
-			$cards = !isset($_POST['cards']) || $_POST['cards'] === '' || !is_array($_POST['cards']) ? array() : $_POST['cards'];
+			$checks = !isset($_POST['checks']) || $_POST['checks'] === '' || !is_array($_POST['checks']) ? array() : $_POST['checks'];
+			
+			if ($cash > $total) {
+				$cash = $total;
+			}
 			
 			$payments = array(
 				'cash' => $cash,
@@ -633,7 +634,7 @@ class Pedidos extends CI_Controller
 				'checks' => $checks
 			);
 
-			if (($billId = $this->bills->register($order, $_POST['billDate'], $payments, $user['id'])) !== false) {
+			if (($billId = $this->bills->register($order, convertToComputerDate($_POST['billDate']), $payments, $user['id'])) !== false) {
 				$message = '<a href="'.site_url('notas_venta/detalles/'.$billId).'" title="Ver nota de venta">Nota de venta creada</a>.';
 				$this->session->set_flashdata('message', $message);
 				redirect('pedidos');
@@ -660,18 +661,12 @@ class Pedidos extends CI_Controller
 	
 	private function _validateBillPayment($data, $orderDate, $total)
 	{
-		$errors = array(
-			'billDate' => array(),
-			'cash' => array(),
-			'cards' => array(),
-			'checks' => array(),
-			'overall' => array()
-		);
-		
+		$errors = array();
+
 		$billDate = !isset($data['billDate']) ? '' : $data['billDate'];
 		$cash = !isset($data['cash']) ? '' : $data['cash'];
 		$cards = !isset($data['cards']) ? '' : $data['cards'];
-		$checks = !isset($data['checks']) ? '' : $data['cards'];
+		$checks = !isset($data['checks']) ? '' : $data['checks'];
 		
 		$cash = $cash === '' ? '0' : $cash;
 		$cards = $cards === '' || !is_array($cards) ? array() : $cards;
@@ -680,19 +675,19 @@ class Pedidos extends CI_Controller
 		$billDateParts = explode('/', $billDate);
 		
 		if ($billDate === '') {
-			$errors['billDate'][] = 'La fecha de la nota es obligatoria';
+			$errors['billDate'] = 'La fecha de la nota es obligatoria';
 		} elseif (count($billDateParts) !== 3 || !checkdate($billDateParts[1], $billDateParts[0], $billDateParts[2])) {
-			$errors['billDate'][] = 'Fecha inválida';
+			$errors['billDate'] = 'Fecha inválida';
 		} elseif (strtotime(convertToComputerDate($billDate)) < strtotime($orderDate)) {
-			$errors['billDate'][] = 'La fecha de la nota debe ser posterior a la del pedido';
+			$errors['billDate'] = 'La fecha de la nota debe ser posterior a la del pedido';
 		}
 		
 		if (!is_numeric($cash)) {
 			$cash = 0;
-			$errors['cash'][] = 'Escribe una cantidad válida';	
+			$errors['cash'] = 'Escribe una cantidad de efectivo válida';	
 		} elseif (($cash = floatval($cash)) < 0) {
 			$cash = 0;
-			$errors['cash'][] = 'Escribe una cantidad positiva';
+			$errors['cash'] = 'Escribe una cantidad de efectivo positiva';
 		}
 		
 		$maxCardNumLength = 19;
@@ -700,10 +695,10 @@ class Pedidos extends CI_Controller
 		$paidWithCards = 0;
 		
 		foreach ($cards as $cardInformation => $paymentAmount) {
-			$cardInformation = explode('|', $cardInformation);
+			$cardInformation = explode('-', $cardInformation);
 			
 			if (count($cardInformation) !== 2) {
-				$errors['cards'][] = 'Error al procesar las tarjetas';
+				$errors['cards'] = 'Error al procesar las tarjetas';
 				break;
 			}
 			
@@ -712,12 +707,12 @@ class Pedidos extends CI_Controller
 			$cardNumLength = strlen($cardNumber);
 				
 			if (!ctype_digit($cardNumber) || $cardNumLength < $minCardNumLength || $cardNumLength > $maxCardNumLength) {
-				$errors['cards'][] = 'Error procesando la información de las tarjetas';
+				$errors['cards'] = 'Error procesando la información de las tarjetas';
 				break;
 			}
 				
 			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0) {
-				$errors['cards'][] = 'Error procesando la información de las tarjetas';
+				$errors['cards'] = 'Error procesando la información de las tarjetas';
 			}
 			
 			$paidWithCards += floatval($paymentAmount);
@@ -728,10 +723,10 @@ class Pedidos extends CI_Controller
 		$paidWithChecks = 0;
 		
 		foreach ($checks as $checkInformation => $paymentAmount) {
-			$checkInformation = explode('|', $checkInformation);
+			$checkInformation = explode('-', $checkInformation);
 			
 			if (count($checkInformation) !== 2) {
-				$errors['cards'][] = 'Error al procesar los cheques';
+				$errors['checks'] = 'Error al procesar los cheques';
 				break;
 			}
 			
@@ -740,12 +735,12 @@ class Pedidos extends CI_Controller
 			$checkNumLength = strlen($checkNumber);
 				
 			if (!ctype_digit($checkNumber) || $checkNumLength < $minCheckNumLength || $checkNumLength > $maxCheckNumLength) {
-				$errors['cards'][] = 'Error procesando la información de los cheques';
+				$errors['checks'] = 'Error procesando la información de los cheques';
 				break;
 			}
 				
 			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0) {
-				$errors['cards'][] = 'Error procesando la información de los cheques';
+				$errors['checks'] = 'Error procesando la información de los cheques';
 			}
 			
 			$paidWithChecks += floatval($paymentAmount);
@@ -754,9 +749,9 @@ class Pedidos extends CI_Controller
 		$totalPaid = $cash + $paidWithCards + $paidWithChecks;
 
 		if ($totalPaid < $total) {
-			$errors['overall'][] = 'Has pagado menos del total';
-		} elseif (($paidWithCards + $paidWithChecks) > ($total - $cash)) {
-			$errors['overall'][] = 'No puedes pagar de más del total con las tarjetas y/o cheques';
+			$errors['overall'] = 'Necesitas pagar el total del pedido';
+		} elseif ($cash < $total && ($paidWithCards + $paidWithChecks) > ($total - $cash)) {
+			$errors['overall'] = 'No puedes pagar de más del total con las tarjetas y/o cheques. x='.$totalPaid.' vs y='.$total;
 		}
 		
 		return $errors;
