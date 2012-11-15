@@ -73,7 +73,7 @@ class Notas_venta extends CI_Controller
 		// Get the array with the bills in the database
 		$data['billsData'] = $this->bills->getAll($filters);
 
-		$data['title'] = "Notas de venta";
+		$data['title'] = "Notas de Venta";
 		$data['user'] = $this->session->userdata('user');
 		$data['branches'] = $this->branches->getAll(array('status' => '1')); // Active branches
 		$data['clients'] = $this->clients->getAll(array('status' => '1')); // Active clients
@@ -328,7 +328,7 @@ class Notas_venta extends CI_Controller
 			$this->_makeReport($filters);
 		}
 
-		$data['title'] = "Crear reporte de notas de venta";
+		$data['title'] = "Crear Reporte de Notas de Venta";
 		$data['user'] = $this->session->userdata('user');
 		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
 		$data['clients'] = $this->clients->getActiveClients();

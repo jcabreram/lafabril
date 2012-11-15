@@ -68,7 +68,7 @@
 		</div>
 		<?php endif; ?>
 	
-		<form action="<?php echo site_url("pagos/agregar_detalles/$payment_id"); ?>" method="post">
+		<form action="<?php echo site_url("pagos/agregar_pago_detalles/{$payment['id_pago_factura']}"); ?>" method="post">
 		
 			<p>
 				<label>Factura *</label>              
