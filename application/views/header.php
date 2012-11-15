@@ -119,7 +119,7 @@
 				</li>
 				
 				<li> 
-					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes' || controllerName() == 'notas_credito') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes' || controllerName() == 'notas_credito' || controllerName() == 'pagos') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
                         Cuentas por cobrar
 					</a>
 					<ul>
