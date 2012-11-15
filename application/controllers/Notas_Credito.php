@@ -2,6 +2,8 @@
 
 class Notas_Credito extends CI_Controller
 {
+	public $creditNote;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -155,9 +157,21 @@ class Notas_Credito extends CI_Controller
 	
 	public function registrar_detalles($id)
 	{
+		$this->creditNote = $id;
+
 		$this->load->model('invoices');
 		
-		$creditNote = $this->credit_notes->getCreditNote($id);
+		$creditNote = $this->credit_notes->getPreCreditNote($id);
+
+		if (count($creditNote) === 0) {
+			$this->session->set_flashdata('error', 'Nota de crédito no existente.');
+			redirect('notas_credito');
+		}
+
+		if ($creditNote['estatus'] !== 'P') {
+			$this->session->set_flashdata('error', 'Nota de crédito no pendiente de creación.');
+			redirect('notas_credito');			
+		}
 		
 		$this->load->library('form_validation');
 
@@ -190,6 +204,15 @@ class Notas_Credito extends CI_Controller
 		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
 		$invoices = $this->invoices->getAllActive($creditNote['id_sucursal'], $creditNote['id_cliente']);
 
+		foreach ($invoices as $invoiceKey => $invoice) {
+			foreach ($creditNoteDetails as $detailKey => $detail) {
+				if ($invoice['id_factura'] == $detail['id_factura']) {
+					$invoices[$invoiceKey]['saldo'] -= $detail['importe_nota_credito'];
+					$creditNoteDetails[$detailKey]['saldo_factura'] = $invoices[$invoiceKey]['saldo'];
+				}
+			}
+		}
+
 		$total = 0.0;
 
 		foreach ($creditNoteDetails as $detail) {
@@ -207,6 +230,36 @@ class Notas_Credito extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('notas_credito/registrar_detalles', $data);
 		$this->load->view('footer', $data);
+	}
+
+	public function valid_amount($payment)
+	{
+		$invoice = $this->invoices->getInvoice($_POST['invoice']);
+		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($this->creditNote);
+
+		foreach ($creditNoteDetails as $detailKey => $detail) {
+			if ($detail['id_factura'] == $invoice['id_factura']) {
+				$invoice['saldo'] -= $detail['importe_nota_credito'];
+			}
+		}
+		
+		if ($payment > $invoice['saldo']) {
+			$this->form_validation->set_message("valid_amount", "La nota de crédito debe ser menor o igual al saldo.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public function finalizar($id)
+	{
+		if ($this->credit_notes->finalize($id)) {
+			$this->session->set_flashdata('message', 'Nota de crédito creada.');
+			redirect('notas_credito');
+		}
+
+		$this->session->set_flashdata('error', 'Tenemos problemas por el momento, intenta en 10 minutos.');
+		redirect('notas_credito/registrar_detalles/' . $id);
 	}
 
 	private function _getCreditNoteType($type)
@@ -228,18 +281,6 @@ class Notas_Credito extends CI_Controller
 		}
 
 		return $creditNoteType;
-	}
-
-	public function valid_amount($payment)
-	{
-		$invoice = $this->invoices->getInvoice($_POST['invoice']);
-		
-		if ($payment > $invoice['saldo']) {
-			$this->form_validation->set_message("valid_amount", "La nota de crédito debe ser menor o igual al saldo.");
-			return false;
-		}
-
-		return true;
 	}
 
 	public function eliminar($creditNoteId, $creditNoteDetailId)

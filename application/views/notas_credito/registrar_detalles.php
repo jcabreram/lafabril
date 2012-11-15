@@ -139,7 +139,7 @@
 		</table>
 	
 	<p>
-		<a href="<?php echo site_url('notas_credito'); ?>"><input class="button" type="button" value="Finalizar" /></a>
+		<a href="<?php echo site_url('notas_credito/finalizar/' . $creditNote['id']); ?>"><input class="button" type="button" value="Finalizar" /></a>
 	</p>				
 
 	</div>
