@@ -125,10 +125,21 @@
 			<?php endforeach; ?>
 			</tbody>
 
+			<tfoot>
+				<tr>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td class="textAlign-right"><strong>Total</strong></td>
+					<td class="textAlign-right">$<?php echo getMoneyFormat($total); ?></td>
+					<td></td>
+				</tr>
+			</tfoot>
+
 		</table>
 	
 	<p>
-		<a href="<?php echo site_url('notas_credito'); ?>"><input class="button" type="button" value="Finalizar" /></a>
+		<a href="<?php echo site_url('notas_credito/finalizar/' . $creditNote['id']); ?>"><input class="button" type="button" value="Finalizar" /></a>
 	</p>				
 
 	</div>
