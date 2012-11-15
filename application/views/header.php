@@ -114,21 +114,21 @@
 						<li><a href="<?php echo site_url('notas_venta'); ?>"<?php if ((methodName() == 'notas_venta/index') || (methodName() == 'notas_venta/listar')) { echo ' class="current"'; } ?>>Administrar Notas de Venta</a></li>
 						<li><a href="<?php echo site_url('facturas'); ?>"<?php if ((methodName() == 'facturas/index') || (methodName() == 'facturas/listar')) { echo ' class="current"'; } ?>>Administrar Facturas</a></li>
 						<li><a href="<?php echo site_url('facturas/crear_reporte'); ?>"<?php if (methodName() == 'facturas/crear_reporte') { echo ' class="current"'; } ?>>Reporte de Facturas</a></li>
-						<li><a href="<?php echo site_url('notas_venta/crear_reporte'); ?>"<?php if (methodName() == 'notas_venta/crearReporte') { echo ' class="current"'; } ?>>Reporte de Notas de Venta</a></li>
+						<li><a href="<?php echo site_url('notas_venta/crear_reporte'); ?>"<?php if (methodName() == 'notas_venta/crear_reporte') { echo ' class="current"'; } ?>>Reporte de Notas de Venta</a></li>
 					</ul>
 				</li>
 				
 				<li> 
-					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes' || controllerName() == 'notas_credito') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
                         Cuentas por cobrar
 					</a>
 					<ul>
 						<li><a href="#">Administrar Pagos</a></li>
 						<li><a href="#">Agregar Pagos</a></li>
-						<li><a href="<?php echo site_url('clientes'); ?>"<?php if (methodName() == 'clientes/index') { echo ' class="current"'; } ?>>Administrar Clientes</a></li>
+						<li><a href="<?php echo site_url('clientes'); ?>"<?php if (methodName() == 'clientes/index' || methodName() == 'clientes/listar') { echo ' class="current"'; } ?>>Administrar Clientes</a></li>
 						<li><a href="<?php echo site_url('clientes/registrar'); ?>"<?php if (methodName() == 'clientes/registrar') { echo ' class="current"'; } ?>>Agregar Cliente</a></li>
-						<li><a href="#">Administrar Notas de Crédito</a></li>
-						<li><a href="#">Agregar Nota de Crédito</a></li>
+						<li><a href="<?php echo site_url('notas_credito'); ?>"<?php if (methodName() == 'notas_credito/index' || methodName() == 'notas_credito/listar') { echo ' class="current"'; } ?>>Administrar Notas de Crédito</a></li>
+						<li><a href="<?php echo site_url('notas_credito/crear'); ?>"<?php if (methodName() == 'notas_credito/crear') { echo ' class="current"'; } ?>>Agregar Nota de Crédito</a></li>
 					</ul>
 					
 				</li>
