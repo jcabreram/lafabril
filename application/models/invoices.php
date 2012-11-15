@@ -57,15 +57,20 @@ class Invoices extends CI_Model
 					su.nombre AS nombre_sucursal, 
 					cl.nombre AS nombre_cliente, 
 					fa.fecha AS fecha_factura, 
-					fa.estatus
+					fa.estatus,
+					mo.importe,
+					mo.saldo
 				FROM facturas AS fa
 				JOIN sucursales AS su ON fa.id_sucursal=su.id_sucursal
 				JOIN pedidos AS pe ON pe.id_pedido=fa.id_pedido
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
 				JOIN folios AS fo ON fa.id_factura=fo.id_documento AND fo.tipo_documento='F'
 				JOIN folios_prefijo AS fp ON fa.id_sucursal=fp.id_sucursal AND fp.tipo_documento='F'
+				JOIN movimientos AS mo ON fa.id_factura = mo.id_documento
 				WHERE su.id_sucursal = $id_sucursal AND cl.id_cliente = $id_cliente
 				ORDER BY fecha_factura ASC";
+				
+		//exit(var_dump($sql));
 		$query = $this->db->query($sql);
 		
 		// Returns the query result as a pure array, or an empty array when no result is produced.
@@ -90,13 +95,16 @@ class Invoices extends CI_Model
 					fa.iva,
 					fa.id_sucursal,
 					su.nombre AS nombre_sucursal,
-					su.iva AS sucursal_iva
+					su.iva AS sucursal_iva,
+					mo.importe,
+					mo.saldo
 				FROM facturas AS fa
 				JOIN pedidos AS pe ON pe.id_pedido=fa.id_pedido
 				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
 				JOIN folios_prefijo AS fp ON fa.id_sucursal=fp.id_sucursal AND fp.tipo_documento="F"
 				JOIN folios AS fo ON fa.id_factura=fo.id_documento AND fo.tipo_documento="F"
 				JOIN sucursales AS su ON fa.id_sucursal=su.id_sucursal
+				JOIN movimientos AS mo ON fa.id_factura = mo.id_documento
 				WHERE id_factura = ' . $id;
 
 		$query = $this->db->query($sql);
