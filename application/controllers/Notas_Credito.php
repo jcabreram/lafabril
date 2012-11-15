@@ -25,12 +25,50 @@ class Notas_Credito extends CI_Controller
 	{
 		$this->listar();
 	}
-	
+
 	public function listar()
 	{
+		/*
+		// We need it to populate the filter form
+		$this->load->helper('form');
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// To populate the filter form
+		$this->load->model('branches');
+		$this->load->model('clients');
+		*/
+
+		// Get orders
+		$data['creditNotes'] = $this->credit_notes->getAll();
+		
+		$data['title'] = 'Notas de Crédito';
+		$data['user'] = $this->session->userdata('user');
+		//$data['branches'] = $this->branches->getAll(array('status' => '1')); // Active branches
+		//$data['clients'] = $this->clients->getAll(array('status' => '1')); // Active clients
+		//$data['filters'] = $filters;
+
+		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('notas_credito/listar', $data);
-		$this->load->view('footer', $data);		
+		//$this->load->view('pedidos/filterForm', $data);
+		$this->load->view('footer', $data);
+	}
+	
+	public function detalles($noteCreditId)
+	{
+		$data['title'] = "Detalle de la Nota de Crédito";
+		$data['user'] = $this->session->userdata('user');
+		$data['creditNote'] = $this->credit_notes->getCreditNote($noteCreditId);
+		$data['creditNoteType'] = $this->_getCreditNoteType($data['creditNote']['tipo']);
+		$data['creditNoteDetails'] = $this->credit_notes->getCreditNoteDetails($noteCreditId);
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('notas_credito/detalles', $data);
+		$this->load->view('footer', $data);
 	}
 	
 	public function registrar()
@@ -110,7 +148,6 @@ class Notas_Credito extends CI_Controller
 		$this->load->model('invoices');
 		
 		$creditNote = $this->credit_notes->getCreditNote($id);
-		$invoices = $this->invoices->getAllActive($creditNote['id_sucursal'], $creditNote['id_cliente']);
 		
 		$this->load->library('form_validation');
 
@@ -134,18 +171,32 @@ class Notas_Credito extends CI_Controller
 		$user = $this->session->userdata('user');
 		
 		if ($this->form_validation->run()) {
-			if($this->credit_notes->addLine($id, $_POST['invoice'], $_POST['amount'])) {
-				$this->session->set_flashdata('message', 'El detalle ha sido registrado.');
-			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el detalle, intenta de nuevo.');
+			if(!$this->credit_notes->addLine($id, $_POST['invoice'], $_POST['amount'])) {
+				$this->session->set_flashdata('error', 'Tenemos problemas por el momento, intenta en 10 minutos.');
+				redirect('notas_credito');
 			}
 		}
 
 		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
+		$invoices = $this->invoices->getAllActive($creditNote['id_sucursal'], $creditNote['id_cliente']);
 		
+		$data['title'] = 'Registrar Nota de Crédito';
+		$data['user'] = $this->session->userdata('user');
+		$data['creditNote'] = $creditNote;
+		$data['creditNoteDetails'] = $creditNoteDetails;
+		$data['creditNoteType'] = $this->_getCreditNoteType($creditNote['tipo']);
+		$data['invoices'] = $invoices;
+		
+		$this->load->view('header', $data);
+		$this->load->view('notas_credito/registrar_detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
+	private function _getCreditNoteType($type)
+	{
 		$creditNoteType = '';
 		
-		switch ($creditNote['tipo']) {
+		switch ($type) {
 			case 'B':
 			$creditNoteType = 'Bonificación';
 			break;
@@ -158,17 +209,8 @@ class Notas_Credito extends CI_Controller
 			$creditNoteType = 'Cancelación';
 			break;
 		}
-		
-		$data['title'] = 'Registrar Nota de Crédito';
-		$data['user'] = $this->session->userdata('user');
-		$data['creditNote'] = $creditNote;
-		$data['creditNoteDetails'] = $creditNoteDetails;
-		$data['creditNoteType'] = $creditNoteType;
-		$data['invoices'] = $invoices;
-		
-		$this->load->view('header', $data);
-		$this->load->view('notas_credito/registrar_detalles', $data);
-		$this->load->view('footer', $data);
+
+		return $creditNoteType;
 	}
 
 	public function valid_amount($payment)
@@ -187,5 +229,16 @@ class Notas_Credito extends CI_Controller
 	{	
 		$this->credit_notes->eliminar($creditNoteDetailId);
 		redirect("notas_credito/registrar_detalles/$creditNoteId");
+	}
+
+	public function cancelar($id)
+	{	
+		if($this->credit_notes->cancelar($id)) {
+				$this->session->set_flashdata('message', 'La nota de crédito ha sido cancelado.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar cancelar la nota de crédito, intenta de nuevo.');
+			}
+		redirect("notas_credito");
+		
 	}
 }

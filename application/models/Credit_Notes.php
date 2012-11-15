@@ -4,8 +4,24 @@ class Credit_Notes extends CI_Model
 {
 	public function getAll()
 	{
+		$sql = 'SELECT 
+					nc.id_nota_credito, 
+					fp.prefijo, 
+					fo.folio, 
+					su.nombre AS nombre_sucursal, 
+					cl.nombre AS nombre_cliente, 
+					nc.fecha, 
+					nc.estatus
+				FROM notas_credito AS nc
+				JOIN sucursales AS su ON nc.id_sucursal=su.id_sucursal
+				JOIN clientes AS cl ON nc.id_cliente=cl.id_cliente
+				JOIN folios AS fo ON nc.id_nota_credito=fo.id_documento AND fo.tipo_documento="B"
+				JOIN folios_prefijo AS fp ON nc.id_sucursal=fp.id_sucursal AND fp.tipo_documento="B"
+				ORDER BY nc.fecha ASC';
+		$query = $this->db->query($sql);
 		
-		
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();	
 	}
 	
 	public function getCreditNote($id)
@@ -132,5 +148,56 @@ class Credit_Notes extends CI_Model
 		}
 
 		return false;
+	}
+
+	public function eliminar($id)
+	{
+		$id = $this->db->escape(intval($id));
+		
+		$this->db->trans_start();
+		
+		$sql = "SELECT * FROM notas_credito_detalles WHERE id_nota_credito_detalle = $id";
+		$query = $this->db->query($sql);
+		$credito_detalle = $query->row_array();
+		
+		$sql = "UPDATE movimientos SET saldo=saldo+{$credito_detalle['importe']} WHERE id_documento = {$credito_detalle['id_factura']}";
+		$this->db->query($sql);
+		
+		$sql = "DELETE FROM notas_credito_detalles WHERE id_nota_credito_detalle = $id";
+		$this->db->query($sql);
+
+		$this->db->trans_complete();
+
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
+	}
+
+	public function cancelar($creditNoteId)
+	{
+		$this->db->trans_start();
+		
+		$creditNoteId = $this->db->escape(intval($creditNoteId));
+		
+		$sql = "SELECT * FROM notas_credito_detalles WHERE id_nota_credito = $creditNoteId";
+		$query = $this->db->query($sql);
+		$detalles = $query->result_array();
+		
+		foreach ($detalles as $detalle) {
+			$sql = "UPDATE movimientos SET saldo=saldo+{$detalle['importe']} WHERE id_documento={$detalle['id_factura']}";
+			$this->db->query($sql);
+		}
+
+		$sql = "UPDATE notas_credito SET estatus='X' WHERE id_nota_credito = $creditNoteId";
+		$this->db->query($sql);
+		
+		$this->db->trans_complete();
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		 }
 	}
 }
