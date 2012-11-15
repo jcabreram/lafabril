@@ -140,6 +140,15 @@ class Payments extends CI_Model
 		$sql = "UPDATE movimientos SET saldo = saldo-$pago WHERE id_documento = $id_factura";
 		$this->db->query($sql);
 		
+		$sql = "SELECT * FROM movimientos WHERE id_documento = $id_factura";
+		$query = $this->db->query($sql);
+		$mov = $query->row_array();
+		
+		if ($mov['saldo'] == 0) {
+			$sql = "UPDATE facturas SET estatus = 'C' WHERE id_factura = $id_factura";
+			$this->db->query($sql);
+		}
+		
 		/*** TRANSACTION FINISHES ***/
 		$this->db->trans_complete();
 		/*** TRANSACTION FINISHES ***/
@@ -151,5 +160,108 @@ class Payments extends CI_Model
 
 		return false;
 	}
+	
+	public function eliminar($id)
+	{
+		$id = $this->db->escape(intval($id));
+		
+		$this->db->trans_start();
+		
+		$sql = "SELECT * FROM pagos_facturas_detalles WHERE id_pago_factura_detalle = $id";
+		$query = $this->db->query($sql);
+		$pago_detalle = $query->row_array();
+		
+		$sql = "UPDATE movimientos SET saldo=saldo+{$pago_detalle['importe']} WHERE id_documento = {$pago_detalle['id_factura']}";
+		$this->db->query($sql);
+		
+
+		$sql = "DELETE FROM pagos_facturas_detalles WHERE id_pago_factura_detalle = $id";
+		$this->db->query($sql);
+
+		
+		/*** TRANSACTION FINISHES ***/
+		$this->db->trans_complete();
+		/*** TRANSACTION FINISHES ***/
+
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
+	}
+	
+	public function getAll()
+	{
+		/*
+		$branch = isset($filters['branch']) ? $filters['branch'] : false;
+		$client = isset($filters['client']) ? $filters['client'] : false;
+		$status = isset($filters['status']) ? $filters['status'] : false;
+
+		$where = '';
+
+		if ($branch !== false) {
+			$where .= 'WHERE pe.id_sucursal = ' . $this->db->escape(intval($branch));
+		}
+
+		if ($client !== false) {
+			$where .= ' AND pe.id_cliente = ' . $this->db->escape(intval($client));
+		}
+
+		if ($status !== false) {
+			$where .= ' AND pe.estatus = ' . $this->db->escape($status);
+		}
+		*/
+
+		$sql = 'SELECT 
+					pf.id_pago_factura, 
+					fp.prefijo, 
+					fo.folio, 
+					su.nombre AS nombre_sucursal, 
+					cl.nombre AS nombre_cliente, 
+					pf.fecha, 
+					pf.estatus,
+					pf.importe
+				FROM pagos_facturas AS pf
+				JOIN sucursales AS su ON pf.id_sucursal=su.id_sucursal
+				JOIN clientes AS cl ON pf.id_cliente=cl.id_cliente
+				JOIN folios AS fo ON pf.id_pago_factura=fo.id_documento AND fo.tipo_documento="A"
+				JOIN folios_prefijo AS fp ON pf.id_sucursal=fp.id_sucursal AND fp.tipo_documento="A"
+				ORDER BY pf.fecha ASC';
+		$query = $this->db->query($sql);
+		
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}
+	
+	public function cancelar($id_pago_factura)
+	{
+		$this->db->trans_start();
+		
+		$id_pago_factura = $this->db->escape(intval($id_pago_factura));
+		
+		$sql = "SELECT * FROM pagos_facturas_detalles WHERE id_pago_factura = $id_pago_factura";
+		$query = $this->db->query($sql);
+		$detalles = $query->result_array();
+		
+		foreach ($detalles as $detalle) {
+			$sql = "UPDATE movimientos SET saldo=saldo+{$detalle['importe']} WHERE id_documento={$detalle['id_factura']}";
+			$this->db->query($sql);
+		}
+
+		$sql = "UPDATE pagos_facturas SET estatus='X' WHERE id_pago_factura = $id_pago_factura";
+		$this->db->query($sql);
+		
+		/*** TRANSACTION FINISHES ***/
+		$this->db->trans_complete();
+		/*** TRANSACTION FINISHES ***/
+
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;
+	}
+	
 	
 }

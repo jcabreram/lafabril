@@ -24,7 +24,7 @@
 
 			<p><b>Sucursal</b>: <?php echo $payment['nombre_sucursal'] ?></p>
 			<p><b>Cliente</b>: <?php echo $payment['nombre_cliente'] ?></p>   
-			<p><b>Importe</b>: $<?php echo number_format($payment['importe'], 2, '.', ','); ?></p>     
+			<p><b>Importe</b>: $<?php echo number_format($payment['importe'], 2, '.', ','); ?></p>   
 
 		</fieldset>
 		
@@ -36,8 +36,17 @@
 			?>
 
 			<p><b>Fecha</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($payment['fecha'])); ?></p>  
-			<p><b>Tipo de pago</b>: <?php echo $payment['tipo_pago'] ?></p> 
-			<p><b>Disponible</b>: $<?php echo number_format($disponible, 2, '.', ','); ?></p>    
+			<p><b>Tipo de pago</b>: <?php echo $payment['tipo_pago'] ?></p>  
+			<p><b>Estatus</b>:
+			
+			<?php if ($payment['estatus'] == 'A') {
+						echo 'Abierto';
+					} else if ($payment['estatus'] == 'C') {
+						echo 'Cerrado';
+					} else if ($payment['estatus'] == 'X') {
+						echo 'Cancelado';
+					}
+			?></p>  
 
 		</fieldset>
 		
@@ -54,58 +63,7 @@
 
 	<!-- Content Box Header -->
 	<div class="content-box-header">
-		<h3>Ingresar línea</h3>
-	</div>
-	
-	<!-- Content Box Content -->			
-	<div class="content-box-content">
-
-		<?php if ($this->session->flashdata('error')) : ?>
-		<!-- Notification -->
-		<div class="notification error png_bg">
-			<!-- Message -->
-			<div><?php echo $this->session->flashdata('error'); ?></div>
-		</div>
-		<?php endif; ?>
-	
-		<form action="<?php echo site_url("pagos/agregar_pago_detalles/{$payment['id_pago_factura']}"); ?>" method="post">
-		
-			<p>
-				<label>Factura *</label>              
-				<select name="invoice" class="large-input">
-					<option value="escoge">Escoge una opción</option>
-					<?php foreach ($invoices as $invoice) : ?>
-					<option value="<?php echo $invoice['id_factura']; ?>"><?php echo $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT).' - Importe: $'.number_format($invoice['importe'], 2, '.', ',').' - Saldo: $'.number_format($invoice['saldo'], 2, '.', ',').' - Fecha: '.strftime('%d/%b/%Y',strtotime($invoice['fecha_factura'])); ?></option>
-					<?php endforeach; ?>
-				</select> 
-				<?php echo form_error('invoice'); ?>
-			</p>
-	
-			<p>
-				<label>Pago *</label>
-				$ <input class="text-input medium-input" type="text" name="pago" />
-				<?php echo form_error('pago'); ?>
-			</p>
-		
-			<p>
-				<input class="button" type="submit" value="Agregar" />
-			</p>
-	
-		<div class="clear"></div><!-- End .clear -->
-	
-		</form>					
-	</div>
-	<!-- End Content Box Content -->
-				
-</div>
-<!-- End Content Box -->
-
-<!-- Content Box -->
-<div class="content-box"> 
-
-	<!-- Content Box Header -->
-	<div class="content-box-header">
-		<h3>Detalle del pago de facturas</h3>
+		<h3>Detalle del pago</h3>
 	</div>
 	
 	<!-- Content Box Content -->			
@@ -121,7 +79,6 @@
 				   <th style="text-align:right">Importe</th>
 				   <th style="text-align:right">Saldo</th>
 				   <th style="text-align:right">Pago</th>
-				   <th style="text-align:center">Opciones</th>
 				</tr>
 			</thead>
 			
@@ -133,15 +90,10 @@
 					<td style="text-align:right">$<?php echo number_format($paymentData['importe_factura'], 2, '.', ','); ?></td>
 					<td style="text-align:right">$<?php echo number_format($paymentData['saldo_factura'], 2, '.', ','); ?></td>
 					<td style="text-align:right">$<?php echo number_format($paymentData['importe_pago'], 2, '.', ','); ?></td>
-					<td style="text-align:center">
-						<!-- Options Icons -->
-						<?php echo '<a href="' . site_url("pagos/eliminar/{$payment['id_pago_factura']}/{$paymentData['id_pago_factura_detalle']}") . '" title="Eliminar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Eliminar" /></a>'; ?>
-					</td>
 				</tr>
 			<?php endforeach; ?>
 			
 			<tr>
-				<td></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -155,20 +107,6 @@
 				<td></td>
 				<td style="text-align:right"><b>Total:</b></td>
 				<td style="text-align:right">$<?php echo number_format($total, 2, '.', ','); ?></td>
-				<td></td>
-			</tr>
-			
-			<tr>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td></td>
-				<td>
-					<p>
-						<a href="<?php echo site_url('pagos'); ?>"><input class="button" type="button" value="Finalizar" /></a>
-					</p>
-				</td>
 			</tr>
 			
 			</tbody>
@@ -180,3 +118,34 @@
 				
 </div>
 <!-- End Content Box -->
+
+<div class="content-box column-left"><!-- Start Content Box -->
+				
+				<div class="content-box-header">
+					
+					<h3>Opciones...</h3>
+					
+				</div> <!-- End .content-box-header -->
+				
+				<div class="content-box-content">
+					
+					<div class="tab-content default-tab">
+						<table>
+							<thead>
+								<tr>
+									<th style="text-align:center">
+										<a href="<?php echo site_url('pagos/imprimir/' . $payment['id_pago_factura']); ?>" target="_blank"><input class="button" type="button" value="Imprimir" /></a>
+									</th>
+									<th style="text-align:center">
+										<a href="<?php echo site_url('pagos/cancelar/' . $payment['id_pago_factura']); ?>" target="_blank"><input class="button" type="button" value="Cancelar" /></a>
+									</th>
+								</tr>
+							</tbody>
+						</table>
+					</div> <!-- End #tab3 -->        
+					
+				</div> <!-- End .content-box-content -->
+				
+			</div> <!-- End .content-box -->
+			
+			<div class="clear"></div>

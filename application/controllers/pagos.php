@@ -141,7 +141,7 @@ class Pagos extends CI_Controller
 		$data['invoices'] = $this->invoices->getAllActive($id_sucursal, $id_cliente);
 		
 		
-		// Declare the $subtotal as float so it gets it in the foreach
+		// Declare the $total as float so it gets it in the foreach
 		settype($total, "float");
 		
 		// For every detail of the order, gather the sum of the product of the prices and quantities
@@ -176,6 +176,72 @@ class Pagos extends CI_Controller
 		$this->payments->eliminar($id);
 		redirect("pagos/agregar_pago_detalles/$id_pago_factura");
 	}
+	
+	public function listar()
+	{
+		/*
+		// We need it to populate the filter form
+		$this->load->helper('form');
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// To populate the filter form
+		$this->load->model('branches');
+		$this->load->model('clients');
+		*/
+
+		// Get orders
+		$data['paymentsData'] = $this->payments->getAll();
+		
+		$data['title'] = "Pagos";
+		$data['user'] = $this->session->userdata('user');
+		//$data['branches'] = $this->branches->getAll(array('status' => '1')); // Active branches
+		//$data['clients'] = $this->clients->getAll(array('status' => '1')); // Active clients
+		//$data['filters'] = $filters;
+
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pagos/listar', $data);
+		//$this->load->view('pedidos/filterForm', $data);
+		$this->load->view('footer', $data);
+	}
+	
+	public function detalles($id_pago_factura)
+	{
+
+		$data['title'] = "Detalles del Pago";
+		$data['user'] = $this->session->userdata('user');
+		$data['payment'] = $this->payments->getPayment($id_pago_factura);
+		$data['payment_details'] = $this->payments->getPaymentDetails($id_pago_factura);
+		
+		// Declare the $total as float so it gets it in the foreach
+		settype($total, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['payment_details'] as $line) {
+			$total+=$line['importe_pago'];
+		}
+		$data['total'] = $total;
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pagos/detalles', $data);
+		$this->load->view('footer', $data);
+	}
+	
+	public function cancelar($id_pago_factura)
+	{	
+		if($this->payments->cancelar($id_pago_factura)) {
+				$this->session->set_flashdata('message', 'El pago ha sido cancelado.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar cancelar el pago, intenta de nuevo.');
+			}
+		redirect("pagos");
+		
+	}
+
 
 	
 }

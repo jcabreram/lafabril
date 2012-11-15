@@ -119,11 +119,11 @@
 				</li>
 				
 				<li> 
-					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes' || controllerName() == 'pagos' || controllerName() == 'notas_credito') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
                         Cuentas por cobrar
 					</a>
 					<ul>
-						<li><a href="#">Administrar Pagos</a></li>
+						<li><a href="<?php echo site_url('pagos'); ?>"<?php if (methodName() == 'pagos/index') { echo ' class="current"'; } ?>>Administrar Pagos</a></li>
 						<li><a href="<?php echo site_url('pagos/agregar_pago'); ?>"<?php if ((methodName() == 'pagos/agregar_pago') || (methodName() == 'pagos/agregar_pago_detalles')) { echo ' class="current"'; } ?>>Agregar Pago</a></li>
 						<li><a href="<?php echo site_url('clientes'); ?>"<?php if (methodName() == 'clientes/index') { echo ' class="current"'; } ?>>Administrar Clientes</a></li>
 						<li><a href="<?php echo site_url('clientes/registrar'); ?>"<?php if (methodName() == 'clientes/registrar') { echo ' class="current"'; } ?>>Agregar Cliente</a></li>
