@@ -11,7 +11,7 @@ class Payments extends CI_Model
 		return $query->result_array();
 		
 	}
-	public function register ($id_sucursal, $id_cliente, $importe, $fecha, $id_tipo_pago, $usuario_captura, $id_moneda) {
+	public function register ($id_sucursal, $id_cliente, $importe, $fecha, $id_tipo_pago, $usuario_captura) {
 		
 		$this->load->model('folios');
 		
@@ -22,7 +22,6 @@ class Payments extends CI_Model
 		$id_tipo_pago = $this->db->escape(intval($id_tipo_pago));
 		$estatus = $this->db->escape('P');
 		$usuario_captura = $this->db->escape(intval($usuario_captura));
-		$id_moneda = $this->db->escape(intval($id_moneda));
 		$tipo_documento = $this->db->escape('A');
 		
 		$fecha_captura = date("Y-m-d H:i:s");
@@ -34,8 +33,8 @@ class Payments extends CI_Model
 		$ultimo_folio = $this->folios->getLastFolio($id_sucursal, 'A');
 		$folio_actual = ++$ultimo_folio['ultimo_folio'];
 		
-		$sql = "INSERT INTO pagos_facturas (id_pago_factura, id_pago_tipo, id_moneda, importe, fecha, id_sucursal, id_cliente, estatus, fecha_captura, usuario_captura)
-				VALUES (NULL, $id_tipo_pago, $id_moneda, $importe, $fecha, $id_sucursal, $id_cliente, $estatus, $fecha_captura,  $usuario_captura)";
+		$sql = "INSERT INTO pagos_facturas (id_pago_factura, id_pago_tipo, importe, fecha, id_sucursal, id_cliente, estatus, fecha_captura, usuario_captura)
+				VALUES (NULL, $id_tipo_pago, $importe, $fecha, $id_sucursal, $id_cliente, $estatus, $fecha_captura,  $usuario_captura)";
 		
 		$this->db->query($sql);
 		$id_pago_factura = $this->db->insert_id();
@@ -74,16 +73,16 @@ class Payments extends CI_Model
 					su.nombre AS nombre_sucursal, 
 					pf.id_cliente,
 					cl.nombre AS nombre_cliente,
-					mo.nombre, 
 					pf.fecha, 
 					pf.estatus,
-					pf.importe
+					pf.importe,
+					pt.nombre AS tipo_pago
 				FROM pagos_facturas AS pf
 				JOIN sucursales AS su ON pf.id_sucursal=su.id_sucursal
 				JOIN clientes AS cl ON pf.id_cliente=cl.id_cliente
 				JOIN folios AS fo ON pf.id_pago_factura=fo.id_documento AND fo.tipo_documento="A"
 				JOIN folios_prefijo AS fp ON pf.id_sucursal=fp.id_sucursal AND fp.tipo_documento="A"
-				JOIN monedas AS mo ON pf.id_moneda = mo.id_moneda
+				JOIN pagos_tipo AS pt ON pf.id_pago_tipo = pt.id_pago_tipo
 				WHERE id_pago_factura = ' . $id;
 
 		$query = $this->db->query($sql);
@@ -99,8 +98,9 @@ class Payments extends CI_Model
 						fp.prefijo, 
 						fo.folio, 
 						fa.fecha,
-						mo.importe,
-						mo.saldo
+						mo.importe AS importe_factura,
+						mo.saldo AS saldo_factura,
+						pd.importe AS importe_pago
 				FROM pagos_facturas_detalles AS pd
 				JOIN pagos_facturas AS pf ON pd.id_pago_factura=pf.id_pago_factura
 				JOIN facturas as fa ON pd.id_factura=fa.id_factura
@@ -114,28 +114,31 @@ class Payments extends CI_Model
 		return $query->result_array();
 	}
 	
-	public function addLine ($id_pedido, $id_producto, $cantidad, $precio) {
-		$id_pedido = $this->db->escape(intval($id_pedido));
-		$id_producto = $this->db->escape(intval($id_producto));
-		$precio = $this->db->escape($precio);
+	public function addLine ($id_pago_factura, $id_factura, $pago) {
+		$id_pago_factura = $this->db->escape(intval($id_pago_factura));
+		$id_factura = $this->db->escape(intval($id_factura));
+		$pago = $this->db->escape($pago);
 		
 		$this->db->trans_start();
 		
-		$sql = "SELECT * FROM pedidos_detalles WHERE id_pedido = $id_pedido AND id_producto = $id_producto";
+		$sql = "SELECT * FROM pagos_facturas_detalles WHERE id_pago_factura = $id_pago_factura AND id_factura = $id_factura";
 		$query = $this->db->query($sql);
 		
 		if ($query->num_rows() > 0) {
-			$sql = "UPDATE pedidos_detalles SET cantidad = cantidad + $cantidad WHERE id_pedido = $id_pedido AND id_producto = $id_producto";
+			$sql = "UPDATE pagos_facturas_detalles SET importe = importe + $pago WHERE id_pago_factura = $id_pago_factura AND id_factura = $id_factura";
 			$this->db->query($sql);	
 			
 		} else {
-			$sql = "INSERT INTO pedidos_detalles (id_pedido_detalle, id_pedido, id_producto, cantidad, precio, cantidad_surtida)
-				VALUES (NULL, $id_pedido, $id_producto, $cantidad, $precio, 0)";
+			$sql = "INSERT INTO pagos_facturas_detalles (id_pago_factura_detalle, id_pago_factura, id_factura, importe)
+				VALUES (NULL, $id_pago_factura, $id_factura, $pago)";
 			$this->db->query($sql);	
 		}
 		
-		$sql = "UPDATE pedidos SET estatus = 'A' WHERE id_pedido = $id_pedido";
+		$sql = "UPDATE pagos_facturas SET estatus = 'A' WHERE id_pago_factura = $id_pago_factura";
 		$this->db->query($sql);	
+		
+		$sql = "UPDATE movimientos SET saldo = saldo-$pago WHERE id_documento = $id_factura";
+		$this->db->query($sql);
 		
 		/*** TRANSACTION FINISHES ***/
 		$this->db->trans_complete();

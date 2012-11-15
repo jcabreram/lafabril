@@ -24,7 +24,7 @@
 
 			<p><b>Sucursal</b>: <?php echo $payment['nombre_sucursal'] ?></p>
 			<p><b>Cliente</b>: <?php echo $payment['nombre_cliente'] ?></p>   
-			<p><b>Importe</b>: $<?php echo $payment['importe'] ?></p>     
+			<p><b>Importe</b>: $<?php echo number_format($payment['importe'], 2, '.', ','); ?></p>     
 
 		</fieldset>
 		
@@ -36,8 +36,8 @@
 			?>
 
 			<p><b>Fecha</b>: <?php echo strftime('%A %d de %b del %Y',strtotime($payment['fecha'])); ?></p>  
-			<p><b>Tipo de pago</b>: <?php echo $payment['importe'] ?></p> 
-			<p><b>Disponible</b>: $<?php echo $payment['importe'] - $payment['usado'] ?></p>    
+			<p><b>Tipo de pago</b>: <?php echo $payment['tipo_pago'] ?></p> 
+			<p><b>Disponible</b>: $<?php echo number_format($disponible, 2, '.', ','); ?></p>    
 
 		</fieldset>
 		
@@ -75,7 +75,7 @@
 				<select name="invoice" class="large-input">
 					<option value="escoge">Escoge una opción</option>
 					<?php foreach ($invoices as $invoice) : ?>
-					<option value="<?php $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT).' - '.$invoice['saldo']; ?>"</option>
+					<option value="<?php echo $invoice['id_factura']; ?>"><?php echo $invoice['prefijo'].str_pad($invoice['folio'], 9, "0", STR_PAD_LEFT).' - Importe: $'.number_format($invoice['importe'], 2, '.', ',').' - Saldo: $'.number_format($invoice['saldo'], 2, '.', ',').' - Fecha: '.strftime('%d/%b/%Y',strtotime($invoice['fecha_factura'])); ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('invoice'); ?>
@@ -87,7 +87,6 @@
 				<?php echo form_error('pago'); ?>
 			</p>
 		
-			<br /><br />
 			<p>
 				<input class="button" type="submit" value="Agregar" />
 			</p>
@@ -119,33 +118,30 @@
 				<tr>
 				   <th>Factura</th>
 				   <th>Fecha</th>
-				   <th>Importe</th>
-				   <th>Saldo</th>
-				   <th>Pago</th>
-				   <th>Opciones</th>
+				   <th style="text-align:right">Importe</th>
+				   <th style="text-align:right">Saldo</th>
+				   <th style="text-align:right">Pago</th>
+				   <th style="text-align:center">Opciones</th>
 				</tr>
 			</thead>
 			
 			<tbody>
-			<?php
-				$total = 0;
-				foreach ($payment_details as $paymentData) : ?>
+			<?php foreach ($payment_details as $paymentData) : ?>
 				<tr>
 					<td><?php echo $paymentData['prefijo'].str_pad($paymentData['folio'], 9, "0", STR_PAD_LEFT); ?></td>
 					<td><?php echo $paymentData['fecha']; ?></td>
-					<td style="text-align:right">$<?php echo number_format($paymentData['importe'], 2, '.', ','); ?></td>
-					<td style="text-align:right">$<?php echo number_format($paymentData['saldo'], 2, '.', ','); ?></td>
-					<td style="text-align:right">$<?php echo number_format($paymentData['pago'], 2, '.', ','); ?></td>
+					<td style="text-align:right">$<?php echo number_format($paymentData['importe_factura'], 2, '.', ','); ?></td>
+					<td style="text-align:right">$<?php echo number_format($paymentData['saldo_factura'], 2, '.', ','); ?></td>
+					<td style="text-align:right">$<?php echo number_format($paymentData['importe_pago'], 2, '.', ','); ?></td>
 					<td style="text-align:center">
 						<!-- Options Icons -->
-						<?php echo '<a href="' . site_url("pagos/eliminar/{$payment['id_pago_factura']}/{$payment['id_pago_factura_detalle']}") . '" title="Eliminar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Eliminar" /></a>'; ?>
+						<?php echo '<a href="' . site_url("pagos/eliminar/{$payment['id_pago_factura']}/{$paymentData['id_pago_factura_detalle']}") . '" title="Eliminar"><img src="' . site_url('resources/images/icons/cross.png') . '" alt="Eliminar" /></a>'; ?>
 					</td>
 				</tr>
-			<?php
-				$total = $total + $paymentData['pago'];
-				endforeach; ?>
+			<?php endforeach; ?>
 			
 			<tr>
+				<td></td>
 				<td></td>
 				<td></td>
 				<td></td>
@@ -154,6 +150,7 @@
 			</tr>
 			
 			<tr>
+				<td></td>
 				<td></td>
 				<td></td>
 				<td style="text-align:right"><b>Total:</b></td>
@@ -162,6 +159,7 @@
 			</tr>
 			
 			<tr>
+				<td></td>
 				<td></td>
 				<td></td>
 				<td></td>

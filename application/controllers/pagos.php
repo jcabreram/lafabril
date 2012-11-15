@@ -74,7 +74,7 @@ class Pagos extends CI_Controller
 		if ($this->form_validation->run()) {
 			$usuario = $this->session->userdata('user');
 			$usuario_captura = $usuario['id'];
-			if($id_pago_factura = $this->payments->register($_POST['branch'], $_POST['client'], $_POST['importe'], $_POST['fecha'], $_POST['tipo_pago'], $usuario_captura, $_POST['moneda'])) {
+			if($id_pago_factura = $this->payments->register($_POST['branch'], $_POST['client'], $_POST['importe'], $_POST['fecha'], $_POST['tipo_pago'], $usuario_captura)) {
 				redirect("pagos/agregar_pago_detalles/$id_pago_factura");
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
@@ -109,14 +109,14 @@ class Pagos extends CI_Controller
 		// Define validation rules
 		$config = array(
 			array(
-				'field' => 'factura', 
+				'field' => 'invoice', 
 				'label' => 'factura', 
 				'rules' => 'callback_not_default'
 			),
 			array(
 				'field' => 'pago', 
 				'label' => 'pago', 
-				'rules' => 'required|numeric'
+				'rules' => 'required|numeric|callback_valid_amount'
 			)
 		);
 
@@ -146,15 +146,35 @@ class Pagos extends CI_Controller
 		
 		// For every detail of the order, gather the sum of the product of the prices and quantities
 		foreach ($data['payment_details'] as $line) {
-			$total+=$line['importe'];
+			$total+=$line['importe_pago'];
 		}
-		
 		$data['total'] = $total;
+		
+		$data['disponible'] = $data['payment']['importe'] - $total;
 		
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('pagos/agregar_pago_detalles', $data);
 		$this->load->view('footer', $data);
+	}
+	
+	public function valid_amount($payment)
+	{
+		$invoice = $this->invoices->getInvoice($_POST['invoice']);
+		
+		if ($invoice['saldo'] < $payment) {
+			$this->form_validation->set_message("valid_amount", "El pago debe ser menor o igual al saldo.");
+			return false;
+		} else {
+			return true;
+		}
+		
+	}
+	
+	public function eliminar($id_pago_factura, $id)
+	{	
+		$this->payments->eliminar($id);
+		redirect("pagos/agregar_pago_detalles/$id_pago_factura");
 	}
 
 	
