@@ -31,6 +31,7 @@ class Pagos extends CI_Controller
 		// Load necessary models
 		$this->load->model('userBranches');
 		$this->load->model('clients');
+		$this->load->model('currencies');
 
 		// Load form validation library
 		$this->load->library('form_validation');
@@ -53,7 +54,7 @@ class Pagos extends CI_Controller
 			array(
 				'field' => 'importe', 
 				'label' => 'importe', 
-				'rules' => 'required|alpha_numeric'
+				'rules' => 'required|numeric'
 			),
 			array(
 				'field' => 'fecha', 
@@ -73,7 +74,7 @@ class Pagos extends CI_Controller
 		if ($this->form_validation->run()) {
 			$usuario = $this->session->userdata('user');
 			$usuario_captura = $usuario['id'];
-			if($id_pago_factura = $this->payments->register($_POST['branch'], $_POST['client'], $_POST['importe'], $_POST['fecha'], $_POST['tipo_pago'], 'P', $usuario_captura)) {
+			if($id_pago_factura = $this->payments->register($_POST['branch'], $_POST['client'], $_POST['importe'], $_POST['fecha'], $_POST['tipo_pago'], $usuario_captura, $_POST['moneda'])) {
 				redirect("pagos/agregar_pago_detalles/$id_pago_factura");
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
@@ -86,11 +87,75 @@ class Pagos extends CI_Controller
 		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
 		$data['clients'] = $this->clients->getActiveClients();
 		$data['payment_types'] = $this->payments->getPaymentTypes();
+		$data['currencies'] = $this->currencies->getCurrencies();
 			
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('pagos/agregar_pago', $data);
 		$this->load->view('footer', $data);
 	}
+	
+	public function agregar_pago_detalles($id_pago_factura)
+	{
+		// Load necessary models
+		$this->load->model('invoices');
+
+		// Load form validation library
+		$this->load->library('form_validation');
+
+		// Setting error delimiters
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		// Define validation rules
+		$config = array(
+			array(
+				'field' => 'factura', 
+				'label' => 'factura', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'pago', 
+				'label' => 'pago', 
+				'rules' => 'required|numeric'
+			)
+		);
+
+		$this->form_validation->set_rules($config);
+
+		// If validation was successful
+		if ($this->form_validation->run()) {
+			if($this->payments->addLine($id_pago_factura, $_POST['invoice'], $_POST['pago'])) {
+				$this->session->set_flashdata('message', 'El pago ha sido registrado.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
+			}
+		}
+
+		$data['title'] = "Registrar detalles del pago";
+		$data['user'] = $this->session->userdata('user');
+		$data['payment'] = $this->payments->getPayment($id_pago_factura);
+		$data['payment_details'] = $this->payments->getPaymentDetails($id_pago_factura);
+		
+		$id_sucursal = $data['payment']['id_sucursal'];
+		$id_cliente = $data['payment']['id_cliente'];
+		$data['invoices'] = $this->invoices->getAllActive($id_sucursal, $id_cliente);
+		
+		
+		// Declare the $subtotal as float so it gets it in the foreach
+		settype($total, "float");
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['payment_details'] as $line) {
+			$total+=$line['importe'];
+		}
+		
+		$data['total'] = $total;
+		
+		// Display views
+		$this->load->view('header', $data);
+		$this->load->view('pagos/agregar_pago_detalles', $data);
+		$this->load->view('footer', $data);
+	}
+
 	
 }

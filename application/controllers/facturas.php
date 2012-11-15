@@ -327,7 +327,7 @@ class Facturas extends CI_Controller
 			$this->_makeReport($filters);
 		}
 
-		$data['title'] = "Crear reporte de facturas";
+		$data['title'] = "Crear Reporte de Facturas";
 		$data['user'] = $this->session->userdata('user');
 		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
 		$data['clients'] = $this->clients->getActiveClients();

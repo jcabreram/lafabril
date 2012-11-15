@@ -14,7 +14,7 @@
 			<!-- Close link -->
 			<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
 			<!-- Message -->
-			<div>Una vez creadas, los sucursales no pueden ser eliminados.</div>
+			<div>Una vez creadas, las sucursales no pueden ser eliminados.</div>
 		</div>
 
 		<?php if ($this->session->flashdata('error')) : ?>

@@ -135,7 +135,7 @@ class Clientes extends CI_Controller
 			}
 		}
 
-		$data['title'] = "Registrar Cliente";
+		$data['title'] = "Agregar Cliente";
 		$data['user'] = $this->session->userdata('user');
 			
 		// Display views

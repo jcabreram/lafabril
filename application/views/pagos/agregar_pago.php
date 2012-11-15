@@ -73,6 +73,16 @@
 				</select> 
 				<?php echo form_error('tipo_pago'); ?>
 			</p>
+			
+			<p>
+				<label>Moneda *</label>              
+				<select name="moneda" class="medium-input">
+					<?php foreach ($currencies as $currency) : ?>
+					<option value="<?php echo $currency['id_moneda']; ?>"><?php echo $currency['nombre']; ?></option>
+					<?php endforeach; ?>
+				</select> 
+				<?php echo form_error('moneda'); ?>
+			</p>
 
 		</fieldset>
 		
