@@ -17,6 +17,10 @@ if (!function_exists('getStatusName')) {
 			case 'X':
 				$name = 'Cancelado';
 				break;
+				
+			case 'P':
+				$name = 'Pendiente';
+				break;
 		}
 
 		return $name;

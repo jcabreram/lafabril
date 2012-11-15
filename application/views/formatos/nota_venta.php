@@ -64,6 +64,29 @@
 			<th class="textAlign-right">Total</th>
 			<td class="textAlign-right">$<?php echo number_format($total, 2, '.', ','); ?></td>
 		</tr>
+
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		
+		<tr>
+			<td></td>
+			<td></td>
+			<th class="textAlign-right">Pago</th>
+			<td></td>
+		</tr>
+			
+		<?php foreach ($payments as $payment) : ?>	
+		<tr>
+			<td></td>
+			<td></td>
+			<td class="textAlign-right"><b><?php echo $payment['tipo_pago']; ?>:</b></td>
+			<td class="textAlign-right">$<?php echo number_format($payment['importe'], 2, '.', ','); ?></td>
+		</tr>	
+		<?php endforeach; ?>
 	</tfoot>
 </table>
 <?php else : ?>
