@@ -324,7 +324,7 @@ class Pedidos extends CI_Controller
 
 		$data['title'] = "Registrar detalles del pedido";
 		$data['user'] = $this->session->userdata('user');
-		$data['order'] = $this->orders->getOrder($id_pedido);
+		$data['order'] = $this->orders->getPreOrder($id_pedido);
 		//$data['sucursal'] = $this->branches->getBranch($data['order']['id_sucursal']);
 		//$data['vendedor'] = $this->salesmen->getSalesman($data['order']['id_vendedor']);
 		//$data['cliente'] = $this->clients->getClient($data['order']['id_cliente']);
@@ -799,5 +799,16 @@ class Pedidos extends CI_Controller
 		$html .= $this->load->view('formatos/footer', $data, true);
 
 		createPDF($html, 'formato');
+	}
+	
+	public function finalizar($id)
+	{
+		if ($this->orders->finalize($id)) {
+			$this->session->set_flashdata('message', 'Pedido creado.');
+			redirect('pedidos');
+		}
+
+		$this->session->set_flashdata('error', 'Tenemos problemas por el momento, intenta en 10 minutos.');
+		redirect('pedidos/registrar_detalles/' . $id);
 	}
 }

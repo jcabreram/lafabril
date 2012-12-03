@@ -166,7 +166,7 @@
 				<td></td>
 				<td>
 					<p>
-						<a href="<?php echo site_url('pagos'); ?>"><input class="button" type="button" value="Finalizar" /></a>
+						<a href="<?php echo site_url("pagos/finalizar/{$payment['id_pago_factura']}"); ?>"><input class="button" type="button" value="Finalizar" /></a>
 					</p>
 				</td>
 			</tr>

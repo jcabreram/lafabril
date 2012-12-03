@@ -17,40 +17,21 @@ class Orders extends CI_Model
 		
 		$fecha_captura = date("Y-m-d H:i:s");
 		$fecha_captura = $this->db->escape($fecha_captura);
-		$resultado = TRUE;
 		
-		// We get the last folio of the orders in that branch
-		$ultimo_folio = $this->folios->getLastFolio($id_sucursal, 'P');
-		$folio_actual = ++$ultimo_folio['ultimo_folio'];
+		$this->db->trans_start();
 		
 		$sql = "INSERT INTO pedidos (id_pedido, id_sucursal, id_vendedor, id_cliente, fecha_pedido, fecha_entrega, estatus, fecha_captura, usuario_captura)
 				VALUES (NULL, $id_sucursal, $id_vendedor, $id_cliente, $fecha_pedido, $fecha_entrega, $estatus, $fecha_captura, $usuario_captura)";
+		$this->db->query($sql);
+				
+		$orderID = $this->db->insert_id();
+				
+		$this->db->trans_complete();
 		
-		if ($this->db->query($sql)) {
-			$id_pedido = $this->db->insert_id();
-		} else {
-			$resultado = FALSE;
-		}
+		if ($this->db->trans_status() === true)
+			return $orderID;
 		
-		// Insert the next folio for the document in the folios table
-		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
-					VALUES (NULL, $id_pedido, $id_sucursal, $tipo_documento, $folio_actual)";
-					
-		if (!$this->db->query($sql))
-			$resultado = FALSE;
-		
-		// Update the value of the last folio
-		$sql = "UPDATE folios_prefijo SET ultimo_folio=$folio_actual WHERE tipo_documento = $tipo_documento AND id_sucursal = $id_sucursal";
-		
-		if (!$this->db->query($sql))
-			$resultado = FALSE;
-		
-		// If there were no problems creating the order, return its ID. If there were, return false.
-		if ($resultado) {
-			return $id_pedido;
-		} else {
-			return FALSE;
-		}
+		return false;
 	}
 	
 	public function addLine ($id_pedido, $id_producto, $cantidad, $precio) {
@@ -134,6 +115,34 @@ class Orders extends CI_Model
 		return $query->result_array();
 		
 		
+	}
+	
+	public function getPreOrder($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = 'SELECT 
+					pe.id_pedido, 
+					pe.id_sucursal,
+					su.nombre AS nombre_sucursal, 
+					su.iva AS sucursal_iva,
+					em.nombre AS nombre_vendedor, 
+					pe.id_cliente,
+					cl.nombre AS nombre_cliente, 
+					pe.fecha_pedido, 
+					pe.fecha_entrega,
+					pe.estatus
+				FROM pedidos AS pe
+				JOIN sucursales AS su ON pe.id_sucursal=su.id_sucursal
+				JOIN vendedores AS ve ON pe.id_vendedor=ve.id_vendedor
+				JOIN clientes AS cl ON pe.id_cliente=cl.id_cliente
+				JOIN empleados AS em ON ve.id_empleado=em.id_empleado
+				WHERE id_pedido = ' . $id;
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->row_array();
 	}
 	
 	public function getOrder($id)
@@ -326,4 +335,45 @@ class Orders extends CI_Model
 
 		return false;
 	}
+	
+	public function finalize($id)
+	{
+		$this->load->model('folios');
+
+		$id = $this->db->escape(intval($id));
+
+		$this->db->trans_start();
+		
+		$order = $this->getPreOrder($id);
+		$orderDetails = $this->getOrderDetail($id);
+		$branch = $order['id_sucursal'];
+		
+		// We get the last folio of the orders in that branch
+		$ultimo_folio = $this->folios->getLastFolio($branch, 'P');
+		$folio_actual = ++$ultimo_folio['ultimo_folio'];
+		
+		// Insert the next folio for the document in the folios table
+		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+					VALUES (NULL, $id, $branch, 'P', $folio_actual)";
+					
+		$this->db->query($sql);
+		
+		// Update the value of the last folio
+		$sql = "UPDATE folios_prefijo SET ultimo_folio=$folio_actual WHERE tipo_documento = 'P' AND id_sucursal = $branch";
+		$this->db->query($sql);
+		
+		// Change the state of the order to Open (A)
+		$sql = "UPDATE pedidos SET estatus = 'A' WHERE id_pedido = $id";
+		$this->db->query($sql);
+		
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;	
+			
+	}
+	
 }
