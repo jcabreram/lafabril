@@ -43,7 +43,7 @@ class Transactions extends CI_Model
 				JOIN sucursales AS su ON fa.id_sucursal=su.id_sucursal
 				JOIN movimientos AS mo ON mo.id_documento = fa.id_factura
 				JOIN clientes AS cl ON mo.id_cliente=cl.id_cliente
-				WHERE fa.id_sucursal = $branch AND fa.estatus != 'X' AND fa.fecha < $fecha AND cl.id_cliente BETWEEN $from_client AND $to_client";
+				WHERE fa.id_sucursal = $branch AND fa.estatus != 'X' AND fa.fecha <= $fecha AND cl.id_cliente BETWEEN $from_client AND $to_client";
 				
 
 		$query = $this->db->query($sql);
