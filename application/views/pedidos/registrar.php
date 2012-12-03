@@ -24,9 +24,9 @@
 			<p>
 				<label>Sucursal *</label>              
 				<select name="branch" class="medium-input">
-					<option value="escoge">Escoge una opción</option>
+					<option value="escoge" <?php echo set_select('branch', 'escoge', true); ?>>Escoge una opción</option>
 					<?php foreach ($branches as $branch) : ?>
-					<option value="<?php echo $branch['id_sucursal']; ?>"><?php echo $branch['nombre']; ?></option>
+					<option value="<?php echo $branch['id_sucursal']; ?>" <?php echo set_select('branch', $branch['id_sucursal']); ?>><?php echo $branch['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('branch'); ?>
@@ -35,9 +35,9 @@
 			<p>
 				<label>Vendedor *</label>              
 				<select name="salesman" class="medium-input">
-					<option value="escoge">Escoge una opción</option>
+					<option value="escoge" <?php echo set_select('salesman', 'escoge', true); ?>>Escoge una opción</option>
 					<?php foreach ($salesmen as $salesman) : ?>
-					<option value="<?php echo $salesman['id_vendedor']; ?>"><?php echo $salesman['nombre']; ?></option>
+					<option value="<?php echo $salesman['id_vendedor']; ?>" <?php echo set_select('salesman', $salesman['id_vendedor']); ?>><?php echo $salesman['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('salesman'); ?>
@@ -46,9 +46,9 @@
 			<p>
 				<label>Cliente *</label>              
 				<select name="client" class="medium-input">
-					<option value="escoge">Escoge una opción</option>
+					<option value="escoge" <?php echo set_select('client', 'escoge', true); ?>>Escoge una opción</option>
 					<?php foreach ($clients as $client) : ?>
-					<option value="<?php echo $client['id_cliente']; ?>"><?php echo $client['nombre']; ?></option>
+					<option value="<?php echo $client['id_cliente']; ?>" <?php echo set_select('client', $client['id_cliente']); ?>><?php echo $client['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('client'); ?>
@@ -64,13 +64,13 @@
 
 			<p>
 				<label>Fecha del Pedido (aaaa-mm-dd) *</label>
-				<input id="fecha" class="text-input medium-input" type="text" name="fecha_pedido" readonly />
+				<input id="fecha" class="text-input medium-input" type="text" name="fecha_pedido" value="<?php echo set_value('fecha_pedido', date('Y-m-d')); ?>" readonly />
 				<?php echo form_error('fecha_pedido'); ?>
 			</p>
 
 			<p>
 				<label>Fecha de Entrega (aaaa-mm-dd) *</label>
-				<input id="fecha2" class="text-input medium-input" type="text" name="fecha_entrega" readonly />
+				<input id="fecha2" class="text-input medium-input" type="text" name="fecha_entrega" value="<?php echo set_value('fecha_entrega'); ?>" readonly />
 				<?php echo form_error('fecha_entrega'); ?>
 			</p>
 

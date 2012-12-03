@@ -7,10 +7,15 @@
 	</tr>
 
 	<tr>
-		<th>Dirección</th>
-		<td><?php echo $clientAddress; ?></td>
+		<th>Estatus</th>
+		<td><?php echo getStatusName($bill['estatus']); ?></td>
 		<th>Pedido</th>
 		<td><?php echo $orderFolio; ?></td>
+	</tr>
+
+	<tr>
+		<th>Dirección</th>
+		<td colspan="3"><?php echo $clientAddress; ?></td>
 	</tr>
 </table>
 

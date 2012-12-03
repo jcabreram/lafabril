@@ -24,9 +24,9 @@
 			<p>
 				<label>Sucursal *</label>              
 				<select name="branch" class="medium-input">
-					<option value="escoge">Escoge una opción</option>
+					<option value="escoge" <?php echo set_select('branch', 'escoge', true); ?>>Escoge una opción</option>
 					<?php foreach ($branches as $branch) : ?>
-					<option value="<?php echo $branch['id_sucursal']; ?>"><?php echo $branch['nombre']; ?></option>
+					<option value="<?php echo $branch['id_sucursal']; ?>" <?php echo set_select('branch', $branch['id_sucursal']); ?>><?php echo $branch['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('branch'); ?>
@@ -35,9 +35,9 @@
 			<p>
 				<label>Cliente *</label>              
 				<select name="client" class="medium-input">
-					<option value="escoge">Escoge una opción</option>
+					<option value="escoge" <?php echo set_select('client', 'escoge', true); ?>>Escoge una opción</option>
 					<?php foreach ($clients as $client) : ?>
-					<option value="<?php echo $client['id_cliente']; ?>"><?php echo $client['nombre']; ?></option>
+					<option value="<?php echo $client['id_cliente']; ?>" <?php echo set_select('branch', $client['id_cliente']); ?>><?php echo $client['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('client'); ?>
@@ -45,7 +45,7 @@
 			
 			<p>
 				<label>Importe *</label>
-				$ <input class="text-input medium-input" type="text" name="importe" />
+				$ <input class="text-input medium-input" type="text" name="importe" value="<?php echo set_value('importe'); ?>" />
 				<?php echo form_error('importe'); ?>
 			</p>
 			
@@ -59,16 +59,16 @@
 
 			<p>
 				<label>Fecha *</label>
-				<input id="fecha" class="text-input medium-input" type="text" name="fecha" readonly />
+				<input id="fecha" class="text-input medium-input" type="text" name="fecha" value="<?php echo set_value('fecha', date('Y-m-d')); ?>" readonly />
 				<?php echo form_error('fecha'); ?>
 			</p>
 
 			<p>
 				<label>Tipo de pago *</label>              
 				<select name="tipo_pago" class="medium-input">
-					<option value="escoge">Escoge una opción</option>
+					<option value="escoge" <?php echo set_select('tipo_pago', 'escoge', true); ?>>Escoge una opción</option>
 					<?php foreach ($payment_types as $type) : ?>
-					<option value="<?php echo $type['id_pago_tipo']; ?>"><?php echo $type['nombre']; ?></option>
+					<option value="<?php echo $type['id_pago_tipo']; ?>" <?php echo set_select('tipo_pago', $type['id_pago_tipo']); ?>><?php echo $type['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('tipo_pago'); ?>
