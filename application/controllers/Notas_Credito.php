@@ -254,7 +254,7 @@ class Notas_Credito extends CI_Controller
 	public function finalizar($id)
 	{
 		if ($this->credit_notes->finalize($id)) {
-			$this->session->set_flashdata('message', 'Nota de crédito creada.');
+			$this->session->set_flashdata('message', 'La nota de crédito ha sido registrada.');
 			redirect('notas_credito');
 		}
 

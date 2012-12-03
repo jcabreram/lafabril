@@ -139,10 +139,8 @@ class Pagos extends CI_Controller
 
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			if($this->payments->addLine($id_pago_factura, $_POST['invoice'], $_POST['pago'])) {
-				$this->session->set_flashdata('message', 'El pago ha sido registrado.');
-			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
+			if(!$this->payments->addLine($id_pago_factura, $_POST['invoice'], $_POST['pago'])) {
+				$this->session->set_flashdata('error', 'Tenemos problemas por el momento, intenta en 10 minutos.');
 			}
 		}
 		
@@ -322,7 +320,7 @@ class Pagos extends CI_Controller
 	public function finalizar($id)
 	{
 		if ($this->payments->finalize($id)) {
-			$this->session->set_flashdata('message', 'Pago creado.');
+			$this->session->set_flashdata('message', 'El pago ha sido registrado.');
 			redirect('pagos');
 		}
 
