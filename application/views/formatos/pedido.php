@@ -2,15 +2,20 @@
 	<tr>
 		<th>Cliente</th>
 		<td><?php echo $order['nombre_cliente']; ?></td>
+		<th>Fecha del Pedido</th>
+		<td><?php echo convertToHumanDate($order['fecha_pedido']); ?></td>
+	</tr>
+
+	<tr>
 		<th>Vendedor</th>
 		<td><?php echo $order['nombre_vendedor']; ?></td>
+		<th>Fecha de Entrega</th>
+		<td><?php echo date('d/m/Y', strtotime($order['fecha_entrega'])); ?></td>
 	</tr>
 
 	<tr>
 		<th>Dirección</th>
-		<td><?php echo $clientAddress; ?></td>
-		<th>Fecha de Entrega</th>
-		<td><?php echo date('d/m/Y', strtotime($order['fecha_entrega'])); ?></td>
+		<td colspan="3"><?php echo $clientAddress; ?></td>
 	</tr>
 </table>
 

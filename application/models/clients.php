@@ -53,7 +53,7 @@ class Clients extends CI_Model
 	
 	public function getActiveClients()
 	{
-		$sql = 'SELECT * FROM clientes WHERE activo = 1';
+		$sql = 'SELECT * FROM clientes WHERE activo = 1 ORDER BY nombre ASC';
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.

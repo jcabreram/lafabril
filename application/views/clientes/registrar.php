@@ -93,8 +93,8 @@
 			
 			<p>
 				<label>Tipo de contribuyente *</label>
-				<input type="radio" name="tipo" value="M" <?php echo set_radio('tipo', '1', true); ?> /> Persona Moral<br />
-				<input type="radio" name="tipo" value="F" <?php echo set_radio('tipo', '0'); ?> /> Persona Física
+				<input type="radio" name="tipo" value="M" <?php echo set_radio('tipo', 'M', true); ?> /> Persona Moral<br />
+				<input type="radio" name="tipo" value="F" <?php echo set_radio('tipo', 'F'); ?> /> Persona Física
 			</p>
 			
 			<p>
