@@ -132,6 +132,8 @@ class Credit_Notes extends CI_Model
 	public function finalize($id)
 	{
 		$this->load->model('folios');
+		$this->load->model('transactions');
+		$this->load->model('invoices');
 
 		$id = $this->db->escape(intval($id));
 
@@ -160,6 +162,16 @@ class Credit_Notes extends CI_Model
 		foreach ($creditNoteDetails as $detail) {
 			$sql = "UPDATE movimientos SET saldo = saldo-{$detail['importe_nota_credito']} WHERE id_documento = {$detail['id_factura']}";
 			$this->db->query($sql);
+
+			// We should close the invoice?
+			$sql = 'SELECT saldo FROM movimientos WHERE id_documento = ' . $detail['id_factura'];
+			$saldo = $this->db->query($sql)->row_array();
+			$saldo = $saldo['saldo'];
+			
+			if (floatval($saldo) == 0.0) {
+				$sql = 'UPDATE facturas SET estatus = "C" WHERE id_factura = ' . $detail['id_factura'];
+				$this->db->query($sql);
+			}
 		}
 
 		$this->db->trans_complete();
@@ -205,23 +217,10 @@ class Credit_Notes extends CI_Model
 	{
 		$id = $this->db->escape(intval($id));
 		
-		$this->db->trans_start();
-		
-		$sql = "SELECT * FROM notas_credito_detalles WHERE id_nota_credito_detalle = $id";
-		$query = $this->db->query($sql);
-		$credito_detalle = $query->row_array();
-		
-		$sql = "UPDATE movimientos SET saldo=saldo+{$credito_detalle['importe']} WHERE id_documento = {$credito_detalle['id_factura']}";
-		$this->db->query($sql);
-		
 		$sql = "DELETE FROM notas_credito_detalles WHERE id_nota_credito_detalle = $id";
-		$this->db->query($sql);
-
-		$this->db->trans_complete();
-
-
-		if ($this->db->trans_status() === true) {
-		    return true;
+		
+		if ($this->db->query($sql) == true) {
+			return true;
 		}
 
 		return false;

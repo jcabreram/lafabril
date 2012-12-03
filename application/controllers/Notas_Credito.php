@@ -88,6 +88,7 @@ class Notas_Credito extends CI_Controller
 		// Load necessary models
 		$this->load->model('userBranches');
 		$this->load->model('clients');
+		$this->load->model('invoices');
 
 		$this->load->library('form_validation');
 
@@ -126,10 +127,16 @@ class Notas_Credito extends CI_Controller
 		$user = $this->session->userdata('user');
 		
 		if ($this->form_validation->run()) {
-			if($creditNoteId = $this->credit_notes->register($_POST['branch'], $_POST['client'], $_POST['date'], $_POST['type'], $_POST['observations'], $user['id'])) {
+			$numInvoices = count($this->invoices->getAllActive($_POST['branch'], $_POST['client']));
+
+			if ($numInvoices === 0) {
+				$this->session->set_flashdata('error', 'No existen facturas para crearles notas de crédito.');
+				redirect('notas_credito/registrar');
+			} elseif($creditNoteId = $this->credit_notes->register($_POST['branch'], $_POST['client'], $_POST['date'], $_POST['type'], $_POST['observations'], $user['id'])) {
 				redirect('notas_credito/registrar_detalles/' . $creditNoteId);
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema, intenta en 10 minutos.');
+				redirect('notas_credito/registrar');
 			}
 		}
 		
@@ -234,6 +241,11 @@ class Notas_Credito extends CI_Controller
 
 	public function valid_amount($payment)
 	{
+		if ($payment <= 0.0) {
+			$this->form_validation->set_message('valid_amount', 'Escribe una cantidad válida.');
+			return false;
+		}
+
 		$invoice = $this->invoices->getInvoice($_POST['invoice']);
 		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($this->creditNote);
 
@@ -253,6 +265,25 @@ class Notas_Credito extends CI_Controller
 
 	public function finalizar($id)
 	{
+		$creditNote = $this->credit_notes->getPreCreditNote($id);
+
+		if (count($creditNote) == 0) {
+			$this->session->set_flashdata('error', 'Nota de crédito inexistente.');
+			redirect('notas_credito');
+		}		
+
+		if ($creditNote['estatus'] !== 'P') {
+			$this->session->set_flashdata('error', 'La nota de crédito no está pendiente de finalización.');
+			redirect('notas_credito');
+		}
+
+		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
+
+		if (count($creditNoteDetails) === 0) {
+			$this->session->set_flashdata('error', 'La nota de crédito no tiene detalles.');
+			redirect('notas_credito/registrar_detalles/' . $id);	
+		}
+
 		if ($this->credit_notes->finalize($id)) {
 			$this->session->set_flashdata('message', 'Nota de crédito creada.');
 			redirect('notas_credito');
