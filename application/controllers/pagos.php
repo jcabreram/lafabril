@@ -102,7 +102,7 @@ class Pagos extends CI_Controller
 
 		$data['title'] = "Registrar detalles del pago";
 		$data['user'] = $this->session->userdata('user');
-		$data['payment'] = $this->payments->getPayment($id_pago_factura);
+		$data['payment'] = $this->payments->getPrePayment($id_pago_factura);
 		$data['payment_details'] = $this->payments->getPaymentDetails($id_pago_factura);
 		
 		$id_sucursal = $data['payment']['id_sucursal'];
@@ -151,7 +151,7 @@ class Pagos extends CI_Controller
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
 			}
 		}
-
+		
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('pagos/agregar_pago_detalles', $data);
@@ -301,4 +301,16 @@ class Pagos extends CI_Controller
 	    	return TRUE;
 	    }
 	}
+	
+	public function finalizar($id)
+	{
+		if ($this->payments->finalize($id)) {
+			$this->session->set_flashdata('message', 'Pago creado.');
+			redirect('pagos');
+		}
+
+		$this->session->set_flashdata('error', 'Tenemos problemas por el momento, intenta en 10 minutos.');
+		redirect('pagos/agregar_pago_detalles/' . $id);
+	}
+
 }

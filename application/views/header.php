@@ -129,6 +129,7 @@
 						<li><a href="<?php echo site_url('clientes/registrar'); ?>"<?php if (methodName() == 'clientes/registrar') { echo ' class="current"'; } ?>>Agregar Cliente</a></li>
 						<li><a href="<?php echo site_url('notas_credito'); ?>"<?php if (methodName() == 'notas_credito/index' || methodName() == 'notas_credito/listar') { echo ' class="current"'; } ?>>Administrar Notas de Crédito</a></li>
 						<li><a href="<?php echo site_url('notas_credito/registrar'); ?>"<?php if (methodName() == 'notas_credito/registrar') { echo ' class="current"'; } ?>>Agregar Nota de Crédito</a></li>
+						<li><a href="<?php echo site_url('movimientos/crear_reporte'); ?>"<?php if (methodName() == 'movimientos/crear_reporte') { echo ' class="current"'; } ?>>Reporte de Cartera</a></li>
 					</ul>
 					
 				</li>

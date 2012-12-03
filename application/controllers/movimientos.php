@@ -64,6 +64,22 @@ class Movimientos extends CI_Controller
 		}
 		
 		*/
+		
+		if ($this->form_validation->run()) {
+			$usuario = $this->session->userdata('user');
+			
+			$filters = array(
+				'branch' => $_POST['branch'],
+				'cutDate' => $_POST['fecha_corte'],
+				'fromClient' => $_POST['from_client'],
+				'toClient' => $_POST['to_client']
+			);
+			
+			$this->_makeReport($filters);
+			
+			$transactions = $this->transactions->getReportData($_POST['branch'], $_POST['from_client'], $_POST['to_client'], $_POST['fecha_corte']);
+			exit(var_dump($transactions));
+		}
 
 		$data['title'] = "Crear Reporte de Cartera";
 		$data['user'] = $this->session->userdata('user');
@@ -72,55 +88,33 @@ class Movimientos extends CI_Controller
 
 		// Display views
 		$this->load->view('header', $data);
-		$this->load->view('facturas/crear_reporte', $data);
+		$this->load->view('movimientos/crear_reporte', $data);
 		$this->load->view('footer', $data);
 	}
 	
-	/*
 	private function _makeReport($filters)
 	{
 		$this->load->helper(array('dompdf', 'file'));
 		$this->load->model('branches');
 		$this->load->model('clients');
 		
-		$invoices = $this->invoices->getReportData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
+		$transactions = $this->transactions->getReportData($filters['branch'], $filters['fromClient'], $filters['toClient'], $filters['cutDate']);
+
 		
-		if (count($invoices) === 0) {
-			exit('No existen facturas con esas especificaciones.');
+		if (count($transactions) === 0) {
+			exit('No existen movimientos con esas especificaciones.');
 		}
 		
 		// Get branch name
 		$branch = $this->branches->getBranch($filters['branch']);
 		$branch = $branch['nombre'];
 
-		if ($filters['client'] === '0') {
-			$client = 'Todos';
-		} else {
-			// Get client name
-			$client = $this->clients->getBranch($filters['client']);
-			$client = $client['nombre'];
-		}
-		
-		$since = convertToHumanDate($filters['since']);
-		$until = convertToHumanDate($filters['until']);
-		
-		$total = 0;
-		foreach ($invoices as $invoice) {
-			$total += $invoice['importe'];
-		}
-
 		$data['title'] = 'Reporte Financiero de Facturas';
-		$data['invoices'] = $invoices;
-		$data['branch'] = $branch;
-		$data['client'] = $client;
-		$data['since'] = $since;
-		$data['until'] = $until;
-		$data['total'] = $total;
+		$data['transactions'] = $transactions;
 
 		$html = $this->load->view('reportes/header', $data, true);
-		$html .= $this->load->view('reportes_financieros/facturas', $data, true);
+		$html .= $this->load->view('reportes_financieros/movimientos', $data, true);
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
-	*/
 }

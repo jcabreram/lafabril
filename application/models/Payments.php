@@ -29,26 +29,12 @@ class Payments extends CI_Model
 		
 		$this->db->trans_start();
 		
-		// We get the last folio of the orders in that branch
-		$ultimo_folio = $this->folios->getLastFolio($id_sucursal, 'A');
-		$folio_actual = ++$ultimo_folio['ultimo_folio'];
-		
 		$sql = "INSERT INTO pagos_facturas (id_pago_factura, id_pago_tipo, importe, fecha, id_sucursal, id_cliente, estatus, fecha_captura, usuario_captura)
 				VALUES (NULL, $id_tipo_pago, $importe, $fecha, $id_sucursal, $id_cliente, $estatus, $fecha_captura,  $usuario_captura)";
 		
 		$this->db->query($sql);
+		
 		$id_pago_factura = $this->db->insert_id();
-		
-		// Insert the next folio for the document in the folios table
-		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
-					VALUES (NULL, $id_pago_factura, $id_sucursal, $tipo_documento, $folio_actual)";
-					
-		$this->db->query($sql);
-		
-		// Update the value of the last folio
-		$sql = "UPDATE folios_prefijo SET ultimo_folio=$folio_actual WHERE tipo_documento = $tipo_documento AND id_sucursal = $id_sucursal";
-		
-		$this->db->query($sql);
 			
 		/*** TRANSACTION FINISHES ***/
 		$this->db->trans_complete();
@@ -60,6 +46,32 @@ class Payments extends CI_Model
 
 		return false;
 	}
+	
+	public function getPrePayment($id)
+	{
+		$id = $this->db->escape(intval($id));
+
+		$sql = 'SELECT 
+					pf.id_pago_factura, 
+					pf.id_sucursal,
+					su.nombre AS nombre_sucursal, 
+					pf.id_cliente,
+					cl.nombre AS nombre_cliente,
+					pf.fecha, 
+					pf.estatus,
+					pf.importe,
+					pt.nombre AS tipo_pago
+				FROM pagos_facturas AS pf
+				JOIN sucursales AS su ON pf.id_sucursal=su.id_sucursal
+				JOIN clientes AS cl ON pf.id_cliente=cl.id_cliente
+				JOIN pagos_tipo AS pt ON pf.id_pago_tipo = pt.id_pago_tipo
+				WHERE id_pago_factura = ' . $id;
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->row_array();
+	}	
 	
 	public function getPayment($id)
 	{
@@ -261,6 +273,45 @@ class Payments extends CI_Model
 		}
 
 		return false;
+	}
+	
+	public function finalize($id)
+	{
+		$this->load->model('folios');
+
+		$id = $this->db->escape(intval($id));
+
+		$this->db->trans_start();
+
+		$payment = $this->getPrePayment($id);
+		$paymentDetails = $this->getPaymentDetails($id);
+		$branch = $payment['id_sucursal'];
+		
+		// We get the last folio of the orders in that branch
+		$ultimo_folio = $this->folios->getLastFolio($branch, 'A');
+		$folio_actual = ++$ultimo_folio['ultimo_folio'];
+		
+		// Insert the next folio for the document in the folios table
+		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
+					VALUES (NULL, $id, $branch, 'A', $folio_actual)";
+					
+		$this->db->query($sql);
+		
+		// Update the value of the last folio
+		$sql = "UPDATE folios_prefijo SET ultimo_folio=$folio_actual WHERE tipo_documento = 'A' AND id_sucursal = $branch";
+		
+		$this->db->query($sql);
+
+		$sql = "UPDATE pagos_facturas SET estatus = 'A' WHERE id_pago_factura = $id";
+		$this->db->query($sql);	
+
+		$this->db->trans_complete();
+		
+		if ($this->db->trans_status() === true) {
+		    return true;
+		}
+
+		return false;		
 	}
 	
 	

@@ -198,7 +198,7 @@
 				<td></td>
 				<td>
 					<p>
-						<a href="<?php echo site_url('pedidos'); ?>"><input class="button" type="button" value="Finalizar" /></a>
+						<a href="<?php echo site_url("pedidos/finalizar/$order_id"); ?>"><input class="button" type="button" value="Finalizar" /></a>
 					</p>
 				</td>
 			</tr>
