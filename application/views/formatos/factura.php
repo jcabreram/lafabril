@@ -16,8 +16,8 @@
 	<tr>
 		<th>RFC</th>
 		<td><?php echo $invoice['rfc']; ?></td>
-		<th></th>
-		<td></td>
+		<th>Estatus</th>
+		<td><?php echo getStatusName($invoice['estatus']); ?></td>
 	</tr>
 </table>
 
