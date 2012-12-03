@@ -100,18 +100,12 @@ class Pagos extends CI_Controller
 		// Load necessary models
 		$this->load->model('invoices');
 
-		$data['title'] = "Registrar detalles del pago";
-		$data['user'] = $this->session->userdata('user');
 		$data['payment'] = $this->payments->getPrePayment($id_pago_factura);
 		$data['payment_details'] = $this->payments->getPaymentDetails($id_pago_factura);
 		
-		$id_sucursal = $data['payment']['id_sucursal'];
-		$id_cliente = $data['payment']['id_cliente'];
-		$data['invoices'] = $this->invoices->getAllActive($id_sucursal, $id_cliente);
-		
-		
 		// Declare the $total as float so it gets it in the foreach
 		settype($total, "float");
+		$total = 0.0;
 		
 		// For every detail of the order, gather the sum of the product of the prices and quantities
 		foreach ($data['payment_details'] as $line) {
@@ -151,6 +145,29 @@ class Pagos extends CI_Controller
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
 			}
 		}
+		
+		$data['title'] = "Registrar detalles del pago";
+		$data['user'] = $this->session->userdata('user');
+		$data['payment'] = $this->payments->getPrePayment($id_pago_factura);
+		$data['payment_details'] = $this->payments->getPaymentDetails($id_pago_factura);
+		
+		$id_sucursal = $data['payment']['id_sucursal'];
+		$id_cliente = $data['payment']['id_cliente'];
+		//exit(var_dump($data));
+		$data['invoices'] = $this->invoices->getAllActive($id_sucursal, $id_cliente);
+		
+		
+		// Declare the $total as float so it gets it in the foreach
+		settype($total, "float");
+		$total = 0.0;
+		
+		// For every detail of the order, gather the sum of the product of the prices and quantities
+		foreach ($data['payment_details'] as $line) {
+			$total+=$line['importe_pago'];
+		}
+		$data['total'] = $total;
+		
+		$data['disponible'] = $data['payment']['importe'] - $total;
 		
 		// Display views
 		$this->load->view('header', $data);

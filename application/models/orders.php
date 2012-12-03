@@ -54,9 +54,6 @@ class Orders extends CI_Model
 			$this->db->query($sql);	
 		}
 		
-		$sql = "UPDATE pedidos SET estatus = 'A' WHERE id_pedido = $id_pedido";
-		$this->db->query($sql);	
-		
 		/*** TRANSACTION FINISHES ***/
 		$this->db->trans_complete();
 		/*** TRANSACTION FINISHES ***/
