@@ -804,7 +804,7 @@ class Pedidos extends CI_Controller
 	public function finalizar($id)
 	{
 		if ($this->orders->finalize($id)) {
-			$this->session->set_flashdata('message', 'Pedido creado.');
+			$this->session->set_flashdata('message', 'El pedido ha sido registrado.');
 			redirect('pedidos');
 		}
 

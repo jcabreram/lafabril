@@ -146,9 +146,6 @@ class Payments extends CI_Model
 			$this->db->query($sql);	
 		}
 		
-		$sql = "UPDATE pagos_facturas SET estatus = 'A' WHERE id_pago_factura = $id_pago_factura";
-		$this->db->query($sql);	
-		
 		$sql = "UPDATE movimientos SET saldo = saldo-$pago WHERE id_documento = $id_factura";
 		$this->db->query($sql);
 		
