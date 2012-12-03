@@ -68,6 +68,7 @@ class Invoices extends CI_Model
 				JOIN folios_prefijo AS fp ON fa.id_sucursal=fp.id_sucursal AND fp.tipo_documento='F'
 				JOIN movimientos AS mo ON fa.id_factura = mo.id_documento
 				WHERE su.id_sucursal = $id_sucursal AND cl.id_cliente = $id_cliente
+				AND fa.estatus = 'A'
 				ORDER BY fecha_factura ASC";
 				
 		//exit(var_dump($sql));
