@@ -100,37 +100,6 @@ class Pagos extends CI_Controller
 		// Load necessary models
 		$this->load->model('invoices');
 
-		// Load form validation library
-		$this->load->library('form_validation');
-
-		// Setting error delimiters
-		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
-		
-		// Define validation rules
-		$config = array(
-			array(
-				'field' => 'invoice', 
-				'label' => 'factura', 
-				'rules' => 'callback_not_default'
-			),
-			array(
-				'field' => 'pago', 
-				'label' => 'pago', 
-				'rules' => 'required|numeric|callback_valid_amount'
-			)
-		);
-
-		$this->form_validation->set_rules($config);
-
-		// If validation was successful
-		if ($this->form_validation->run()) {
-			if($this->payments->addLine($id_pago_factura, $_POST['invoice'], $_POST['pago'])) {
-				$this->session->set_flashdata('message', 'El pago ha sido registrado.');
-			} else {
-				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
-			}
-		}
-
 		$data['title'] = "Registrar detalles del pago";
 		$data['user'] = $this->session->userdata('user');
 		$data['payment'] = $this->payments->getPrePayment($id_pago_factura);
@@ -151,6 +120,37 @@ class Pagos extends CI_Controller
 		$data['total'] = $total;
 		
 		$data['disponible'] = $data['payment']['importe'] - $total;
+
+		// Load form validation library
+		$this->load->library('form_validation');
+
+		// Setting error delimiters
+		$this->form_validation->set_error_delimiters('<span class="input-notification error png_bg">', '</span>');
+		
+		// Define validation rules
+		$config = array(
+			array(
+				'field' => 'invoice', 
+				'label' => 'factura', 
+				'rules' => 'callback_not_default'
+			),
+			array(
+				'field' => 'pago', 
+				'label' => 'pago', 
+				'rules' => 'required|numeric|callback_check_balance|callback_check_available['.$data['disponible'].']'
+			)
+		);
+
+		$this->form_validation->set_rules($config);
+
+		// If validation was successful
+		if ($this->form_validation->run()) {
+			if($this->payments->addLine($id_pago_factura, $_POST['invoice'], $_POST['pago'])) {
+				$this->session->set_flashdata('message', 'El pago ha sido registrado.');
+			} else {
+				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar el pago, intenta de nuevo.');
+			}
+		}
 		
 		// Display views
 		$this->load->view('header', $data);
@@ -158,17 +158,27 @@ class Pagos extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 	
-	public function valid_amount($payment)
+	public function check_balance($payment)
 	{
 		$invoice = $this->invoices->getInvoice($_POST['invoice']);
 		
 		if ($invoice['saldo'] < $payment) {
-			$this->form_validation->set_message("valid_amount", "El pago debe ser menor o igual al saldo.");
+			$this->form_validation->set_message("check_balance", "El pago debe ser menor o igual al saldo.");
 			return false;
 		} else {
 			return true;
 		}
 		
+	}
+
+	public function check_available($payment, $available)
+	{
+		if ($payment > $available) {
+			$this->form_validation->set_message("check_available", "Estás pagando más de lo disponible.");
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	public function eliminar($id_pago_factura, $id)

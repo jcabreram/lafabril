@@ -5,7 +5,7 @@ class Products extends CI_Model
 	
 	public function getProducts()
 	{
-		$sql = 'SELECT * FROM productos';
+		$sql = 'SELECT * FROM productos ORDER BY nombre ASC';
 		$query = $this->db->query($sql);
 
 		// Returns the query result as a pure array, or an empty array when no result is produced.
