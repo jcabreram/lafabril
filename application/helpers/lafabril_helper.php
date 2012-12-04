@@ -76,3 +76,13 @@ if (!function_exists('convertToComputerDate')) {
 		return false;
 	}
 }
+
+/**
+ * Rounds money
+ */
+if (!function_exists('roundMoney')) {
+	function roundMoney($money)
+	{
+		return round($money, 2, PHP_ROUND_HALF_UP);
+	}
+}
