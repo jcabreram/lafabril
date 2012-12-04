@@ -159,12 +159,13 @@ $(function() {
 			return false;
 		}
 
+		
 		if (!validPrecision(parseFloat(cardPaymentAmount.val()))) {
 			alert('La precisión máxima de pago son 2 decimales.');
 			return false;
 		}
 		
-		var difference = parseFloat(billBalance.val()) - parseFloat(cardPaymentAmount.val());
+		var difference = Math.round((parseFloat(billBalance.val()) - parseFloat(cardPaymentAmount.val())) * 100) / 100;
 
 		if (Math.abs(difference) < 0.01) {
 			// This is just to catch the precision error
@@ -255,7 +256,7 @@ $(function() {
 			return false;
 		}
 		
-		var difference = parseFloat(billBalance.val()) - parseFloat(checkPaymentAmount.val());
+		var difference = Math.round((parseFloat(billBalance.val()) - parseFloat(checkPaymentAmount.val())) * 100) / 100;
 
 		if (Math.abs(difference) < 0.01) {
 			// This is just to catch the precision error

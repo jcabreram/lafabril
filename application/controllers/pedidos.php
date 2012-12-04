@@ -712,7 +712,7 @@ class Pedidos extends CI_Controller
 			if ($cash < 0.0) {
 				$cash = 0.0;
 				$errors['cash'] = 'Escribe una cantidad de efectivo positiva';
-			} elseif (!checkPrecision($cash)) {
+			} elseif (!$this->checkPrecision($cash)) {
 				$cash = 0.0;
 				$errors['cash'] = 'Precisión máxima de 2 decimales.';
 			}
@@ -745,7 +745,7 @@ class Pedidos extends CI_Controller
 			} else {
 				$paymentAmount = floatval($paymentAmount);
 
-				if ($paymentAmount < 0.0 || !checkPrecision($paymentAmount)) {
+				if ($paymentAmount < 0.0 || !$this->checkPrecision($paymentAmount)) {
 					$errors['cards'] = 'Error procesando la información de las tarjetas';
 					break;
 				}
@@ -781,7 +781,7 @@ class Pedidos extends CI_Controller
 			} else {
 				$paymentAmount = floatval($paymentAmount);
 
-				if ($paymentAmount < 0.0 || !checkPrecision($paymentAmount)) {
+				if ($paymentAmount < 0.0 || !$this->checkPrecision($paymentAmount)) {
 					$errors['checks'] = 'Error procesando la información de las tarjetas';
 					break;
 				}
