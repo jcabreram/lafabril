@@ -532,7 +532,7 @@ class Pedidos extends CI_Controller
 
 					if ($inTheOrder !== false) {
 						// Amount ordered - Amount delivered
-						$maximumAmount = $order['products'][$inTheOrder]['cantidad'] - $order['products'][$inTheOrder]['cantidad_surtida'];
+						$maximumAmount = roundMoney($order['products'][$inTheOrder]['cantidad'] - $order['products'][$inTheOrder]['cantidad_surtida']);
 
 						if ($productAmount > $maximumAmount) {
 							$errors['products'][$productId] = 'Máximo ' . $maximumAmount . ' ' . $order['products'][$inTheOrder]['udm'] . '.';
