@@ -62,8 +62,8 @@ class Clients extends CI_Model
 	
 	public function getWalletClients($branch, $from_client, $to_client, $fecha) {
 		$branch = $this->db->escape(intval($branch));
-		$from_client = $this->db->escape(intval($from_client));
-		$to_client = $this->db->escape(intval($to_client));
+		$from_client = $this->db->escape($from_client);
+		$to_client = $this->db->escape($to_client);
 		$fecha = $this->db->escape($fecha);
 		
 
@@ -73,8 +73,10 @@ class Clients extends CI_Model
 				FROM facturas AS fa
 				JOIN movimientos AS mo ON mo.id_documento = fa.id_factura
 				JOIN clientes AS cl ON mo.id_cliente=cl.id_cliente
-				WHERE fa.id_sucursal = 9 AND fa.estatus != 'X' AND fa.fecha <= '2012-12-03' AND left(cl.nombre,1) BETWEEN left('Bepensa',1) AND left('Universidad Anáhuac Mayab',1)
+				WHERE fa.id_sucursal = $branch AND fa.estatus != 'X' AND fa.fecha <= $fecha AND left(cl.nombre,1) BETWEEN left($from_client,1) AND left($to_client,1)
 				GROUP BY cl.id_cliente";
+				
+		//exit(var_dump($sql));
 				
 
 		$query = $this->db->query($sql);

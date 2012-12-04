@@ -44,6 +44,16 @@ class Movimientos extends CI_Controller
 				'field' => 'fecha_corte', 
 				'label' => 'fecha de inicio', 
 				'rules' => 'required|exact_length[10]|alpha_dash'
+			),
+			array(
+				'field' => 'from_client', 
+				'label' => 'de cliente', 
+				'rules' => 'required'
+			),
+			array(
+				'field' => 'to_client', 
+				'label' => 'a cliente', 
+				'rules' => 'required'
 			)
 		);
 
@@ -51,20 +61,6 @@ class Movimientos extends CI_Controller
 		
 		// If validation was successful
 		if ($this->form_validation->run()) {
-			$filters = array(
-				'branch' => $_POST['branch'],
-				'cutDate' => $_POST['fecha_corte'],
-				'fromClient' => $_POST['from_client'],
-				'toClient' => $_POST['to_client']
-			);
-			
-			$this->_makeReport($filters);
-		}
-		
-		
-		if ($this->form_validation->run()) {
-			$usuario = $this->session->userdata('user');
-			
 			$filters = array(
 				'branch' => $_POST['branch'],
 				'cutDate' => $_POST['fecha_corte'],
@@ -125,24 +121,19 @@ class Movimientos extends CI_Controller
 		$branch = $this->branches->getBranch($filters['branch']);
 		$branch = $branch['nombre'];
 		
-		// Get clients names
-		$from_client = $this->clients->getClient($filters['fromClient']);
-		$from_client = $from_client['nombre'];
-		$to_client = $this->clients->getClient($filters['toClient']);
-		$to_client = $to_client['nombre'];
-		
 		$cutDate = convertToHumanDate($filters['cutDate']);
 		
 		$data['title'] = 'Reporte de Cartera';
 		$data['clients'] = $clients;
-		$data['from_client'] = $from_client;
-		$data['to_client'] = $to_client;
+		$data['from_client'] = $filters['fromClient'];
+		$data['to_client'] = $filters['toClient'];
 		$data['cutDate'] = $cutDate;
 		$data['branch'] = $branch;
 		$data['wallet'] = $wallet;
 				
 		if (count($clients) === 0) {
 			$this->session->set_flashdata('attention', 'No existen facturas con esas especificaciones.');
+			
 			redirect("movimientos/crear_reporte");
 		}
 
