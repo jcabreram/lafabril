@@ -44,9 +44,9 @@
 			<p>
 				<label>Sucursal *</label>              
 				<select name="branch" class="medium-input">
-					<option value="">Escoge una opción</option>
+					<option value="" <?php echo set_select('branch', '', true); ?>>Escoge una opción</option>
 					<?php foreach ($branches as $branch) : ?>
-					<option value="<?php echo $branch['id_sucursal']; ?>"><?php echo $branch['nombre']; ?></option>
+					<option value="<?php echo $branch['id_sucursal']; ?>" <?php echo set_select('branch', $branch['id_sucursal']); ?>><?php echo $branch['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('branch'); ?>
@@ -54,7 +54,7 @@
 			
 			<p>
 				<label>Fecha de corte: (aaaa-mm-dd) *</label>
-				<input id="fecha" class="text-input medium-input" type="text" name="fecha_corte" readonly />
+				<input id="fecha" class="text-input medium-input" value="<?php echo set_value('fecha_corte', date('Y-m-d')); ?>" type="text" name="fecha_corte" readonly />
 				<?php echo form_error('fecha_corte'); ?>
 			</p>
 			
@@ -69,9 +69,9 @@
 			<p>
 				<label>De cliente *</label>              
 				<select name="from_client" class="medium-input">
-					<option value="">Escoge una opción</option>
+					<option value="" <?php echo set_select('from_client', '', true); ?>>Escoge una opción</option>
 					<?php foreach ($clients as $client) : ?>
-					<option value="<?php echo $client['nombre']; ?>"><?php echo $client['nombre']; ?></option>
+					<option value="<?php echo $client['nombre']; ?>" <?php echo set_select('from_client', $client['nombre']); ?>><?php echo $client['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('from_client'); ?>
@@ -80,9 +80,9 @@
 			<p>
 				<label>A cliente *</label>              
 				<select name="to_client" class="medium-input">
-					<option value="">Escoge una opción</option>
+					<option value="" <?php echo set_select('to_client', '', true); ?>>Escoge una opción</option>
 					<?php foreach ($clients as $client) : ?>
-					<option value="<?php echo $client['nombre']; ?>"><?php echo $client['nombre']; ?></option>
+					<option value="<?php echo $client['nombre']; ?>" <?php echo set_select('to_client', $client['nombre']); ?>><?php echo $client['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('to_client'); ?>

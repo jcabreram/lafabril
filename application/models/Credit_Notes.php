@@ -2,8 +2,28 @@
 
 class Credit_Notes extends CI_Model
 {
-	public function getAll()
+	public function getAll($filters = false)
 	{
+		/*** PREPARE FILTERS ***/
+		$branch = isset($filters['branch']) ? $filters['branch'] : false;
+		$client = isset($filters['client']) ? $filters['client'] : false;
+		$status = isset($filters['status']) ? $filters['status'] : false;
+		/*** PREPARE FILTERS ***/
+
+		$where = '';
+
+		if ($branch !== false) {
+			$where .= 'WHERE nc.id_sucursal = ' . $this->db->escape(intval($branch));
+		}
+
+		if ($client !== false) {
+			$where .= ' AND nc.id_cliente = ' . $this->db->escape(intval($client));
+		}
+
+		if ($status !== false) {
+			$where .= ' AND nc.estatus = ' . $this->db->escape($status);
+		}
+
 		$sql = 'SELECT 
 					nc.id_nota_credito, 
 					fp.prefijo, 
@@ -17,6 +37,7 @@ class Credit_Notes extends CI_Model
 				JOIN clientes AS cl ON nc.id_cliente=cl.id_cliente
 				JOIN folios AS fo ON nc.id_nota_credito=fo.id_documento AND fo.tipo_documento="B"
 				JOIN folios_prefijo AS fp ON nc.id_sucursal=fp.id_sucursal AND fp.tipo_documento="B"
+				' . $where . '
 				ORDER BY nc.fecha ASC';
 		$query = $this->db->query($sql);
 		

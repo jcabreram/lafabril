@@ -193,7 +193,7 @@ class Movimientos extends CI_Controller
 			$this->_makeAntiquityReport($filters);
 		}
 
-		$data['title'] = "Crear Reporte de Cartera";
+		$data['title'] = "Crear Reporte de Antiguedad de Saldos";
 		$data['user'] = $this->session->userdata('user');
 		$data['branches'] = $this->userBranches->getActiveUserBranches($data['user']['id']);
 		$data['clients'] = $this->clients->getActiveClients();

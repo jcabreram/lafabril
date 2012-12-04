@@ -65,7 +65,7 @@
 					<td><?php echo $billData['nombre_sucursal']; ?></td>
 					<td><?php echo $billData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($billData['fecha_nota_venta'])); ?></td>
-					<td class="textAlign-center"><?php echo $billData['estatus']; ?></td>
+					<td class="textAlign-center"><?php echo getStatusName($billData['estatus']); ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>

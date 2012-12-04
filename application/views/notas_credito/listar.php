@@ -7,6 +7,12 @@
 	<!-- Content Box Header -->
 	<div class="content-box-header">
 		<h3>Lista de Notas de Crédito</h3>
+
+		<ul class="content-box-tabs">
+			<li><a href="#" class="current">Tabla</a></li>
+			<li><a href="#filtrar" rel="modal">Filtrar</a></li>
+			<li><a href="<?php echo site_url('notas_credito/exportar' . getParameters()); ?>" target="_blank">Exportar a PDF</a></li>
+		</ul>
 	</div>
 	
 	<!-- Content Box Content -->			

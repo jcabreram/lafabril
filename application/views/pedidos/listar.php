@@ -68,7 +68,7 @@
 					<td><?php echo $orderData['nombre_vendedor']; ?></td>
 					<td><?php echo $orderData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($orderData['fecha_pedido'])); ?></td>
-					<td class="textAlign-center"><?php echo $orderData['estatus']; ?></td>
+					<td class="textAlign-center"><?php echo getStatusName($orderData['estatus']); ?></td>
 				</tr>
 				<?php endif; ?>
 			<?php endforeach; ?>

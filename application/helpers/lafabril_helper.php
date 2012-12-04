@@ -27,6 +27,33 @@ if (!function_exists('getStatusName')) {
 	}
 }
 
+if (!function_exists('getStatusCode')) {
+	function getStatusCode($code) 
+	{
+		$name = 'Desconocido';
+
+		switch ($code) {
+			case 'abierto':
+				$name = 'A';
+				break;
+
+			case 'cerrado':
+				$name = 'C';
+				break;
+
+			case 'cancelado':
+				$name = 'X';
+				break;
+				
+			case 'pendiente':
+				$name = 'P';
+				break;
+		}
+
+		return $name;
+	}
+}
+
 if (!function_exists('getFolio')) {
 	function getFolio($prefix, $number)
 	{

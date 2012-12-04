@@ -83,12 +83,25 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td class="textAlign-right">%<?php echo roundMoney(($totals['fallDue'] * 100) / $totals['balances']); ?></td>
-			<td class="textAlign-right">%<?php echo roundMoney(($totals['1-30'] * 100) / $totals['balances']); ?></td>
-			<td class="textAlign-right">%<?php echo roundMoney(($totals['31-60'] * 100) / $totals['balances']); ?></td>
-			<td class="textAlign-right">%<?php echo roundMoney(($totals['61-90'] * 100) / $totals['balances']); ?></td>
-			<td class="textAlign-right">%<?php echo roundMoney(($totals['91-120'] * 100) / $totals['balances']); ?></td>
-			<td class="textAlign-right">%<?php echo roundMoney(($totals['+120'] * 100) / $totals['balances']); ?></td>
+			<td class="textAlign-right"><?php echo roundMoney(($totals['fallDue'] * 100) / $totals['balances']); ?>%</td>
+			<td class="textAlign-right"><?php echo roundMoney(($totals['1-30'] * 100) / $totals['balances']); ?>%</td>
+			<td class="textAlign-right"><?php echo roundMoney(($totals['31-60'] * 100) / $totals['balances']); ?>%</td>
+			<td class="textAlign-right"><?php echo roundMoney(($totals['61-90'] * 100) / $totals['balances']); ?>%</td>
+			<td class="textAlign-right"><?php echo roundMoney(($totals['91-120'] * 100) / $totals['balances']); ?>%</td>
+			<td class="textAlign-right"><?php echo roundMoney(($totals['+120'] * 100) / $totals['balances']); ?>%</td>
+		</tr>
+
+		<tr>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
 		</tr>
 	</tfoot>	
 </table>

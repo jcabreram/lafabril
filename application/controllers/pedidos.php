@@ -129,19 +129,7 @@ class Pedidos extends CI_Controller
 		}
 
 		if (isset($dirtyFilters['estatus']) && trim($dirtyFilters['estatus']) !== '') {
-			switch ($dirtyFilters['estatus']) {
-				case 'abierto':
-					$filters['status'] = 'A';
-					break;
-
-				case 'cerrado':
-					$filters['status'] = 'C';
-					break;
-
-				case 'cancelado':
-					$filters['status'] = 'X';
-					break;
-			}
+			$filters['status'] = getStatusCode($dirtyFilters['estatus']);
 		}
 		
 		return $filters;
@@ -196,19 +184,7 @@ class Pedidos extends CI_Controller
 			}
 
 			if ($status !== false && $status !== '') {
-				switch ($status) {
-					case 'A':
-						$filters['estatus'] = 'abierto';
-						break;
-
-					case 'C':
-						$filters['estatus'] = 'cerrado';
-						break;
-
-					case 'X':
-						$filters['estatus'] = 'cancelado';
-						break;
-				}
+				$filters['estatus'] = strtolower(getStatusName($status));
 			}
 
 			if (count($filters) > 0) {
@@ -246,26 +222,14 @@ class Pedidos extends CI_Controller
 		if (!isset($filters['client'])) {
 			$client = 'Todos';
 		} else {
-			$client = $this->clients->getBranch($filters['client']);
+			$client = $this->clients->getClient($filters['client']);
 			$client = $client['nombre'];
 		}
 
 		if (!isset($filters['status'])) {
 			$status = 'Todos';
 		} else {
-			switch ($filters['status']) {
-				case 'A':
-					$status = 'Abierto';
-					break;
-
-				case 'C':
-					$status = 'Cerrado';
-					break;
-
-				case 'X':
-					$status = 'Cancelado';
-					break;
-			}
+			$status = getStatusName($filters['status']);
 		}
 
 		$data['title'] = "Reporte de Pedidos";

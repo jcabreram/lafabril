@@ -36,7 +36,7 @@
 			<td><?php echo $order['nombre_vendedor']; ?></td>
 			<td><?php echo $order['nombre_cliente']; ?></td>
 			<td><?php echo date('d/m/Y', strtotime($order['fecha_pedido'])); ?></td>
-			<td class="textAlign-center"><?php echo $order['estatus']; ?></td>
+			<td class="textAlign-center"><?php echo getStatusName($order['estatus']); ?></td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>
