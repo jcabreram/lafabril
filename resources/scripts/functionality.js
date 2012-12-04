@@ -47,7 +47,7 @@ $(function() {
 		VAT = $('.invoiceVAT').first().val();
 		tax = Math.round(VAT * subtotal * 100) / 100;
 
-		total = Math.round(tax + subtotal * 100) / 100;
+		total = Math.round((tax + subtotal) * 100) / 100;
 
 		$('.invoiceSubtotal').first().text('$' + getMoneyFormat(subtotal));
 		$('.invoiceTax').first().text('$' + getMoneyFormat(tax));
