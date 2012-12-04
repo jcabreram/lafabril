@@ -5,7 +5,7 @@ if (! function_exists('createPDF'))
 	function createPDF($html, $filename = '', $stream = true) 
 	{
 	    require_once('dompdf/dompdf_config.inc.php');
-	    
+	    $old_limit = ini_set("memory_limit", "64M");
 	    $dompdf = new DOMPDF();
 	    $dompdf->load_html($html);
 	    $dompdf->render();
