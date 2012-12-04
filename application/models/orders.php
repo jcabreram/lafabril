@@ -271,19 +271,16 @@ class Orders extends CI_Model
 		}
 		/*** INSERT INVOICE PRODUCTS AND UPDATE DELIVERED AMOUNT ***/
 
-
 		/*** GET LAST FOLIO NUMBER ***/
 		$folioInformation = $this->folios->getLastFolio($order['id_sucursal'], 'F');
 		$currentFolio = intval($folioInformation['ultimo_folio']) + 1;
 		/*** GET LAST FOLIO NUMBER ***/
-
 
 		/*** INSERT NEW FOLIO FOR INVOICE ***/
 		$sql = "INSERT INTO folios (id, id_documento, id_sucursal, tipo_documento, folio)
 				VALUES (NULL, $invoiceId, {$order['id_sucursal']}, 'F', $currentFolio)";
 		$this->db->query($sql);
 		/*** INSERT NEW FOLIO FOR INVOICE ***/
-
 
 		/*** UPDATE LAST FOLIO INFORMATION ***/
 		$sql = "UPDATE folios_prefijo SET ultimo_folio = $currentFolio WHERE tipo_documento = 'F' AND id_sucursal = {$order['id_sucursal']}";
@@ -320,11 +317,9 @@ class Orders extends CI_Model
 		$this->db->query($sql);
 		/*** REGISTER INVOICE IN ACCOUNTS RECEIVABLE ***/
 
-
 		/*** TRANSACTION FINISHES ***/
 		$this->db->trans_complete();
 		/*** TRANSACTION FINISHES ***/
-
 
 		if ($this->db->trans_status() === true) {
 		    return true;
