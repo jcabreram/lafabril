@@ -73,7 +73,7 @@ class Clients extends CI_Model
 				FROM facturas AS fa
 				JOIN movimientos AS mo ON mo.id_documento = fa.id_factura
 				JOIN clientes AS cl ON mo.id_cliente=cl.id_cliente
-				WHERE fa.id_sucursal = $branch AND fa.estatus != 'X' AND fa.fecha <= $fecha AND cl.id_cliente BETWEEN $from_client AND $to_client
+				WHERE fa.id_sucursal = 9 AND fa.estatus != 'X' AND fa.fecha <= '2012-12-03' AND left(cl.nombre,1) BETWEEN left('Bepensa',1) AND left('Universidad Anáhuac Mayab',1)
 				GROUP BY cl.id_cliente";
 				
 
