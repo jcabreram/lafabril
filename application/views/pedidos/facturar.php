@@ -63,7 +63,7 @@
 						<td><?php echo $product['nombre']; ?></td>
 						<td><?php echo $product['cantidad']; ?> <?php echo $product['udm']; ?><input type="hidden" value="<?php echo $product['cantidad']; ?>" class="amountOrdered" /></td>
 						<td><?php echo $product['cantidad_surtida']; ?> <?php echo $product['udm']; ?><input type="hidden" value="<?php echo $product['cantidad_surtida']; ?>" class="amountDelivered" /></td>
-						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input fixed-small-input userAmount" value="<?php echo isset($_POST['products'][$product['id_producto']]) ? $_POST['products'][$product['id_producto']] : $product['cantidad'] - $product['cantidad_surtida']; ?>" />
+						<td><input type="text" name="products[<?php echo $product['id_producto']; ?>]" class="text-input fixed-small-input userAmount" value="<?php echo isset($_POST['products'][$product['id_producto']]) ? $_POST['products'][$product['id_producto']] : roundMoney($product['cantidad'] - $product['cantidad_surtida']); ?>" />
 							<?php echo $product['udm']; ?>
 							<?php if (isset($errors['products'][$product['id_producto']])) : ?>
 							<span class="input-notification error png_bg"><?php echo $errors['products'][$product['id_producto']]; ?></span>
