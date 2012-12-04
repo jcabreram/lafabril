@@ -113,7 +113,7 @@ class Pagos extends CI_Controller
 		}
 		$data['total'] = $total;
 		
-		$data['disponible'] = $data['payment']['importe'] - $total;
+		$data['disponible'] = roundMoney($data['payment']['importe'] - $total);
 
 		// Load form validation library
 		$this->load->library('form_validation');
@@ -181,7 +181,7 @@ class Pagos extends CI_Controller
 	{
 		$invoice = $this->invoices->getInvoice($_POST['invoice']);
 		
-		if ($invoice['saldo'] < $payment) {
+		if ($invoice['saldo'] <= $payment) {
 			$this->form_validation->set_message("check_balance", "El pago debe ser menor o igual al saldo.");
 			return false;
 		} else {
@@ -191,7 +191,7 @@ class Pagos extends CI_Controller
 	}
 
 	public function check_available($payment, $available)
-	{
+	{	
 		if ($payment > $available) {
 			$this->form_validation->set_message("check_available", "Estás pagando más de lo disponible.");
 			return false;
