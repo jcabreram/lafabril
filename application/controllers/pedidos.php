@@ -301,12 +301,12 @@ class Pedidos extends CI_Controller
 			array(
 				'field' => 'cantidad', 
 				'label' => 'cantidad', 
-				'rules' => 'required|greater_than[0]'
+				'rules' => 'required|greater_than[0]|callback_checkPrecision'
 			),
 			array(
 				'field' => 'precio', 
 				'label' => 'precio unitario', 
-				'rules' => 'required|greater_than[0]'
+				'rules' => 'required|greater_than[0]|callback_checkPrecision'
 			)
 		);
 
@@ -350,6 +350,18 @@ class Pedidos extends CI_Controller
 		$this->load->view('pedidos/registrar_detalles', $data);
 		$this->load->view('footer', $data);
 	}
+
+	public function checkPrecision($price)
+	{
+		$priceParts = explode('.', $price);
+		
+		if (count($priceParts) === 2 && strlen($priceParts[1]) > 2) {
+			$this->form_validation->set_message('checkPrecision', 'El campo %s no puede tener más de 2 decimales de precisión.');
+			return false;
+		}
+
+		return true;
+	}
 	
 	public function detalles($id_pedido)
 	{
@@ -377,13 +389,14 @@ class Pedidos extends CI_Controller
 		
 		// For every detail of the order, gather the sum of the product of the prices and quantities
 		foreach ($data['order_details'] as $line) {
-			$subtotal+=$line['cantidad']*$line['precio'];
+			$subtotal = $subtotal + roundMoney($line['cantidad'] * $line['precio']);
 		}
 		
 		$data['subtotal'] = $subtotal;
-		
+		$data['taxes'] = roundMoney($subtotal * $data['order']['sucursal_iva']);
+
 		// The total is equal to the subtotal plus its tax
-		$data['total'] = $subtotal + $subtotal * $data['order']['sucursal_iva']; 
+		$data['total'] = roundMoney($subtotal + $data['taxes']); 
 		
 		// Display views
 		$this->load->view('header', $data);
@@ -499,6 +512,12 @@ class Pedidos extends CI_Controller
 						continue;
 					}
 
+					// Check precision
+					$productAmountParts = explode('.', $productAmount);
+
+					if (count($productAmountParts) === 2 && strlen($productAmountParts[1]) > 2) {
+						$errors['products'][$productId] = 'Precisión máxima de 2 decimales.';
+					}
 
 					/*** VERIFY IF THE PRODUCT IS IN THE ORDER ***/
 					$inTheOrder = false;
@@ -608,11 +627,11 @@ class Pedidos extends CI_Controller
 		$total = 0.0;
 		
 		foreach ($order['products'] as $product) {
-			$subtotal += $product['cantidad'] * $product['precio'];
+			$subtotal += roundMoney($product['cantidad'] * $product['precio']);
 		}
 
-		$taxes = $subtotal * $order['sucursal_iva'];
-		$total = round($subtotal + $taxes, 2);
+		$taxes = roundMoney($subtotal * $order['sucursal_iva']);
+		$total = roundMoney($subtotal + $taxes);
 		
 		$user = $this->session->userdata('user');
 		$errors = array();
@@ -683,16 +702,23 @@ class Pedidos extends CI_Controller
 		}
 		
 		if (!is_numeric($cash)) {
-			$cash = 0;
+			$cash = 0.0;
 			$errors['cash'] = 'Escribe una cantidad de efectivo válida';	
-		} elseif (($cash = floatval($cash)) < 0) {
-			$cash = 0;
-			$errors['cash'] = 'Escribe una cantidad de efectivo positiva';
+		} else {
+			$cash = roundMoney(floatval($cash));
+
+			if ($cash < 0.0) {
+				$cash = 0.0;
+				$errors['cash'] = 'Escribe una cantidad de efectivo positiva';
+			} elseif (!checkPrecision($cash)) {
+				$cash = 0.0;
+				$errors['cash'] = 'Precisión máxima de 2 decimales.';
+			}
 		}
 		
 		$maxCardNumLength = 19;
 		$minCardNumLength = 14;
-		$paidWithCards = 0;
+		$paidWithCards = 0.0;
 		
 		foreach ($cards as $cardInformation => $paymentAmount) {
 			$cardInformation = explode('-', $cardInformation);
@@ -711,16 +737,17 @@ class Pedidos extends CI_Controller
 				break;
 			}
 				
-			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0) {
+			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0.0 || !checkPrecision(floatval($paymentAmount))) {
+				$paymentAmount = 0.0;
 				$errors['cards'] = 'Error procesando la información de las tarjetas';
 			}
 			
-			$paidWithCards += floatval($paymentAmount);
+			$paidWithCards += roundMoney(floatval($paymentAmount));
 		}
 		
 		$maxCheckNumLength = 45;
 		$minCheckNumLength = 4;
-		$paidWithChecks = 0;
+		$paidWithChecks = 0.0;
 		
 		foreach ($checks as $checkInformation => $paymentAmount) {
 			$checkInformation = explode('-', $checkInformation);
@@ -739,16 +766,19 @@ class Pedidos extends CI_Controller
 				break;
 			}
 				
-			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0) {
+			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0.0 || !checkPrecision(floatval($paymentAmount))) {
+				$paymentAmount = 0.0;
 				$errors['checks'] = 'Error procesando la información de los cheques';
 			}
 			
 			$paidWithChecks += floatval($paymentAmount);
 		}
 		
-		$totalPaid = $cash + $paidWithCards + $paidWithChecks;
+		$totalPaid = roundMoney($cash + $paidWithCards + $paidWithChecks);
 
-		if ($totalPaid < $total) {
+		if (($total - $totalPaid) < 0.01) {
+			// We catch the accuracy error
+		} elseif ($totalPaid < $total) {
 			$errors['overall'] = 'Necesitas pagar el total del pedido';
 		} elseif ($cash < $total && ($paidWithCards + $paidWithChecks) > ($total - $cash)) {
 			$errors['overall'] = 'No puedes pagar de más del total con las tarjetas y/o cheques. x='.$totalPaid.' vs y='.$total;
@@ -776,14 +806,14 @@ class Pedidos extends CI_Controller
 		$branch = $this->branches->getBranch($order['id_sucursal']);
 		$clientAddress = $this->clients->getClientAddress($order['id_cliente']);
 
-		$subtotal = 0;
+		$subtotal = 0.0;
 
 		foreach ($order['products'] as $product) {
-			$subtotal += $product['cantidad'] * $product['precio'];
+			$subtotal = $subtotal + roundMoney($product['cantidad'] * $product['precio']);
 		}
 
-		$iva = $subtotal * $order['sucursal_iva'];
-		$total = $subtotal + $iva;
+		$iva = roundMoney($subtotal * $order['sucursal_iva']);
+		$total = roundMoney($subtotal + $iva);
 
 		$data['title'] = 'Pedido';
 		$data['branch'] = $branch;
