@@ -639,11 +639,13 @@ class Pedidos extends CI_Controller
 		if ($_POST && count($errors = $this->_validateBillPayment($_POST, $order['fecha_pedido'], $total)) === 0) {
 			$this->load->model('bills');
 			
-			$cash = !isset($_POST['cash']) || $_POST['cash'] === '' ? 0 : floatval($_POST['cash']);
+			$cash = !isset($_POST['cash']) || $_POST['cash'] === '' ? 0.0 : floatval($_POST['cash']);
 			$cards = !isset($_POST['cards']) || $_POST['cards'] === '' || !is_array($_POST['cards']) ? array() : $_POST['cards'];
 			$checks = !isset($_POST['checks']) || $_POST['checks'] === '' || !is_array($_POST['checks']) ? array() : $_POST['checks'];
 			
-			if ($cash > $total) {
+			if (($total - $cash) < 0.01) {
+				// Catch accuracy error
+			} else {
 				$cash = $total;
 			}
 			
@@ -737,12 +739,19 @@ class Pedidos extends CI_Controller
 				break;
 			}
 				
-			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0.0 || !checkPrecision(floatval($paymentAmount))) {
-				$paymentAmount = 0.0;
+			if (!is_numeric($paymentAmount)) {
 				$errors['cards'] = 'Error procesando la información de las tarjetas';
+				break;
+			} else {
+				$paymentAmount = floatval($paymentAmount);
+
+				if ($paymentAmount < 0.0 || !checkPrecision($paymentAmount)) {
+					$errors['cards'] = 'Error procesando la información de las tarjetas';
+					break;
+				}
 			}
 			
-			$paidWithCards += roundMoney(floatval($paymentAmount));
+			$paidWithCards += $paymentAmount;
 		}
 		
 		$maxCheckNumLength = 45;
@@ -766,12 +775,19 @@ class Pedidos extends CI_Controller
 				break;
 			}
 				
-			if (!is_numeric($paymentAmount) || floatval($paymentAmount) < 0.0 || !checkPrecision(floatval($paymentAmount))) {
-				$paymentAmount = 0.0;
+			if (!is_numeric($paymentAmount)) {
 				$errors['checks'] = 'Error procesando la información de los cheques';
+				break;
+			} else {
+				$paymentAmount = floatval($paymentAmount);
+
+				if ($paymentAmount < 0.0 || !checkPrecision($paymentAmount)) {
+					$errors['checks'] = 'Error procesando la información de las tarjetas';
+					break;
+				}
 			}
 			
-			$paidWithChecks += floatval($paymentAmount);
+			$paidWithChecks += $paymentAmount;
 		}
 		
 		$totalPaid = roundMoney($cash + $paidWithCards + $paidWithChecks);
@@ -781,7 +797,7 @@ class Pedidos extends CI_Controller
 		} elseif ($totalPaid < $total) {
 			$errors['overall'] = 'Necesitas pagar el total del pedido';
 		} elseif ($cash < $total && ($paidWithCards + $paidWithChecks) > ($total - $cash)) {
-			$errors['overall'] = 'No puedes pagar de más del total con las tarjetas y/o cheques. x='.$totalPaid.' vs y='.$total;
+			$errors['overall'] = 'No puedes pagar de más del total con las tarjetas y/o cheques. x=';//.$totalPaid.' vs y='.$total;
 		}
 		
 		return $errors;

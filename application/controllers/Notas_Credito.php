@@ -2,8 +2,6 @@
 
 class Notas_Credito extends CI_Controller
 {
-	public $creditNote;
-
 	public function __construct()
 	{
 		parent::__construct();
@@ -164,8 +162,6 @@ class Notas_Credito extends CI_Controller
 	
 	public function registrar_detalles($id)
 	{
-		$this->creditNote = $id;
-
 		$this->load->model('invoices');
 		
 		$creditNote = $this->credit_notes->getPreCreditNote($id);
@@ -193,7 +189,7 @@ class Notas_Credito extends CI_Controller
 			array(
 				'field' => 'amount', 
 				'label' => 'importe', 
-				'rules' => 'required|numeric|callback_valid_amount'
+				'rules' => 'required|numeric|callback_checkPrecision|callback_valid_amount['.$id.']'
 			)
 		);
 
@@ -239,7 +235,7 @@ class Notas_Credito extends CI_Controller
 		$this->load->view('footer', $data);
 	}
 
-	public function valid_amount($payment)
+	public function valid_amount($payment, $id)
 	{
 		if ($payment <= 0.0) {
 			$this->form_validation->set_message('valid_amount', 'Escribe una cantidad válida.');
@@ -247,7 +243,7 @@ class Notas_Credito extends CI_Controller
 		}
 
 		$invoice = $this->invoices->getInvoice($_POST['invoice']);
-		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($this->creditNote);
+		$creditNoteDetails = $this->credit_notes->getCreditNoteDetails($id);
 
 		foreach ($creditNoteDetails as $detailKey => $detail) {
 			if ($detail['id_factura'] == $invoice['id_factura']) {
@@ -257,6 +253,18 @@ class Notas_Credito extends CI_Controller
 		
 		if ($payment > $invoice['saldo']) {
 			$this->form_validation->set_message("valid_amount", "La nota de crédito debe ser menor o igual al saldo.");
+			return false;
+		}
+
+		return true;
+	}
+
+	public function checkPrecision($price)
+	{
+		$priceParts = explode('.', $price);
+		
+		if (count($priceParts) === 2 && strlen($priceParts[1]) > 2) {
+			$this->form_validation->set_message('checkPrecision', 'El campo %s no puede tener más de 2 decimales de precisión.');
 			return false;
 		}
 
