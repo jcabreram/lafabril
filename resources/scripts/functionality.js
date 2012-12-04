@@ -24,7 +24,7 @@ $(function() {
 
 			amountOrdered = tr.find('.amountOrdered').first().val();
 			amountDelivered = tr.find('.amountDelivered').first().val();
-			maximumAmountAllowed = parseFloat(amountOrdered) - parseFloat(amountDelivered);
+			maximumAmountAllowed = Math.round((parseFloat(amountOrdered) - parseFloat(amountDelivered)) * 100) / 100;
 			userAmount = tr.find('.userAmount').first().val();
 			userAmount = userAmount === '' ? 0 : parseFloat(userAmount);
 			userAmount = isNaN(userAmount) ? -1 : userAmount;
@@ -47,7 +47,7 @@ $(function() {
 		VAT = $('.invoiceVAT').first().val();
 		tax = Math.round(VAT * subtotal * 100) / 100;
 
-		total = Math.round(tax + subtotal * 100) / 100;
+		total = Math.round((tax + subtotal) * 100) / 100;
 
 		$('.invoiceSubtotal').first().text('$' + getMoneyFormat(subtotal));
 		$('.invoiceTax').first().text('$' + getMoneyFormat(tax));

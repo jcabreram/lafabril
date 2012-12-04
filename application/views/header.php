@@ -9,7 +9,7 @@
 		
 		<title>La Fabril - <?php echo $title; ?></title>
 		
-		<link rel="icon" href="<?=base_url()?>resources/images/favicon.png" type="image/png">
+		<link rel="icon" href="<?php echo base_url(); ?>resources/images/favicon.png" type="image/png">
 		
 		<!-- CSS -->
 	  
@@ -89,11 +89,11 @@
 		  
 			<!-- Sidebar Profile links -->
 			<div id="profile-links">
-				Bienvenido, <a href="#" title="Edita tu perfil"><?php echo $user['nombre']; ?></a>.<br />
+				<a href="<?php echo base_url(); ?>usuarios/editar/<?php echo $user['id']; ?>" title="Edita tu perfil"><?php echo $user['nombre']; ?></a>
+				| <a href="<?php echo site_url('salir'); ?>" title="Cerrar Sesión">Salir</a>.
 				<br />
-				Fecha: <?php echo date('d/m/Y'); ?>, Hora: <?php echo date('H:i'); ?><br />
 				<br />
-				<a href="#" title="Cambiar Contraseña">Cambiar Contraseña</a> | <a href="<?php echo site_url('salir'); ?>" title="Cerrar Sesión">Salir</a>
+				Fecha: <?php echo date('d/m/Y'); ?>, Hora: <?php echo date('H:i'); ?>.
 			</div>        
 			
 			<ul id="main-nav">  <!-- Accordion Menu -->
@@ -130,6 +130,7 @@
 						<li><a href="<?php echo site_url('notas_credito'); ?>"<?php if (methodName() == 'notas_credito/index' || methodName() == 'notas_credito/listar') { echo ' class="current"'; } ?>>Administrar Notas de Crédito</a></li>
 						<li><a href="<?php echo site_url('notas_credito/registrar'); ?>"<?php if (methodName() == 'notas_credito/registrar') { echo ' class="current"'; } ?>>Agregar Nota de Crédito</a></li>
 						<li><a href="<?php echo site_url('movimientos/crear_reporte'); ?>"<?php if (methodName() == 'movimientos/crear_reporte') { echo ' class="current"'; } ?>>Reporte de Cartera</a></li>
+						<li><a href="<?php echo site_url('reportes/antiguedad_saldos'); ?>"<?php if (methodName() == 'reportes/antiguedad_saldos') { echo ' class="current"'; } ?>>Reporte de Antigüedad de Saldos</a></li>
 					</ul>
 					
 				</li>
