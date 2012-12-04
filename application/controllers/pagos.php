@@ -154,6 +154,10 @@ class Pagos extends CI_Controller
 		//exit(var_dump($data));
 		$data['invoices'] = $this->invoices->getAllActive($id_sucursal, $id_cliente);
 		
+		if (count($data['invoices']) === 0) {
+			$this->session->set_flashdata('attention', 'No existen facturas del cliente en la sucursal especificada.');
+			redirect("pagos/agregar_pago");
+		}
 		
 		// Declare the $total as float so it gets it in the foreach
 		settype($total, "float");
