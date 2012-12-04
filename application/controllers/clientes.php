@@ -128,7 +128,7 @@ class Clientes extends CI_Controller
 		// If validation was successful
 		if ($this->form_validation->run()) {
 			if($this->clients->create($_POST['nombre'], $_POST['razon_social'], $_POST['calle'], $_POST['num_ext'], $_POST['num_int'], $_POST['colonia'], $_POST['ciudad'], $_POST['municipio'], $_POST['estado'], $_POST['pais'], $_POST['cp'], $_POST['rfc'], $_POST['tipo'], $_POST['contacto'], $_POST['lim_credito'], $_POST['dias_credito'], $_POST['status'])) {
-				$this->session->set_flashdata('message', 'El usuario "' . htmlspecialchars($_POST['nombre'], ENT_QUOTES, 'UTF-8') . '" ha sido registrado.');
+				$this->session->set_flashdata('message', 'El cliente "' . htmlspecialchars($_POST['nombre'], ENT_QUOTES, 'UTF-8') . '" ha sido registrado.');
 				redirect('clientes');
 			} else {
 				$this->session->set_flashdata('error', 'Tuvimos un problema al intentar registrar al cliente, intenta de nuevo.');
