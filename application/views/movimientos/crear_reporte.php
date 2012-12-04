@@ -51,7 +51,7 @@
 				<select name="from_client" class="medium-input">
 					<option value="">Escoge una opción</option>
 					<?php foreach ($clients as $client) : ?>
-					<option value="<?php echo $client['id_cliente']; ?>"><?php echo $client['nombre']; ?></option>
+					<option value="<?php echo $client['nombre']; ?>"><?php echo $client['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('from_client'); ?>
@@ -62,7 +62,7 @@
 				<select name="to_client" class="medium-input">
 					<option value="">Escoge una opción</option>
 					<?php foreach ($clients as $client) : ?>
-					<option value="<?php echo $client['id_cliente']; ?>"><?php echo $client['nombre']; ?></option>
+					<option value="<?php echo $client['nombre']; ?>"><?php echo $client['nombre']; ?></option>
 					<?php endforeach; ?>
 				</select> 
 				<?php echo form_error('to_client'); ?>
