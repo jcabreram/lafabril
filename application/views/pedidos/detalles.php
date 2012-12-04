@@ -114,7 +114,7 @@
 				<td></td>
 				<td></td>
 				<td style="text-align:right"><b>IVA (<?php echo $order['sucursal_iva']*100; ?>%)</b></td>
-				<td style="text-align:right">$<?php echo number_format($order['sucursal_iva']*$subtotal, 2, '.', ','); ?></td>
+				<td style="text-align:right">$<?php echo number_format($taxes, 2, '.', ','); ?></td>
 			</tr>
 			
 			<tr>

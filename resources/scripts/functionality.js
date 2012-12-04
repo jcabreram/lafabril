@@ -30,22 +30,24 @@ $(function() {
 			userAmount = isNaN(userAmount) ? -1 : userAmount;
 
 			productPrice = tr.find('.productPrice').first().val();
+			var productCost = 0.0;
 			
-			if (userAmount >= 0 && userAmount <= maximumAmountAllowed) {
-				productsCost = parseFloat(userAmount) * parseFloat(productPrice);
-				subtotal += productsCost;
+			if (userAmount >= 0.0 && userAmount <= maximumAmountAllowed && validPrecision(userAmount)) {
+				productCost = Math.round(parseFloat(userAmount) * parseFloat(productPrice) * 100) / 100;
+				subtotal = subtotal + productCost;
 
 				tr.removeAttr('style');
-				tr.find('td').last().text('$' + getMoneyFormat(productsCost));
+				tr.find('td').last().text('$' + getMoneyFormat(productCost));
 			} else {
 				tr.attr('style', 'color: red');
+				tr.find('td').last().text('$' + getMoneyFormat(0));
 			}
 		});
 
 		VAT = $('.invoiceVAT').first().val();
-		tax = VAT * subtotal;
+		tax = Math.round(VAT * subtotal * 100) / 100;
 
-		total = tax + subtotal;
+		total = Math.round(tax + subtotal * 100) / 100;
 
 		$('.invoiceSubtotal').first().text('$' + getMoneyFormat(subtotal));
 		$('.invoiceTax').first().text('$' + getMoneyFormat(tax));
@@ -53,9 +55,37 @@ $(function() {
 	}
 	/*** CALCULATE INVOICE TOTAL ***/
 
+	/*** VALIDATE CASH PAYMENT ***/
+	$('input[name="cash"]').bind('input', validateCash);
+
+	function validateCash()
+	{
+		var input = $(this);
+		var cash = input.val();
+
+		if (!isNumber(cash)) {
+			input.attr('style', 'color: red');
+		} else {
+			if (!validPrecision(parseFloat(cash))) {
+				input.attr('style', 'color: red');
+			} else {
+				input.removeAttr('style');
+			}
+		}
+
+		calculateBillBalance();	
+	}
+	/*** VALIDATE CASH PAYMENT ***/
+
 	/*** SHOW PAYMENT METHOD FORM ***/
 	$('select[name="paymentMethod"]').change(function() {
 		var select = $(this);
+
+		if(parseFloat($('input[name="billBalance"]').val()) === 0.0) {
+			alert('El saldo está en 0. Puedes pagar.');
+			select.val('');
+			return false;
+		}
 
 		var divId = '';
 
@@ -82,14 +112,13 @@ $(function() {
 		var checkPaymentAmount = $('input[name="checkPaymentAmount"]').last();
 		
 		// Bill balance as default to the payment amount
-		cardPaymentAmount.val(parseFloat(billBalance.val()).toFixed(2));
-		checkPaymentAmount.val(parseFloat(billBalance.val()).toFixed(2));
+		cardPaymentAmount.val(Math.round(parseFloat(billBalance.val()) * 100) / 100);
+		checkPaymentAmount.val(Math.round(parseFloat(billBalance.val()) * 100) / 100);
 
 		$('.addCard').last().click(addCard);
 		$('.addCheck').last().click(addCheck);
 	});
 	/*** BIND FACEBOX EVENTS ***/
-
 
 	/*** ADD CARD PAYMENT TO BILL ***/
 	function addCard() {
@@ -129,10 +158,21 @@ $(function() {
 			alert('Esta tarjeta ya ha sido agregada.');
 			return false;
 		}
-		
-		if (parseFloat(cardPaymentAmount.val()) - .001 > parseFloat(billBalance.val())) {
-			alert('No puedes pagar con la tarjeta más del saldo.');
+
+		if (!validPrecision(parseFloat(cardPaymentAmount.val()))) {
+			alert('La precisión máxima de pago son 2 decimales.');
 			return false;
+		}
+		
+		var difference = parseFloat(billBalance.val()) - parseFloat(cardPaymentAmount.val());
+
+		if (Math.abs(difference) < 0.01) {
+			// This is just to catch the precision error
+		} else {
+			if (parseFloat(cardPaymentAmount.val()) > parseFloat(billBalance.val())) {
+				alert('No puedes pagar con la tarjeta más del saldo.');
+				return false;				
+			}
 		}
 		/*** VALIDATION ***/
 
@@ -171,7 +211,7 @@ $(function() {
 	/*** ADD CARD PAYMENT TO BILL ***/
 
 
-	/*** ADD CARD PAYMENT TO BILL ***/
+	/*** ADD CHECK PAYMENT TO BILL ***/
 	function addCheck() {
 		var bank = $('select[name="checkBank"]').last();
 		var checkNumber = $('input[name="checkNumber"]').last();
@@ -205,14 +245,25 @@ $(function() {
 			return false;
 		}
 
-		if (isNaN(checkPaymentAmount.val()) || checkPaymentAmount.val() === '') {
+		if (!isNumber(checkPaymentAmount.val()) || checkPaymentAmount.val() === '') {
 			alert('Escribe una cantidad válida.');
 			return false;
 		}
-		
-		if (parseFloat(checkPaymentAmount.val()) - .001 > parseFloat(billBalance.val())) {
-			alert('No puedes pagar con el cheque más del saldo.');
+
+		if (!validPrecision(parseFloat(checkPaymentAmount.val()))) {
+			alert('La precisión máxima de pago son 2 decimales.');
 			return false;
+		}
+		
+		var difference = parseFloat(billBalance.val()) - parseFloat(checkPaymentAmount.val());
+
+		if (Math.abs(difference) < 0.01) {
+			// This is just to catch the precision error
+		} else {
+			if (parseFloat(checkPaymentAmount.val()) > parseFloat(billBalance.val())) {
+				alert('No puedes pagar con el cheque más del saldo.');
+				return false;				
+			}
 		}
 		/*** VALIDATION ***/
 
