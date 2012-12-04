@@ -32,9 +32,9 @@
 			</p>
 			
 			<p>
-				<label>IVA (en formato decimal) *</label>
+				<label>IVA *</label>
 				<input class="text-input small-input" value="<?php echo set_value('iva', $branch['iva']); ?>" type="text" name="iva" />
-				<?php echo form_error('iva'); ?>
+				<?php echo form_error('iva'); ?>%
 			</p>
 
 			<p>

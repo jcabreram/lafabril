@@ -4,14 +4,51 @@ class Branches extends CI_Model
 {
 	public function create($name, $address, $status, $iva)
 	{
+		$pedidos = mb_substr($name, 0, 3).'P';
+		$facturas = mb_substr($name, 0, 3).'F';
+		$nota_venta = mb_substr($name, 0, 3).'N';
+		$pagos = mb_substr($name, 0, 3).'A';
+		$nota_credito = mb_substr($name, 0, 3).'B';
+		
+		$pedidos = $this->db->escape(strtoupper($pedidos));
+		$facturas = $this->db->escape(strtoupper($facturas));
+		$nota_venta = $this->db->escape(strtoupper($nota_venta));
+		$pagos = $this->db->escape(strtoupper($pagos));
+		$nota_credito = $this->db->escape(strtoupper($nota_credito));
+		
+		// Convert the tax to decimals
+		$iva = $iva/100;
+	
 		$name = $this->db->escape($name);
 		$address = empty($address) ? 'NULL' : $this->db->escape($address);
 		$status = $this->db->escape($status);
 		$iva = $this->db->escape(floatval($iva));
+		
+		$this->db->trans_start();
 
 		$sql = "INSERT INTO sucursales (id_sucursal, nombre, direccion, estatus, iva) VALUES (NULL, $name, $address, $status, $iva)";
-
-		return $this->db->query($sql);
+		$this->db->query($sql);
+		
+		$id = $this->db->insert_id();
+		
+		// Fill the prefixes for the folios
+		$sql = "INSERT INTO folios_prefijo (id, id_sucursal, tipo_documento, prefijo, ultimo_folio) VALUES (NULL, $id, 'P', $pedidos, 0)";
+		$this->db->query($sql);
+		$sql = "INSERT INTO folios_prefijo (id, id_sucursal, tipo_documento, prefijo, ultimo_folio) VALUES (NULL, $id, 'F', $facturas, 0)";
+		$this->db->query($sql);
+		
+		$sql = "INSERT INTO folios_prefijo (id, id_sucursal, tipo_documento, prefijo, ultimo_folio) VALUES (NULL, $id, 'N', $nota_venta, 0)";
+		$this->db->query($sql);
+		
+		$sql = "INSERT INTO folios_prefijo (id, id_sucursal, tipo_documento, prefijo, ultimo_folio) VALUES (NULL, $id, 'A', $pagos, 0)";
+		$this->db->query($sql);
+		
+		$sql = "INSERT INTO folios_prefijo (id, id_sucursal, tipo_documento, prefijo, ultimo_folio) VALUES (NULL, $id, 'B', $nota_credito, 0)";
+		$this->db->query($sql);
+		
+		$this->db->trans_complete();
+		
+		return ($this->db->trans_status() === true);
 	}
 
 	public function getAll($filters = false)
@@ -55,6 +92,9 @@ class Branches extends CI_Model
 
 	public function update($id, $name, $address, $status, $iva)
 	{
+		// Convert the tax to decimals
+		$iva = $iva/100;
+		
 		$id = $this->db->escape(intval($id));
 		$name = $this->db->escape($name);
 		$address = empty($address) ? 'NULL' : $this->db->escape($address);
