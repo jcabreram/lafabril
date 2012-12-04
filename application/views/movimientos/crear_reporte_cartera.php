@@ -37,7 +37,7 @@
 		</div>
 		<?php endif; ?>
 
-		<form action="<?php echo site_url('movimientos/crear_reporte'); ?>" method="post">
+		<form action="<?php echo site_url('movimientos/crear_reporte_cartera'); ?>" method="post">
 		
 		<fieldset class="column-left">
 

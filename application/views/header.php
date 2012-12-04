@@ -119,7 +119,7 @@
 				</li>
 				
 				<li> 
-					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes' || controllerName() == 'notas_credito' || controllerName() == 'pagos' || controllerName() == 'movimientos' || controllerName() == 'reportes') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
+					<a href="#" class="nav-top-item<?php if (controllerName() == 'clientes' || controllerName() == 'notas_credito' || controllerName() == 'pagos' || controllerName() == 'movimientos') { echo ' current'; } ?>"> <!-- Add the class "current" to current menu item -->
                         Cuentas por cobrar
 					</a>
 					<ul>
@@ -129,8 +129,8 @@
 						<li><a href="<?php echo site_url('clientes/registrar'); ?>"<?php if (methodName() == 'clientes/registrar') { echo ' class="current"'; } ?>>Agregar Cliente</a></li>
 						<li><a href="<?php echo site_url('notas_credito'); ?>"<?php if (methodName() == 'notas_credito/index' || methodName() == 'notas_credito/listar') { echo ' class="current"'; } ?>>Administrar Notas de Crédito</a></li>
 						<li><a href="<?php echo site_url('notas_credito/registrar'); ?>"<?php if (methodName() == 'notas_credito/registrar') { echo ' class="current"'; } ?>>Agregar Nota de Crédito</a></li>
-						<li><a href="<?php echo site_url('movimientos/crear_reporte'); ?>"<?php if (methodName() == 'movimientos/crear_reporte') { echo ' class="current"'; } ?>>Reporte de Cartera</a></li>
-						<li><a href="<?php echo site_url('reportes/antiguedad_saldos'); ?>"<?php if (methodName() == 'reportes/antiguedad_saldos') { echo ' class="current"'; } ?>>Reporte de Antigüedad de Saldos</a></li>
+						<li><a href="<?php echo site_url('movimientos/crear_reporte_cartera'); ?>"<?php if (methodName() == 'movimientos/crear_reporte_cartera') { echo ' class="current"'; } ?>>Reporte de Cartera</a></li>
+						<li><a href="<?php echo site_url('movimientos/crear_reporte_antiguedad'); ?>"<?php if (methodName() == 'movimientos/crear_reporte_antiguedad') { echo ' class="current"'; } ?>>Reporte de Antigüedad de Saldos</a></li>
 					</ul>
 					
 				</li>
