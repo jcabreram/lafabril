@@ -34,7 +34,7 @@
 			<td><?php echo $bill['nombre_sucursal']; ?></td>
 			<td><?php echo $bill['nombre_cliente']; ?></td>
 			<td><?php echo date('d/m/Y', strtotime($bill['fecha_nota_venta'])); ?></td>
-			<td class="textAlign-center"><?php echo $bill['estatus']; ?></td>
+			<td class="textAlign-center"><?php echo getStatusName($bill['estatus']); ?></td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>

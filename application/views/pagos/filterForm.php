@@ -1,8 +1,8 @@
 <div id="filtrar" style="display: none">
 
-	<h3>Filtrado de Notas de Crédito</h3>
+	<h3>Filtrado de Pagos</h3>
 
-	<form action="<?php echo site_url('notas_credito/filtrar'); ?>" method="post">
+	<form action="<?php echo site_url('pagos/filtrar'); ?>" method="post">
 
 		<p>
 			<label>Sucursal</label><?php if (!isset($filters['branch'])) { $filters['branch'] = ''; } ?>

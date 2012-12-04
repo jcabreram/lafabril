@@ -39,19 +39,7 @@ class Notas_Credito extends CI_Controller
 		}
 
 		if (isset($dirtyFilters['estatus']) && trim($dirtyFilters['estatus']) !== '') {
-			switch ($dirtyFilters['estatus']) {
-				case 'abierto':
-					$filters['status'] = 'A';
-					break;
-
-				case 'cerrado':
-					$filters['status'] = 'C';
-					break;
-
-				case 'cancelado':
-					$filters['status'] = 'X';
-					break;
-			}
+			$filters['status'] = getStatusCode($dirtyFilters['estatus']);
 		}
 		
 		return $filters;
@@ -82,8 +70,88 @@ class Notas_Credito extends CI_Controller
 		// Display views
 		$this->load->view('header', $data);
 		$this->load->view('notas_credito/listar', $data);
-		$this->load->view('pedidos/filterForm', $data);
+		$this->load->view('notas_credito/filterForm', $data);
 		$this->load->view('footer', $data);
+	}
+
+	public function filtrar()
+	{
+		if ($_POST) {
+			$filters = array();
+
+			$branch = isset($_POST['branch']) ? trim($_POST['branch']) : false;
+			$client = isset($_POST['client']) ? trim($_POST['client']) : false;
+			$status = isset($_POST['status']) ? trim($_POST['status']) : false;
+
+			if ($branch !== false && $branch !== '') {
+				// Is a numeric value? I mean, is it an id?
+				$filters['sucursal'] = $branch;
+			}
+
+			if ($client !== false && $client !== '') {
+				// Is a numeric value? I mean, is it an id?
+				$filters['cliente'] = $client;
+			}
+
+			if ($status !== false && $status !== '') {
+				$filters['estatus'] = strtolower(getStatusName($status));
+			}
+
+			if (count($filters) > 0) {
+				redirect('notas_credito/listar/' . $this->uri->assoc_to_uri($filters));
+			} else {
+				redirect('notas_credito');
+			}
+		}
+
+		// WTH is the user doing here?
+		redirect();
+	}
+
+	public function exportar()
+	{
+		$this->load->helper(array('dompdf', 'file'));
+
+		// Fetch filters from uri
+		$filters = $this->uri->uri_to_assoc(3);
+		$filters = $this->_sanitizeFilters($filters);
+
+		// To populate the filter form
+		$this->load->model('branches');
+		$this->load->model('clients');
+		
+		$creditNotes = $this->credit_notes->getAll($filters);
+
+		if (!isset($filters['branch'])) {
+			$branch = 'Todos';
+		} else {
+			$branch = $this->branches->getBranch($filters['branch']);
+			$branch = $branch['nombre'];
+		}
+
+		if (!isset($filters['client'])) {
+			$client = 'Todos';
+		} else {
+			$client = $this->clients->getClient($filters['client']);
+			$client = $client['nombre'];
+		}
+
+		if (!isset($filters['status'])) {
+			$status = 'Todos';
+		} else {
+			$status = getStatusName($filters['status']);
+		}
+
+		$data['title'] = "Reporte de Notas de Crédito";
+		$data['creditNotes'] = $creditNotes;
+		$data['branch'] = $branch;
+		$data['client'] = $client;
+		$data['status'] = $status;
+
+		$html = $this->load->view('reportes/header', $data, true);
+		$html .= $this->load->view('reportes/notas_credito', $data, true);
+		$html .= $this->load->view('reportes/footer', $data, true);
+		createPDF($html, 'reporte');
 	}
 	
 	public function detalles($noteCreditId)

@@ -7,6 +7,12 @@
 	<!-- Content Box Header -->
 	<div class="content-box-header">
 		<h3>Lista de Pagos</h3>
+
+		<ul class="content-box-tabs">
+			<li><a href="#" class="current">Tabla</a></li>
+			<li><a href="#filtrar" rel="modal">Filtrar</a></li>
+			<li><a href="<?php echo site_url('pagos/exportar' . getParameters()); ?>" target="_blank">Exportar a PDF</a></li>
+		</ul>
 	</div>
 	
 	<!-- Content Box Content -->			
@@ -62,7 +68,7 @@
 					<td><?php echo $paymentData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($paymentData['fecha'])); ?></td>
 					<td class="textAlign-right">$<?php echo number_format($paymentData['importe'], 2, '.', ','); ?></td>
-					<td class="textAlign-center"><?php echo $paymentData['estatus']; ?></td>
+					<td class="textAlign-center"><?php echo getStatusName($paymentData['estatus']); ?></td>
 				</tr>
 				<?php endif; ?>
 			<?php endforeach; ?>

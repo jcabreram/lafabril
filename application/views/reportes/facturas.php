@@ -34,7 +34,7 @@
 			<td><?php echo $invoice['nombre_sucursal']; ?></td>
 			<td><?php echo $invoice['nombre_cliente']; ?></td>
 			<td><?php echo date('d/m/Y', strtotime($invoice['fecha_factura'])); ?></td>
-			<td class="textAlign-center"><?php echo $invoice['estatus']; ?></td>
+			<td class="textAlign-center"><?php echo getStatusName($invoice['estatus']); ?></td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>
