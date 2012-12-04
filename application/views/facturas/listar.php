@@ -65,7 +65,7 @@
 					<td><?php echo $invoiceData['nombre_sucursal']; ?></td>
 					<td><?php echo $invoiceData['nombre_cliente']; ?></td>
 					<td><?php echo strftime('%d/%b/%Y',strtotime($invoiceData['fecha_factura'])); ?></td>
-					<td class="textAlign-center"><?php echo $invoiceData['estatus']; ?></td>
+					<td class="textAlign-center"><?php echo getStatusName($invoiceData['estatus']); ?></td>
 				</tr>
 			<?php endforeach; ?>
 			</tbody>

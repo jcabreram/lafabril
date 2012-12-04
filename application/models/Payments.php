@@ -225,27 +225,27 @@ class Payments extends CI_Model
 		return false;
 	}
 	
-	public function getAll()
+	public function getAll($filters = false)
 	{
-		/*
+		/*** PREPARE FILTERS ***/
 		$branch = isset($filters['branch']) ? $filters['branch'] : false;
 		$client = isset($filters['client']) ? $filters['client'] : false;
 		$status = isset($filters['status']) ? $filters['status'] : false;
+		/*** PREPARE FILTERS ***/
 
 		$where = '';
 
 		if ($branch !== false) {
-			$where .= 'WHERE pe.id_sucursal = ' . $this->db->escape(intval($branch));
+			$where .= 'WHERE pf.id_sucursal = ' . $this->db->escape(intval($branch));
 		}
 
 		if ($client !== false) {
-			$where .= ' AND pe.id_cliente = ' . $this->db->escape(intval($client));
+			$where .= ' AND pf.id_cliente = ' . $this->db->escape(intval($client));
 		}
 
 		if ($status !== false) {
-			$where .= ' AND pe.estatus = ' . $this->db->escape($status);
+			$where .= ' AND pf.estatus = ' . $this->db->escape($status);
 		}
-		*/
 
 		$sql = 'SELECT 
 					pf.id_pago_factura, 
@@ -261,6 +261,7 @@ class Payments extends CI_Model
 				JOIN clientes AS cl ON pf.id_cliente=cl.id_cliente
 				JOIN folios AS fo ON pf.id_pago_factura=fo.id_documento AND fo.tipo_documento="A"
 				JOIN folios_prefijo AS fp ON pf.id_sucursal=fp.id_sucursal AND fp.tipo_documento="A"
+				' . $where . '
 				ORDER BY pf.fecha ASC';
 		$query = $this->db->query($sql);
 		
