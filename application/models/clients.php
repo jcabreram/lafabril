@@ -59,6 +59,29 @@ class Clients extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();
 	}
+	
+	public function getWalletClients($branch, $from_client, $to_client, $fecha) {
+		$branch = $this->db->escape(intval($branch));
+		$from_client = $this->db->escape(intval($from_client));
+		$to_client = $this->db->escape(intval($to_client));
+		$fecha = $this->db->escape($fecha);
+		
+
+		$sql = "SELECT
+					cl.id_cliente,
+					cl.nombre AS nombre_cliente
+				FROM facturas AS fa
+				JOIN movimientos AS mo ON mo.id_documento = fa.id_factura
+				JOIN clientes AS cl ON mo.id_cliente=cl.id_cliente
+				WHERE fa.id_sucursal = $branch AND fa.estatus != 'X' AND fa.fecha <= $fecha AND cl.id_cliente BETWEEN $from_client AND $to_client
+				GROUP BY cl.id_cliente";
+				
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}
 
 	public function getClient($id)
 	{

@@ -47,6 +47,31 @@ class Payments extends CI_Model
 		return false;
 	}
 	
+	public function getWalletPayments($invoice, $fecha)
+	{
+		$invoice = $this->db->escape(intval($invoice));
+		$fecha = $this->db->escape($fecha);
+		
+
+		$sql = "SELECT
+					fpp.prefijo, 
+					fop.folio,
+					pf.fecha,
+					pfd.importe
+				FROM facturas AS fa
+				LEFT JOIN pagos_facturas_detalles AS pfd ON fa.id_factura=pfd.id_factura
+				LEFT JOIN pagos_facturas AS pf ON pfd.id_pago_factura=pf.id_pago_factura
+				LEFT JOIN folios_prefijo AS fpp ON pf.id_sucursal=fpp.id_sucursal AND fpp.tipo_documento='A'
+				LEFT JOIN folios AS fop ON pf.id_pago_factura=fop.id_documento AND fop.tipo_documento='A'
+				WHERE fa.id_factura = $invoice AND pf.fecha <= $fecha";
+				
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}	
+	
 	public function getPrePayment($id)
 	{
 		$id = $this->db->escape(intval($id));

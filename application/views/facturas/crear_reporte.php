@@ -8,7 +8,27 @@
 	</div> <!-- End .content-box-header -->
 
 	<div class="content-box-content">
-
+	
+		<?php if ($this->session->flashdata('message')) : ?>
+			<!-- Notification -->
+			<div class="notification success png_bg">
+				<!-- Close link -->
+				<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
+				<!-- Message -->
+				<div><?php echo $this->session->flashdata('message'); ?></div>
+			</div>
+		<?php endif; ?>
+		
+		<?php if ($this->session->flashdata('attention')) : ?>
+			<!-- Notification -->
+			<div class="notification attention png_bg">
+				<!-- Close link -->
+				<a href="#" class="close"><img src="<?php echo site_url('resources/images/icons/cross_grey_small.png'); ?>" title="Cerrar Notificación" alt="cerrar" /></a>
+				<!-- Message -->
+				<div><?php echo $this->session->flashdata('attention'); ?></div>
+			</div>
+		<?php endif; ?>
+		
 		<?php if ($this->session->flashdata('error')) : ?>
 		<!-- Notification -->
 		<div class="notification error png_bg">

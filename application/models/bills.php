@@ -340,7 +340,7 @@ class Bills extends CI_Model
 				GROUP BY nombre";
 		
 		if ($client != '0') {
-			$sql .= "AND pe.id_cliente = $client";
+			$sql .= " AND pe.id_cliente = $client";
 		}
 
 		$query = $this->db->query($sql);

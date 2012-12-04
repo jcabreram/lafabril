@@ -359,7 +359,8 @@ class Notas_venta extends CI_Controller
 		$payments = $this->bills->getPaymentData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
 
 		if (count($bills) === 0) {
-			exit('No existen notas de venta con esas especificaciones.');
+			$this->session->set_flashdata('attention', 'No existen notas de venta con esas especificaciones.');
+			redirect("notas_venta/crear_reporte");
 		}
 		
 		// Get branch name
@@ -370,7 +371,7 @@ class Notas_venta extends CI_Controller
 			$client = 'Todos';
 		} else {
 			// Get client name
-			$client = $this->clients->getBranch($filters['client']);
+			$client = $this->clients->getClient($filters['client']);
 			$client = $client['nombre'];
 		}
 		

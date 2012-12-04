@@ -78,6 +78,36 @@ class Invoices extends CI_Model
 		return $query->result_array();
 	}
 	
+	public function getWalletInvoices($branch, $client, $fecha) {
+		$branch = $this->db->escape(intval($branch));
+		$client = $this->db->escape(intval($client));
+		$fecha = $this->db->escape($fecha);
+		
+
+		$sql = "SELECT
+					fa.id_factura,
+					fp.prefijo,
+					fo.folio,
+					fa.fecha,
+					mo.importe,
+					mo.fecha_vencimiento,
+					mo.saldo,
+					su.nombre AS nombre_sucursal
+				FROM facturas AS fa
+				JOIN folios_prefijo AS fp ON fa.id_sucursal=fp.id_sucursal AND fp.tipo_documento='F'
+				JOIN folios AS fo ON fa.id_factura=fo.id_documento AND fo.tipo_documento='F'
+				JOIN sucursales AS su ON fa.id_sucursal=su.id_sucursal
+				JOIN movimientos AS mo ON mo.id_documento = fa.id_factura
+				JOIN clientes AS cl ON mo.id_cliente=cl.id_cliente
+				WHERE fa.id_sucursal = $branch AND fa.estatus != 'X' AND fa.fecha <= $fecha AND cl.id_cliente = $client
+				GROUP BY fa.id_factura";
+			
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}
+	
 	public function getInvoice($id)
 	{
 		$id = $this->db->escape(intval($id));

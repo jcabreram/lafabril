@@ -347,7 +347,8 @@ class Facturas extends CI_Controller
 		$invoices = $this->invoices->getReportData($filters['branch'], $filters['client'], $filters['since'], $filters['until']);
 		
 		if (count($invoices) === 0) {
-			exit('No existen facturas con esas especificaciones.');
+			$this->session->set_flashdata('attention', 'No existen facturas con esas especificaciones.');
+			redirect("facturas/crear_reporte");
 		}
 		
 		// Get branch name
@@ -358,7 +359,7 @@ class Facturas extends CI_Controller
 			$client = 'Todos';
 		} else {
 			// Get client name
-			$client = $this->clients->getBranch($filters['client']);
+			$client = $this->clients->getClient($filters['client']);
 			$client = $client['nombre'];
 		}
 		
