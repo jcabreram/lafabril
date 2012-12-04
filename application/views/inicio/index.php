@@ -4,24 +4,24 @@
 			
 			<ul class="shortcut-buttons-set">
 				
-				<li><a class="shortcut-button new-article" href="#"><span class="png_bg">
+				<li><a class="shortcut-button new-article" href="<?php echo site_url('clientes/registrar'); ?>"><span class="png_bg">
 					Agregar cliente
 				</span></a></li>
 				
-				<li><a class="shortcut-button new-page" href="#"><span class="png_bg">
-					Crear una factura
+				<li><a class="shortcut-button new-page" href="<?php echo site_url('pedidos/registrar'); ?>"><span class="png_bg">
+					Crear un pedido
 				</span></a></li>
 				
-				<li><a class="shortcut-button upload-image" href="#"><span class="png_bg">
-					Crear una nota de crédito
+				<li><a class="shortcut-button upload-image" href="<?php echo site_url('pedidos'); ?>"><span class="png_bg">
+					Ver pedidos
 				</span></a></li>
 				
-				<li><a class="shortcut-button add-event" href="#"><span class="png_bg">
-					Crear una nota de venta
+				<li><a class="shortcut-button upload-image" href="<?php echo site_url('facturas'); ?>"><span class="png_bg">
+					Ver facturas
 				</span></a></li>
 				
-				<li><a class="shortcut-button manage-comments" href="#messages" rel="modal"><span class="png_bg">
-					Modificar usuarios
+				<li><a class="shortcut-button add-event" href="<?php echo site_url('movimientos/crear_reporte_cartera'); ?>"><span class="png_bg">
+					Reporte de cartera
 				</span></a></li>
 				
 			</ul><!-- End .shortcut-buttons-set -->
