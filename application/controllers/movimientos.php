@@ -98,37 +98,48 @@ class Movimientos extends CI_Controller
 
 		$wallet = array();
 		$clients = $this->clients->getWalletClients($filters['branch'], $filters['fromClient'], $filters['toClient'], $filters['cutDate']);
+		
+		$i = 0;
 
 		foreach ($clients as $client) {
-			$wallet[$client['id_cliente']]['name'] = $client['nombre_cliente'];
-			$wallet[$client['id_cliente']]['invoices'] = $this->invoices->getWalletInvoices($filters['branch'], $client['id_cliente'], $filters['cutDate']);
+			$clientData = array(
+				'name' => $client['nombre_cliente'],
+				'invoices' => $this->invoices->getWalletInvoices($filters['branch'], $client['id_cliente'], $filters['cutDate'])
+			);
+			
+			$wallet[$i] = $clientData;
 
-			foreach($wallet[$client['id_cliente']]['invoices'] as $invoice) {
-				$wallet[$client['id_cliente']]['invoices'][$invoice['id_factura']]['payments']
-					= $this->payments->getWalletPayments($invoice['id_factura'], $filters['cutDate']);
-				$wallet[$client['id_cliente']]['invoices'][$invoice['id_factura']]['credit_notes']
-					= $this->credit_notes->getWalletCreditNotes($invoice['id_factura'], $filters['cutDate']);
+			foreach($wallet[$i]['invoices'] as $invoiceKey => $invoice) {
+				$wallet[$i]['invoices'][$invoiceKey]['payments'] = 
+				$this->payments->getWalletPayments($invoice['id_factura'], $filters['cutDate']);
+				$wallet[$i]['invoices'][$invoiceKey]['credit_notes'] = 
+				$this->credit_notes->getWalletCreditNotes($invoice['id_factura'], $filters['cutDate']);
 			}
+			
+			$i++;
 		}
 		
-		exit(var_dump($wallet));
+		//exit(var_dump($wallet));
 		
 		// Get branch name
 		$branch = $this->branches->getBranch($filters['branch']);
 		$branch = $branch['nombre'];
 		
 		// Get clients names
-		$from_client = $this->clients->getClient($filters['from_client']);
+		$from_client = $this->clients->getClient($filters['fromClient']);
 		$from_client = $from_client['nombre'];
-		$to_client = $this->clients->getClient($filters['to_client']);
+		$to_client = $this->clients->getClient($filters['toClient']);
 		$to_client = $to_client['nombre'];
 		
 		$cutDate = convertToHumanDate($filters['cutDate']);
 		
+		$data['title'] = 'Reporte de Cartera';
 		$data['clients'] = $clients;
 		$data['from_client'] = $from_client;
 		$data['to_client'] = $to_client;
 		$data['cutDate'] = $cutDate;
+		$data['branch'] = $branch;
+		$data['wallet'] = $wallet;
 				
 		if (count($clients) === 0) {
 			$this->session->set_flashdata('attention', 'No existen facturas con esas especificaciones.');
@@ -139,5 +150,6 @@ class Movimientos extends CI_Controller
 		$html .= $this->load->view('reportes_financieros/movimientos', $data, true);
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
+		
 	}
 }
