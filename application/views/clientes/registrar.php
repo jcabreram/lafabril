@@ -45,7 +45,7 @@
 			
 			<p>
 				<label>Número interior</label>
-				<input class="text-input medium-input" value="<?php echo set_value('num_int'); ?>" type="text" name="num_int" />
+				<input class="text-input small-input" value="<?php echo set_value('num_int'); ?>" type="text" name="num_int" />
 				<?php echo form_error('num_int'); ?>
 			</p>
 			
@@ -105,13 +105,13 @@
 			
 			<p>
 				<label>Límite de crédito *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('lim_credito'); ?>" type="text" name="lim_credito" />
+				$ <input class="text-input small-input" value="<?php echo set_value('lim_credito'); ?>" type="text" name="lim_credito" />
 				<?php echo form_error('lim_credito'); ?>
 			</p>
 			
 			<p>
 				<label>Días de crédito *</label>
-				<input class="text-input medium-input" value="<?php echo set_value('dias_credito'); ?>" type="text" name="dias_credito" />
+				<input class="text-input small-input" value="<?php echo set_value('dias_credito'); ?>" type="text" name="dias_credito" />
 				<?php echo form_error('dias_credito'); ?>
 			</p>
 
