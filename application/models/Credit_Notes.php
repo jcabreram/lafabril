@@ -23,6 +23,31 @@ class Credit_Notes extends CI_Model
 		// Returns the query result as a pure array, or an empty array when no result is produced.
 		return $query->result_array();	
 	}
+	
+	public function getWalletCreditNotes($invoice, $fecha)
+	{
+		$invoice = $this->db->escape(intval($invoice));
+		$fecha = $this->db->escape($fecha);
+		
+
+		$sql = "SELECT
+					fpn.prefijo, 
+					fon.folio, 
+					nc.fecha,
+					ncd.importe
+				FROM facturas AS fa
+				LEFT JOIN notas_credito_detalles AS ncd ON fa.id_factura=ncd.id_factura
+				LEFT JOIN notas_credito AS nc ON ncd.id_nota_credito=nc.id_nota_credito
+				LEFT JOIN folios_prefijo AS fpn ON nc.id_sucursal=fpn.id_sucursal AND fpn.tipo_documento='B'
+				LEFT JOIN folios AS fon ON nc.id_nota_credito=fon.id_documento AND fon.tipo_documento='B'
+				WHERE fa.id_factura = $invoice AND nc.fecha <= $fecha";
+				
+
+		$query = $this->db->query($sql);
+
+		// Returns the query result as a pure array, or an empty array when no result is produced.
+		return $query->result_array();
+	}	
 
 	public function getPreCreditNote($id)
 	{

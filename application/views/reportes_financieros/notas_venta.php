@@ -57,6 +57,5 @@
 		</tr>
 	</tfoot>
 </table>
-<?php else : ?>
-<p>No existen pedidos con esas especificaciones.</p>
+
 <?php endif; ?>
