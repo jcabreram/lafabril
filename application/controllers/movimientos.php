@@ -78,7 +78,7 @@ class Movimientos extends CI_Controller
 
 		// Display views
 		$this->load->view('header', $data);
-		$this->load->view('movimientos/crear_reporte', $data);
+		$this->load->view('movimientos/crear_reporte_cartera', $data);
 		$this->load->view('footer', $data);
 	}
 	
@@ -138,7 +138,7 @@ class Movimientos extends CI_Controller
 		}
 
 		$html = $this->load->view('reportes/header', $data, true);
-		$html .= $this->load->view('reportes_financieros/movimientos', $data, true);
+		$html .= $this->load->view('reportes_financieros/cartera', $data, true);
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
@@ -190,7 +190,7 @@ class Movimientos extends CI_Controller
 				'toClient' => $_POST['to_client']
 			);
 			
-			$this->_makeReport($filters);
+			$this->_makeAntiquityReport($filters);
 		}
 
 		$data['title'] = "Crear Reporte de Cartera";
@@ -213,31 +213,23 @@ class Movimientos extends CI_Controller
 		$this->load->model('payments');
 		$this->load->model('credit_notes');
 		
-
-		$wallet = array();
 		$clients = $this->clients->getWalletClients($filters['branch'], $filters['fromClient'], $filters['toClient'], $filters['cutDate']);
-		
-		$i = 0;
 
-		foreach ($clients as $client) {
-			$clientData = array(
-				'name' => $client['nombre_cliente'],
-				'invoices' => $this->invoices->getWalletInvoices($filters['branch'], $client['id_cliente'], $filters['cutDate'])
-			);
+		foreach ($clients as $i => $client) {
+			$clients[$i]['invoices'] = $this->invoices->getWalletInvoices($filters['branch'], $client['id_cliente'], $filters['cutDate']);
 			
-			$wallet[$i] = $clientData;
+			foreach ($clients[$i]['invoices'] as $j => $invoice) {
+				$datetime1 = new DateTime();
+				$datetime2 = new DateTime($invoice['fecha_vencimiento']);
+				$interval = $datetime1->diff($datetime2);
 
-			foreach($wallet[$i]['invoices'] as $invoiceKey => $invoice) {
-				$wallet[$i]['invoices'][$invoiceKey]['payments'] = 
-				$this->payments->getWalletPayments($invoice['id_factura'], $filters['cutDate']);
-				$wallet[$i]['invoices'][$invoiceKey]['credit_notes'] = 
-				$this->credit_notes->getWalletCreditNotes($invoice['id_factura'], $filters['cutDate']);
+				if ($datetime1 > $datetime2) {
+					$clients[$i]['invoices'][$j]['daysToFallDue'] = 0;
+				} else {
+					$clients[$i]['invoices'][$j]['daysToFallDue'] = $interval->days;
+				}
 			}
-			
-			$i++;
 		}
-		
-		//exit(var_dump($wallet));
 		
 		// Get branch name
 		$branch = $this->branches->getBranch($filters['branch']);
@@ -245,13 +237,13 @@ class Movimientos extends CI_Controller
 		
 		$cutDate = convertToHumanDate($filters['cutDate']);
 		
-		$data['title'] = 'Reporte de Cartera';
+		$data['title'] = 'Reporte de Antiguedad de Saldos';
 		$data['clients'] = $clients;
 		$data['from_client'] = $filters['fromClient'];
 		$data['to_client'] = $filters['toClient'];
 		$data['cutDate'] = $cutDate;
 		$data['branch'] = $branch;
-		$data['wallet'] = $wallet;
+		$data['clients'] = $clients;
 				
 		if (count($clients) === 0) {
 			$this->session->set_flashdata('attention', 'No existen facturas con esas especificaciones.');
@@ -260,7 +252,7 @@ class Movimientos extends CI_Controller
 		}
 
 		$html = $this->load->view('reportes/header', $data, true);
-		$html .= $this->load->view('reportes_financieros/movimientos', $data, true);
+		$html .= $this->load->view('reportes_financieros/antiguedad_saldos', $data, true);
 		$html .= $this->load->view('reportes/footer', $data, true);
 		createPDF($html, 'reporte');
 	}
