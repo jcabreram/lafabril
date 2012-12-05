@@ -131,7 +131,7 @@ class Pagos extends CI_Controller
 			array(
 				'field' => 'pago', 
 				'label' => 'pago', 
-				'rules' => 'required|numeric|callback_check_balance|callback_check_available['.$data['disponible'].']'
+				'rules' => 'required|numeric|callback_checkPrecision|callback_check_balance|callback_check_available['.$data['disponible'].']'
 			)
 		);
 
@@ -175,6 +175,18 @@ class Pagos extends CI_Controller
 		$this->load->view('header', $data);
 		$this->load->view('pagos/agregar_pago_detalles', $data);
 		$this->load->view('footer', $data);
+	}
+	
+	public function checkPrecision($price)
+	{
+		$priceParts = explode('.', $price);
+		
+		if (count($priceParts) === 2 && strlen($priceParts[1]) > 2) {
+			$this->form_validation->set_message('checkPrecision', 'El campo %s no puede tener más de 2 decimales de precisión.');
+			return false;
+		}
+
+		return true;
 	}
 	
 	public function check_balance($payment)
